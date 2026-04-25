@@ -1,0 +1,65 @@
+<div class="board-view" *ngIf="board">
+  <div class="board-header">
+    <button mat-icon-button routerLink="/boards"><mat-icon>arrow_back</mat-icon></button>
+    <h2>{{ board?.title }}</h2>
+    <button mat-raised-button color="primary" (click)="openCreateTaskDialog()">
+      <mat-icon>add</mat-icon> Завдання
+    </button>
+  </div>
+
+  <div class="kanban-columns">
+    <div *ngFor="let column of columns" class="column" cdkDropListGroup>
+      <div class="column-header">
+        <h3>{{ column.name }}</h3>
+      </div>
+      <div cdkDropList
+           [cdkDropListData]="getTasksByStatus(column.status)"
+           [cdkDropListConnectedTo]="getConnectedDropLists()"
+           (cdkDropListDropped)="drop($event, column.status)"
+           class="task-list">
+        <div *ngFor="let task of getTasksByStatus(column.status)" cdkDrag class="task-card">
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-meta">
+            <span *ngIf="task.deadline" [class.overdue]="isOverdue(task.deadline)">
+              📅 {{ task.deadline | date }}
+            </span>
+            <span class="priority" [class]="task.priority.toLowerCase()">
+              {{ task.priority }}
+            </span>
+          </div>
+          <div class="task-actions">
+            <button mat-icon-button (click)="editTask(task)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button (click)="deleteTask(task.id)"><mat-icon>delete</mat-icon></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #taskDialog>
+  <h2 mat-dialog-title>{{ editingTask ? 'Редагувати' : 'Нове завдання' }}</h2>
+  <mat-dialog-content>
+    <mat-form-field appearance="fill"><mat-label>Назва</mat-label><input matInput [(ngModel)]="taskForm.title" required></mat-form-field>
+    <mat-form-field appearance="fill"><mat-label>Опис</mat-label><textarea matInput [(ngModel)]="taskForm.description"></textarea></mat-form-field>
+    <mat-form-field appearance="fill"><mat-label>Дедлайн</mat-label><input matInput type="datetime-local" [(ngModel)]="taskForm.deadline"></mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Пріоритет</mat-label>
+      <mat-select [(ngModel)]="taskForm.priority">
+        <mat-option value="Low">Low</mat-option><mat-option value="Medium">Medium</mat-option>
+        <mat-option value="High">High</mat-option><mat-option value="Critical">Critical</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Статус</mat-label>
+      <mat-select [(ngModel)]="taskForm.status">
+        <mat-option value="ToDo">To Do</mat-option><mat-option value="InProgress">In Progress</mat-option>
+        <mat-option value="Done">Done</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef.close()">Скасувати</button>
+    <button mat-raised-button color="primary" (click)="saveTask()">Зберегти</button>
+  </mat-dialog-actions>
+</ng-template>

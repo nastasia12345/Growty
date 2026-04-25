@@ -1,0 +1,25 @@
+.boards-container {
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.boards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.board-card {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+  .board-card:hover {
+    transform: translateY(-4px);
+  }
