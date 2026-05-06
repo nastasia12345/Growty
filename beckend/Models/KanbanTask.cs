@@ -10,7 +10,7 @@
         public string Status { get; set; } = "ToDo";
         public int BoardId { get; set; }
         public Board? Board { get; set; }
-        public string UserId { get; set; } = "temp-user";
+        public int UserId { get; set; } = 1;
         public DateTime? CompletedAt { get; set; }
     }
 }

@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -38,6 +38,7 @@ import { Board, KanbanTask } from '../../models/board.model';
 export class BoardDetailComponent implements OnInit {
   board: Board | null = null;
   tasks: KanbanTask[] = [];
+
   columns = [
     { name: 'To Do', status: 'ToDo' },
     { name: 'In Progress', status: 'InProgress' },
@@ -49,13 +50,23 @@ export class BoardDetailComponent implements OnInit {
   taskForm: any = { title: '', description: '', deadline: '', priority: 'Medium', status: 'ToDo' };
   editingTask: KanbanTask | null = null;
 
+  filterPeriods = [
+    { label: 'Всі', value: 'all' },
+    { label: 'Сьогодні', value: 'today' },
+    { label: 'Тиждень', value: 'week' },
+    { label: 'Місяць', value: 'month' },
+    { label: 'Виконані', value: 'done' }
+  ];
+
+  activeFilter = 'all';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private boardService: BoardService,
     private taskService: TaskService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef 
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -74,13 +85,41 @@ export class BoardDetailComponent implements OnInit {
     if (this.board) {
       this.taskService.getTasksByBoard(this.board.id).subscribe(tasks => {
         this.tasks = tasks;
-        this.cdr.detectChanges(); // Примусове виявлення змін
+        this.cdr.detectChanges();
       });
     }
   }
 
+  setFilter(value: string) {
+    this.activeFilter = value;
+  }
+
+  getFilteredTasks(): KanbanTask[] {
+    if (!this.tasks) return [];
+    const now = new Date();
+
+    switch (this.activeFilter) {
+      case 'today':
+        return this.tasks.filter(t => t.deadline && new Date(t.deadline).toDateString() === now.toDateString());
+      case 'week': {
+        const weekEnd = new Date(now);
+        weekEnd.setDate(now.getDate() + 7);
+        return this.tasks.filter(t => t.deadline && new Date(t.deadline) <= weekEnd);
+      }
+      case 'month': {
+        const monthEnd = new Date(now);
+        monthEnd.setDate(now.getDate() + 30);
+        return this.tasks.filter(t => t.deadline && new Date(t.deadline) <= monthEnd);
+      }
+      case 'done':
+        return this.tasks.filter(t => t.status === 'Done');
+      default:
+        return this.tasks;
+    }
+  }
+
   getTasksByStatus(status: string): KanbanTask[] {
-    return this.tasks.filter(t => t.status === status);
+    return this.getFilteredTasks().filter(t => t.status === status);
   }
 
   getConnectedDropLists(): string[] {
@@ -90,13 +129,11 @@ export class BoardDetailComponent implements OnInit {
   drop(event: CdkDragDrop<KanbanTask[]>, newStatus: string) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-      this.cdr.detectChanges(); // Оновлюємо порядок в межах колонки
+      this.cdr.detectChanges();
     } else {
       const task = event.previousContainer.data[event.previousIndex];
       this.taskService.moveTask(task.id, newStatus).subscribe({
-        next: () => {
-          this.loadTasks(); // Перезавантажуємо всі завдання
-        },
+        next: () => this.loadTasks(),
         error: (err) => console.error('Помилка переміщення:', err)
       });
     }
@@ -118,18 +155,12 @@ export class BoardDetailComponent implements OnInit {
     const taskData = { ...this.taskForm, boardId: this.board!.id };
     if (this.editingTask) {
       this.taskService.updateTask(this.editingTask.id, taskData).subscribe({
-        next: () => {
-          this.loadTasks();
-          this.dialogRef.close();
-        },
+        next: () => { this.loadTasks(); this.dialogRef.close(); },
         error: (err) => console.error('Помилка оновлення:', err)
       });
     } else {
       this.taskService.createTask(taskData).subscribe({
-        next: () => {
-          this.loadTasks();
-          this.dialogRef.close();
-        },
+        next: () => { this.loadTasks(); this.dialogRef.close(); },
         error: (err) => console.error('Помилка створення:', err)
       });
     }

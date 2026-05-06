@@ -13,6 +13,10 @@ export class TaskService {
     return this.http.get<KanbanTask[]>(`${this.apiUrl}/board/${boardId}`);
   }
 
+  getTask(id: number) {
+    return this.http.get<KanbanTask>(`${this.apiUrl}/${id}`);
+  }
+
   createTask(task: Partial<KanbanTask>): Observable<KanbanTask> {
     return this.http.post<KanbanTask>(this.apiUrl, task);
   }

@@ -8,6 +8,9 @@ namespace beckend.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Board> Boards { get; set; }
         public DbSet<KanbanTask> Tasks { get; set; }
+        public DbSet<UserStats> UserStats { get; set; }
+        public DbSet<TaskFeedback> TaskFeedbacks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Board>()

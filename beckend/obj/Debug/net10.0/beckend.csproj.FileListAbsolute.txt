@@ -157,3 +157,4 @@ D:\growty\beckend\obj\Debug\net10.0\beckend.pdb
 D:\growty\beckend\obj\Debug\net10.0\beckend.genruntimeconfig.cache
 D:\growty\beckend\obj\Debug\net10.0\ref\beckend.dll
 D:\growty\beckend\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+D:\growty\beckend\obj\Debug\net10.0\beckend.sourcelink.json

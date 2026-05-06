@@ -1,0 +1,73 @@
+<div class="analytics-container">
+
+  <!-- Header -->
+  <div class="analytics-header">
+    <h2>📊 Аналітика продуктивності</h2>
+    <p class="subtitle">Статистика за останні 30 днів</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="stat-card completed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ summary.totalCompleted }}</div>
+      <div class="stat-label">Виконано</div>
+    </div>
+    <div class="stat-card overdue">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-value">{{ summary.totalOverdue }}</div>
+      <div class="stat-label">Прострочено</div>
+    </div>
+    <div class="stat-card created">
+      <div class="stat-icon">📝</div>
+      <div class="stat-value">{{ summary.totalCreated }}</div>
+      <div class="stat-label">Створено</div>
+    </div>
+    <div class="stat-card rate">
+      <div class="stat-icon">📈</div>
+      <div class="stat-value">{{ completionRate }}%</div>
+      <div class="stat-label">Завершення</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>📊 Активність по днях</h3>
+        <span class="chart-badge">Стовпчикова</span>
+      </div>
+      <div class="chart-body">
+        <canvas baseChart
+                [data]="barChartData"
+                [options]="barChartOptions"
+                type="bar">
+        </canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>📈 Виконані vs Прострочені</h3>
+        <span class="chart-badge">Лінійна</span>
+      </div>
+      <div class="chart-body">
+        <canvas baseChart
+                [data]="lineChartData"
+                [options]="lineChartOptions"
+                type="line">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button mat-stroked-button (click)="refreshData()">
+      <mat-icon>refresh</mat-icon> Оновити
+    </button>
+    <button mat-raised-button color="primary" (click)="exportData()">
+      <mat-icon>download</mat-icon> Експорт CSV
+    </button>
+  </div>
+</div>

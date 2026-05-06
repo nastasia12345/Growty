@@ -3,16 +3,73 @@
   "WorkspaceRootPath": "D:\\growty\\beckend\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\controllers\\analyticscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:controllers\\analyticscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\services\\statisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:services\\statisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\controllers\\feedbackcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:controllers\\feedbackcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\models\\userstats.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:models\\userstats.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\models\\taskfeedback.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:models\\taskfeedback.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\models\\board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:models\\board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\task-details\\task-details.spec.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\task-details\\task-details.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\controllers\\taskscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:controllers\\taskscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\controllers\\boardscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:controllers\\boardscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\boards\\boards.spec.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\boards\\boards.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\boards\\boards.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\app-routing-module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\app-routing-module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\app-module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\app.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\services\\task.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\services\\feedback.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\boards\\boards.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
@@ -30,9 +87,6 @@
       "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\services\\board.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\services\\task.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{349EC62A-85E3-C852-F5FF-E97A8E3AB0F5}|..\\frontend\\frontend.esproj|d:\\growty\\frontend\\src\\app\\components\\shared\\menu\\menu.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
@@ -47,10 +101,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|d:\\growty\\beckend\\controllers\\boardscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{102E7185-6BD5-1423-8F60-14205448B8D4}|beckend.csproj|solutionrelative:controllers\\boardscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -60,27 +110,256 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AnalyticsController.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Controllers\\AnalyticsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AnalyticsController.cs",
+              "ToolTip": "D:\\growty\\beckend\\Controllers\\AnalyticsController.cs*",
+              "RelativeToolTip": "Controllers\\AnalyticsController.cs*",
+              "ViewState": "AgIAABEAAAAAAAAAAAAwwCYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T22:41:20.601Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TaskFeedback.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Models\\TaskFeedback.cs",
+              "RelativeDocumentMoniker": "Models\\TaskFeedback.cs",
+              "ToolTip": "D:\\growty\\beckend\\Models\\TaskFeedback.cs",
+              "RelativeToolTip": "Models\\TaskFeedback.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T22:40:28.843Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "task-details.spec.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\task-details\\task-details.spec.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\task-details\\task-details.spec.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\task-details\\task-details.spec.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\task-details\\task-details.spec.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-05-06T22:34:02.561Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Board.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Models\\Board.cs",
+              "RelativeDocumentMoniker": "Models\\Board.cs",
+              "ToolTip": "D:\\growty\\beckend\\Models\\Board.cs",
+              "RelativeToolTip": "Models\\Board.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T22:31:24.632Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "boards.css",
-              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.css",
-              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\boards\\boards.css",
-              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.css",
-              "RelativeToolTip": "..\\frontend\\src\\app\\components\\boards\\boards.css",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAwwBkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-23T18:59:51.905Z"
+              "DocumentIndex": 7,
+              "Title": "task-details.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\task-details\\task-details.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\task-details\\task-details.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\task-details\\task-details.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\task-details\\task-details.ts",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAACUAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-26T17:16:12.931Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UserStats.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Models\\UserStats.cs",
+              "RelativeDocumentMoniker": "Models\\UserStats.cs",
+              "ToolTip": "D:\\growty\\beckend\\Models\\UserStats.cs",
+              "RelativeToolTip": "Models\\UserStats.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T17:13:20.248Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "StatisticsService.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Services\\StatisticsService.cs",
+              "RelativeDocumentMoniker": "Services\\StatisticsService.cs",
+              "ToolTip": "D:\\growty\\beckend\\Services\\StatisticsService.cs",
+              "RelativeToolTip": "Services\\StatisticsService.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAAIwEsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T17:12:33.036Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "TasksController.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Controllers\\TasksController.cs",
+              "RelativeDocumentMoniker": "Controllers\\TasksController.cs",
+              "ToolTip": "D:\\growty\\beckend\\Controllers\\TasksController.cs",
+              "RelativeToolTip": "Controllers\\TasksController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T22:32:29.68Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "FeedbackController.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Controllers\\FeedbackController.cs",
+              "RelativeDocumentMoniker": "Controllers\\FeedbackController.cs",
+              "ToolTip": "D:\\growty\\beckend\\Controllers\\FeedbackController.cs",
+              "RelativeToolTip": "Controllers\\FeedbackController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T17:12:43.91Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "boards.spec.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.spec.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\boards\\boards.spec.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.spec.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\components\\boards\\boards.spec.ts",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-05-06T22:29:34.499Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "task.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\services\\task.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\services\\task.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\services\\task.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\services\\task.ts",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABAAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-23T18:17:45.355Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
+              "ToolTip": "D:\\growty\\beckend\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T17:13:38.594Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "app-routing-module.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\app-routing-module.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\app-routing-module.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\app-routing-module.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\app-routing-module.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-23T18:17:15.467Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "BoardsController.cs",
+              "DocumentMoniker": "D:\\growty\\beckend\\Controllers\\BoardsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\BoardsController.cs",
+              "ToolTip": "D:\\growty\\beckend\\Controllers\\BoardsController.cs",
+              "RelativeToolTip": "Controllers\\BoardsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-23T18:30:55.777Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "boards.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\boards\\boards.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\components\\boards\\boards.ts",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAuwCYAAABrAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-23T18:58:04.405Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "board-detail.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
+              "ViewState": "AgIAAHYAAAAAAAAAAAAQwAAAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-23T18:53:32.686Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "feedback.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\services\\feedback.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\services\\feedback.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\services\\feedback.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\services\\feedback.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-26T17:18:31.9Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "app-module.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\app-module.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\app-module.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\app-module.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\app-module.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-26T17:21:37.118Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "app.ts",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\app.ts",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\app.ts",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\app.ts",
+              "RelativeToolTip": "..\\frontend\\src\\app\\app.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-26T17:22:07.755Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
               "Title": "boards.html",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.html",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\boards\\boards.html",
@@ -92,20 +371,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "board-detail.ts",
-              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
-              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
-              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
-              "RelativeToolTip": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.ts",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAABFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-04-23T18:53:32.686Z",
-              "EditorCaption": ""
+              "DocumentIndex": 22,
+              "Title": "boards.css",
+              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.css",
+              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\boards\\boards.css",
+              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.css",
+              "RelativeToolTip": "..\\frontend\\src\\app\\components\\boards\\boards.css",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAwwBkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-23T18:59:51.905Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 20,
               "Title": "board-detail.css",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.css",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.css",
@@ -117,19 +395,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "boards.ts",
-              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.ts",
-              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\boards\\boards.ts",
-              "ToolTip": "D:\\growty\\frontend\\src\\app\\components\\boards\\boards.ts",
-              "RelativeToolTip": "..\\frontend\\src\\app\\components\\boards\\boards.ts",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAACYAAABrAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-04-23T18:58:04.405Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 21,
               "Title": "board-detail.html",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.html",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.html",
@@ -141,7 +407,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 25,
               "Title": "menu.ts",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\shared\\menu\\menu.ts",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\shared\\menu\\menu.ts",
@@ -153,19 +419,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "app-routing-module.ts",
-              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\app-routing-module.ts",
-              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\app-routing-module.ts",
-              "ToolTip": "D:\\growty\\frontend\\src\\app\\app-routing-module.ts",
-              "RelativeToolTip": "..\\frontend\\src\\app\\app-routing-module.ts",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-04-23T18:17:15.467Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 26,
               "Title": "menu.spec.ts",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\shared\\menu\\menu.spec.ts",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\shared\\menu\\menu.spec.ts",
@@ -177,7 +431,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 27,
               "Title": "menu.html",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\shared\\menu\\menu.html",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\shared\\menu\\menu.html",
@@ -189,7 +443,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 23,
               "Title": "board-detail.spec.ts",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\components\\board-detail\\board-detail.spec.ts",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\components\\board-detail\\board-detail.spec.ts",
@@ -201,19 +455,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "BoardsController.cs",
-              "DocumentMoniker": "D:\\growty\\beckend\\Controllers\\BoardsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\BoardsController.cs",
-              "ToolTip": "D:\\growty\\beckend\\Controllers\\BoardsController.cs",
-              "RelativeToolTip": "Controllers\\BoardsController.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAUwB4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-23T18:30:55.777Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 24,
               "Title": "board.ts",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\services\\board.ts",
               "RelativeDocumentMoniker": "..\\frontend\\src\\app\\services\\board.ts",
@@ -225,7 +467,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 29,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\growty\\beckend\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -237,19 +479,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "task.ts",
-              "DocumentMoniker": "D:\\growty\\frontend\\src\\app\\services\\task.ts",
-              "RelativeDocumentMoniker": "..\\frontend\\src\\app\\services\\task.ts",
-              "ToolTip": "D:\\growty\\frontend\\src\\app\\services\\task.ts",
-              "RelativeToolTip": "..\\frontend\\src\\app\\services\\task.ts",
-              "ViewState": "AgIAAAkAAAAAAAAAAAA2wB8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-04-23T18:17:45.355Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 28,
               "Title": "main.ts",
               "DocumentMoniker": "D:\\growty\\frontend\\src\\main.ts",
               "RelativeDocumentMoniker": "..\\frontend\\src\\main.ts",

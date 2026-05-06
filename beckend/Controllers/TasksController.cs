@@ -3,7 +3,6 @@ using beckend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace beckend.Controllers
 {
     [Route("api/[controller]")]
@@ -11,7 +10,7 @@ namespace beckend.Controllers
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly string _tempUserId = "temp-user";
+        private readonly int _tempUserId = 1;
 
         public TasksController(AppDbContext context) => _context = context;
 
@@ -36,14 +35,21 @@ namespace beckend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTask(int id, [FromBody] KanbanTask updated)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
-            if (task == null) return NotFound();
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
+
+            if (task == null)
+                return NotFound();
+
             task.Title = updated.Title;
             task.Description = updated.Description;
             task.Deadline = updated.Deadline;
             task.Priority = updated.Priority;
             task.Status = updated.Status;
-            if (task.Status == "Done") task.CompletedAt = DateTime.UtcNow;
+
+            if (task.Status == "Done")
+                task.CompletedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
             return Ok(task);
         }
@@ -51,10 +57,17 @@ namespace beckend.Controllers
         [HttpPatch("{id}/move")]
         public async Task<IActionResult> MoveTask(int id, [FromBody] string newStatus)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
-            if (task == null) return NotFound();
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
+
+            if (task == null)
+                return NotFound();
+
             task.Status = newStatus;
-            if (newStatus == "Done") task.CompletedAt = DateTime.UtcNow;
+
+            if (newStatus == "Done")
+                task.CompletedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
             return Ok(task);
         }
@@ -62,8 +75,12 @@ namespace beckend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTask(int id)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
-            if (task == null) return NotFound();
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
+
+            if (task == null)
+                return NotFound();
+
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
             return Ok();

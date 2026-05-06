@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("beckend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d64118279b9b2c3ab19306629b1d6a85d9f72503")]
 [assembly: System.Reflection.AssemblyProductAttribute("beckend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("beckend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

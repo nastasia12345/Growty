@@ -1,0 +1,63 @@
+<div class="task-drawer" [class.open]="isOpen">
+  <div class="drawer-header">
+    <h2>{{ task.id ? 'Редагувати завдання' : 'Нове завдання' }}</h2>
+    <button mat-icon-button (click)="close()"><mat-icon>close</mat-icon></button>
+  </div>
+  <div class="drawer-content">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Назва</mat-label>
+      <input matInput [(ngModel)]="task.title" required>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Опис</mat-label>
+      <textarea matInput [(ngModel)]="task.description" rows="3"></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Дедлайн</mat-label>
+      <input matInput [matDatepicker]="dp" [(ngModel)]="deadlineDate">
+      <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+      <mat-datepicker #dp></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Пріоритет</mat-label>
+      <mat-select [(ngModel)]="task.priority">
+        <mat-option value="Low">Low</mat-option>
+        <mat-option value="Medium">Medium</mat-option>
+        <mat-option value="High">High</mat-option>
+        <mat-option value="Critical">Critical</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="checkbox-row">
+      <mat-checkbox [(ngModel)]="isDone" (change)="onStatusChanged()">
+        Виконано
+      </mat-checkbox>
+    </div>
+
+    <div class="feedback-section" *ngIf="isDone && task.id">
+      <h3>Відгук про виконання</h3>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Коментар (необов'язково)</mat-label>
+        <textarea matInput [(ngModel)]="feedbackComment" rows="2"></textarea>
+      </mat-form-field>
+      <div class="star-rating">
+        <span>Оцініть складність:</span>
+        <span *ngFor="let star of [1,2,3,4,5]"
+              (click)="difficultyRating = star"
+              (mouseenter)="hoverRating = star"
+              (mouseleave)="hoverRating = 0">
+          <mat-icon class="star">{{ (hoverRating >= star || difficultyRating >= star) ? 'star' : 'star_border' }}</mat-icon>
+        </span>
+      </div>
+      <button mat-raised-button color="primary" (click)="submitFeedback()" [disabled]="difficultyRating === 0">
+        Зберегти відгук
+      </button>
+    </div>
+
+    <div class="drawer-actions">
+      <button mat-button (click)="close()">Скасувати</button>
+      <button mat-raised-button color="primary" (click)="saveTask()">Зберегти</button>
+      <button mat-raised-button color="warn" (click)="deleteTask()" *ngIf="task.id">Видалити</button>
+    </div>
+  </div>
+</div>
