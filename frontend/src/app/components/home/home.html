@@ -1,0 +1,105 @@
+<div class="home-page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🌱 Growty — твій менеджер задач</div>
+      <h1 class="hero-title">
+        Організуй роботу.<br>
+        <span class="gradient-text">Досягай більшого.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Kanban-дошки, AI-помічник та зручний трекінг задач —
+        все що потрібно для продуктивної роботи в одному місці.
+      </p>
+      <div class="hero-actions">
+        <button mat-raised-button class="cta-btn" (click)="goToBoards()">
+          <mat-icon>rocket_launch</mat-icon>
+          Почати роботу
+        </button>
+        <button mat-stroked-button class="secondary-btn" (click)="goToBoards()">
+          Мої дошки
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">Kanban</span>
+          <span class="stat-label">Дошки</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">AI</span>
+          <span class="stat-label">Помічник</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">∞</span>
+          <span class="stat-label">Завдань</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="kanban-preview">
+        <div class="preview-column todo">
+          <div class="preview-col-header">
+            <span class="dot red"></span> To Do
+          </div>
+          <div class="preview-card">Дизайн головної сторінки</div>
+          <div class="preview-card">Налаштувати CI/CD</div>
+        </div>
+        <div class="preview-column inprogress">
+          <div class="preview-col-header">
+            <span class="dot yellow"></span> In Progress
+          </div>
+          <div class="preview-card active">
+            Розробка API
+            <span class="preview-badge">High</span>
+          </div>
+        </div>
+        <div class="preview-column done">
+          <div class="preview-col-header">
+            <span class="dot green"></span> Done
+          </div>
+          <div class="preview-card done-card">✓ Аналіз вимог</div>
+          <div class="preview-card done-card">✓ Прототип</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="features-header">
+      <h2>Все що тобі потрібно</h2>
+      <p>Потужні інструменти для організації роботи</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let f of features">
+        <div class="feature-icon">
+          <mat-icon>{{ f.icon }}</mat-icon>
+        </div>
+        <h3>{{ f.title }}</h3>
+        <p>{{ f.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BOTTOM -->
+  <section class="cta-section">
+    <div class="cta-card">
+      <h2>Готовий почати?</h2>
+      <p>Твої перші задачі — за одним кліком</p>
+      <button mat-raised-button class="cta-btn-white" (click)="goToBoards()">
+        <mat-icon>add_circle</mat-icon>
+        Перейти до дошок
+      </button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>🌱 Growty — 2026</span>
+  </footer>
+
+</div>

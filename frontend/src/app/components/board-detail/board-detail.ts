@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +13,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { RouterModule } from '@angular/router';
 import { BoardService } from '../../services/board';
 import { TaskService } from '../../services/task';
 import { AIService, AISuggestion } from '../../services/ai';
@@ -24,6 +27,7 @@ import { AiSuggestionDialog } from '../ai-suggestion-dialog/ai-suggestion-dialog
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatIconModule,
     MatButtonModule,
     MatCardModule,
@@ -33,6 +37,7 @@ import { AiSuggestionDialog } from '../ai-suggestion-dialog/ai-suggestion-dialog
     MatDatepickerModule,
     MatNativeDateModule,
     MatSidenavModule,
+    MatTooltipModule,
     DragDropModule
   ],
   templateUrl: './board-detail.html',
@@ -71,6 +76,7 @@ export class BoardDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private boardService: BoardService,
     private taskService: TaskService,
     private aiService: AIService,
@@ -84,47 +90,38 @@ export class BoardDetailComponent implements OnInit {
     this.loadTasks();
   }
 
+  goBack() {
+    this.location.back();
+  }
+
   loadBoard() {
     this.boardService.getBoard(this.boardId).subscribe({
-      next: (data: any) => {
-        this.board = data;
-      },
-      error: (err: any) => {
-        console.error('Помилка завантаження дошки:', err);
-      }
+      next: (data: any) => { this.board = data; },
+      error: (err: any) => console.error('Помилка завантаження дошки:', err)
     });
   }
 
   loadTasks() {
     this.taskService.getTasksByBoard(this.boardId).subscribe({
-      next: (data: any[]) => {
-        this.tasks = this.filterTasks(data);
-      },
-      error: (err: any) => {
-        console.error('Помилка завантаження задач:', err);
-      }
+      next: (data: any[]) => { this.tasks = this.filterTasks(data); },
+      error: (err: any) => console.error('Помилка завантаження задач:', err)
     });
   }
 
   filterTasks(tasks: any[]): any[] {
     if (this.activeFilter === 'all') return tasks;
-
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
     return tasks.filter(task => {
       if (!task.deadline) return false;
       const deadline = new Date(task.deadline);
-
       switch (this.activeFilter) {
         case 'today':
           return deadline >= today && deadline < new Date(today.getTime() + 86400000);
         case 'week':
-          const weekEnd = new Date(today.getTime() + 7 * 86400000);
-          return deadline >= today && deadline <= weekEnd;
+          return deadline >= today && deadline <= new Date(today.getTime() + 7 * 86400000);
         case 'month':
-          const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-          return deadline >= today && deadline <= monthEnd;
+          return deadline >= today && deadline <= new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
         default:
           return true;
       }
@@ -146,13 +143,11 @@ export class BoardDetailComponent implements OnInit {
 
   drop(event: any, newStatus: string) {
     const task = event.previousContainer.data[event.previousIndex];
-    if (task.status !== newStatus) {
+    if (task && task.status !== newStatus) {
       this.taskService.updateTaskStatus(task.id, newStatus).subscribe({
         next: () => {
           task.status = newStatus;
-          if (newStatus === 'Done') {
-            task.completedAt = new Date().toISOString();
-          }
+          if (newStatus === 'Done') task.completedAt = new Date().toISOString();
           this.loadTasks();
         },
         error: (err: any) => console.error('Помилка оновлення статусу:', err)
@@ -162,13 +157,7 @@ export class BoardDetailComponent implements OnInit {
 
   openCreateTaskDialog() {
     this.editingTask = null;
-    this.taskForm = {
-      title: '',
-      description: '',
-      deadline: '',
-      priority: 'Medium',
-      status: 'ToDo'
-    };
+    this.taskForm = { title: '', description: '', deadline: '', priority: 'Medium', status: 'ToDo' };
   }
 
   editTask(task: any) {
@@ -187,24 +176,14 @@ export class BoardDetailComponent implements OnInit {
       alert('Введіть назву задачі');
       return;
     }
-
     if (this.editingTask) {
       this.taskService.updateTask(this.editingTask.id, this.taskForm).subscribe({
-        next: () => {
-          this.loadTasks();
-          this.resetForm();
-        },
+        next: () => { this.loadTasks(); this.resetForm(); },
         error: (err: any) => console.error('Помилка оновлення:', err)
       });
     } else {
-      this.taskService.createTask({
-        ...this.taskForm,
-        boardId: this.boardId
-      }).subscribe({
-        next: () => {
-          this.loadTasks();
-          this.resetForm();
-        },
+      this.taskService.createTask({ ...this.taskForm, boardId: this.boardId }).subscribe({
+        next: () => { this.loadTasks(); this.resetForm(); },
         error: (err: any) => console.error('Помилка створення:', err)
       });
     }
@@ -221,40 +200,22 @@ export class BoardDetailComponent implements OnInit {
 
   resetForm() {
     this.editingTask = null;
-    this.taskForm = {
-      title: '',
-      description: '',
-      deadline: '',
-      priority: 'Medium',
-      status: 'ToDo'
-    };
+    this.taskForm = { title: '', description: '', deadline: '', priority: 'Medium', status: 'ToDo' };
   }
 
   openAISuggestion(task: any) {
-    if (!this.aiService) {
-      console.error('AIService не ініціалізовано');
-      return;
-    }
-
     this.aiLoadingTaskId = task.id;
-
     this.aiService.improveTask(task.id).subscribe({
       next: (suggestion: AISuggestion) => {
         this.aiLoadingTaskId = null;
         this.cdr.detectChanges();
-
         const dialogRef = this.dialog.open(AiSuggestionDialog, {
           width: '700px',
-          data: {
-            task: task,
-            suggestion: suggestion
-          }
+          maxWidth: '95vw',
+          data: { task, suggestion }
         });
-
         dialogRef.afterClosed().subscribe((result: any) => {
-          if (result?.accepted) {
-            this.loadTasks();
-          }
+          if (result?.accepted) this.loadTasks();
         });
       },
       error: (err: any) => {
@@ -268,10 +229,10 @@ export class BoardDetailComponent implements OnInit {
 
   isOverdue(deadline: string): boolean {
     if (!deadline) return false;
-    const deadlineDate = new Date(deadline);
+    const d = new Date(deadline);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    deadlineDate.setHours(0, 0, 0, 0);
-    return deadlineDate < today && deadlineDate.getTime() !== today.getTime();
+    d.setHours(0, 0, 0, 0);
+    return d < today;
   }
 }

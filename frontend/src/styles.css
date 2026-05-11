@@ -1,12 +1,61 @@
-html,
-body {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mat card override */
+mat-card {
+  font-family: 'Inter', 'Roboto', sans-serif !important;
+}
+
+/* Mat button text fix */
+.mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
+  font-family: 'Inter', 'Roboto', sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+/* Drag-and-drop placeholder */
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .task-card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

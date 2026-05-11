@@ -1,11 +1,115 @@
+.toolbar {
+  background: white !important;
+  border-bottom: 1px solid #f1f5f9;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-toggle {
+  color: #374151;
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.brand-name {
+  color: #10b981;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 24px;
+}
+
+.desktop-nav a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  transition: 0.2s;
+}
+
+.desktop-nav a mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.desktop-nav a:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.desktop-nav a.active-link {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
 .spacer {
   flex: 1 1 auto;
 }
 
-mat-sidenav-container {
+/* Sidenav */
+.sidenav-container {
   height: calc(100vh - 64px);
 }
 
-mat-sidenav {
-  width: 250px;
+.sidenav {
+  width: 260px;
+  background: white;
+  border-right: 1px solid #f1f5f9;
+}
+
+.sidenav-brand {
+  padding: 24px 20px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 8px;
+}
+
+mat-nav-list a.active-item {
+  background: #ecfdf5 !important;
+  color: #10b981 !important;
+  border-radius: 12px;
+}
+
+mat-nav-list a.active-item mat-icon {
+  color: #10b981 !important;
+}
+
+/* Hide desktop nav on mobile */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .menu-toggle {
+    display: none;
+  }
 }

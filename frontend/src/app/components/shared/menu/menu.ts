@@ -23,10 +23,5 @@ import { MatListModule } from '@angular/material/list';
   styleUrls: ['./menu.css']
 })
 export class MenuComponent {
-  isLoggedIn = true;
   @ViewChild('sidenav') sidenav!: MatSidenav;
-
-  logout() {
-    // майбутня логіка
-  }
 }

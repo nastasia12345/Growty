@@ -1,37 +1,44 @@
-<mat-toolbar color="primary">
-  <button mat-icon-button (click)="sidenav.toggle()" *ngIf="isLoggedIn">
+<mat-toolbar class="toolbar">
+  <button mat-icon-button (click)="sidenav.toggle()" class="menu-toggle">
     <mat-icon>menu</mat-icon>
   </button>
-  <span>🌱 KanbanPlant</span>
+
+  <a class="brand" routerLink="/">
+    🌱 <span class="brand-name">Growty</span>
+  </a>
+
+  <!-- Desktop nav links -->
+  <nav class="desktop-nav">
+    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">
+      <mat-icon>home</mat-icon> Головна
+    </a>
+    <a routerLink="/boards" routerLinkActive="active-link">
+      <mat-icon>dashboard</mat-icon> Дошки
+    </a>
+  </nav>
+
   <span class="spacer"></span>
-  <!-- Тимчасово без логіна – просто кнопка виходу для очищення -->
-  <button mat-button *ngIf="isLoggedIn" (click)="logout()">Вийти</button>
 </mat-toolbar>
 
-<mat-sidenav-container *ngIf="isLoggedIn">
-  <mat-sidenav #sidenav mode="over">
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="over" class="sidenav">
+    <div class="sidenav-brand">
+      🌱 <strong>Growty</strong>
+    </div>
     <mat-nav-list>
-      <a mat-list-item routerLink="/boards" (click)="sidenav.close()">
-        <mat-icon>dashboard</mat-icon> Дошки
+      <a mat-list-item routerLink="/" routerLinkActive="active-item"
+         [routerLinkActiveOptions]="{exact:true}" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <span matListItemTitle>Головна</span>
       </a>
-      <a mat-list-item routerLink="/calendar" (click)="sidenav.close()">
-        <mat-icon>calendar_today</mat-icon> Календар
-      </a>
-      <a mat-list-item routerLink="/plant" (click)="sidenav.close()">
-        <mat-icon>local_florist</mat-icon> Рослинка
-      </a>
-      <a mat-list-item routerLink="/analytics" routerLinkActive="active">
-        <mat-icon>analytics</mat-icon> Аналітика
+      <a mat-list-item routerLink="/boards" routerLinkActive="active-item" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Дошки</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
+
   <mat-sidenav-content>
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>
-
-<div *ngIf="!isLoggedIn" style="padding: 2rem; text-align: center;">
-  <h2>Ласкаво просимо!</h2>
-  <button mat-raised-button color="primary" routerLink="/boards">Увійти як гість</button>
-  <p style="margin-top: 1rem;">(Поки що без реєстрації – використовується тимчасовий користувач)</p>
-</div>

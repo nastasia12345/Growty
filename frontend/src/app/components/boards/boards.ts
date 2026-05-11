@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { BoardService } from '../../services/board';
 import { Board } from '../../models/board.model';
@@ -23,6 +24,7 @@ import { Board } from '../../models/board.model';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatTooltipModule,
     FormsModule
   ],
   templateUrl: './boards.html',

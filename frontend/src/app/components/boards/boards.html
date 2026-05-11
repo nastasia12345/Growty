@@ -5,66 +5,53 @@
       <h1>Мої дошки</h1>
       <p>Організуй свої проєкти та завдання</p>
     </div>
-
-    <button mat-raised-button
-            color="primary"
-            class="create-btn"
-            (click)="createBoard()">
-
+    <button mat-raised-button color="primary" class="create-btn" (click)="createBoard()">
       <mat-icon>add</mat-icon>
       Нова дошка
     </button>
   </div>
 
-  <div class="boards-grid">
+  <!-- Empty state -->
+  <div *ngIf="boards.length === 0" class="empty-state">
+    <mat-icon>dashboard_customize</mat-icon>
+    <h3>Ще немає дошок</h3>
+    <p>Створи свою першу дошку, щоб почати організовувати завдання</p>
+    <button mat-raised-button color="primary" class="create-btn" (click)="createBoard()">
+      <mat-icon>add</mat-icon>
+      Створити дошку
+    </button>
+  </div>
 
+  <!-- Boards grid -->
+  <div class="boards-grid" *ngIf="boards.length > 0">
     <mat-card *ngFor="let board of boards"
               class="board-card"
               [routerLink]="['/board', board.id]">
 
       <div class="board-card-top">
-        <div class="board-icon">
-          🌱
-        </div>
-
+        <div class="board-icon">🌱</div>
         <div class="board-menu">
-          <button mat-icon-button
-                  (click)="editBoard(board); $event.stopPropagation()">
-
+          <button mat-icon-button (click)="editBoard(board); $event.stopPropagation()" matTooltip="Редагувати">
             <mat-icon>edit</mat-icon>
           </button>
-
-          <button mat-icon-button
-                  (click)="deleteBoard(board.id); $event.stopPropagation()">
-
+          <button mat-icon-button color="warn" (click)="deleteBoard(board.id); $event.stopPropagation()" matTooltip="Видалити">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       </div>
 
       <mat-card-content>
-
         <h2>{{ board.title }}</h2>
-
-        <p>
-          {{ board.description || 'Без опису' }}
-        </p>
-
+        <p>{{ board.description || 'Без опису' }}</p>
         <div class="board-footer">
-          <span>
-            {{ board.createdAt | date:'dd.MM.yyyy' }}
-          </span>
-
+          <span>{{ board.createdAt | date:'dd.MM.yyyy' }}</span>
           <div class="open-board">
-            Відкрити
-            <mat-icon>arrow_forward</mat-icon>
+            Відкрити <mat-icon>arrow_forward</mat-icon>
           </div>
         </div>
-
       </mat-card-content>
 
     </mat-card>
-
   </div>
 
 </div>
