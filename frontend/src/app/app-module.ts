@@ -8,21 +8,14 @@ import { App } from './app';
 //import { MenuComponent } from './components/shared/menu/menu';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AiSuggestionDialog } from './components/ai-suggestion-dialog/ai-suggestion-dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+
 
 @NgModule({
-  declarations: [
-   
-  ],
-  imports: [
-    BrowserModule,
-    App,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-  ],
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-  ],
-  bootstrap: [App]
+  declarations: [],
+  imports: [BrowserModule, AppRoutingModule, BrowserAnimationsModule, HttpClientModule, AiSuggestionDialog, MatDialogModule],
+  providers: [provideBrowserGlobalErrorListeners()],
+  bootstrap: [App],
 })
-export class AppModule { }
+export class AppModule {}

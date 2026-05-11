@@ -9,8 +9,8 @@ namespace beckend.Services
         Task UpdateAfterTaskCreated(int userId, DateTime createdDate);
         Task UpdateAfterTaskCompleted(int userId, DateTime completedDate);
         Task UpdateOverdueStatsDaily();
-        Task<UserStats[]> GetUserStats(int userId, DateTime from, DateTime to);
-        Task<UserStats> GetOrCreateStats(int userId, DateTime date);
+        Task<UserStat[]> GetUserStats(int userId, DateTime from, DateTime to);
+        Task<UserStat> GetOrCreateStats(int userId, DateTime date);
     }
 
     public class StatisticsService : IStatisticsService
@@ -54,7 +54,7 @@ namespace beckend.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<UserStats[]> GetUserStats(int userId, DateTime from, DateTime to)
+        public async Task<UserStat[]> GetUserStats(int userId, DateTime from, DateTime to)
         {
             return await _context.UserStats
                 .Where(s => s.UserId == userId && s.Date >= from.Date && s.Date <= to.Date)
@@ -62,12 +62,12 @@ namespace beckend.Services
                 .ToArrayAsync();
         }
 
-        public async Task<UserStats> GetOrCreateStats(int userId, DateTime date)
+        public async Task<UserStat> GetOrCreateStats(int userId, DateTime date)
         {
             var stats = await _context.UserStats.FirstOrDefaultAsync(s => s.UserId == userId && s.Date == date);
             if (stats == null)
             {
-                stats = new UserStats { UserId = userId, Date = date };
+                stats = new UserStat { UserId = userId, Date = date };
                 _context.UserStats.Add(stats);
             }
             return stats;

@@ -1,34 +1,70 @@
 <div class="boards-container">
-  <div class="header">
-    <h2>Мої дошки</h2>
-    <button mat-raised-button color="primary" (click)="createBoard()">
-      <mat-icon>add</mat-icon> Нова дошка
+
+  <div class="boards-header">
+    <div>
+      <h1>Мої дошки</h1>
+      <p>Організуй свої проєкти та завдання</p>
+    </div>
+
+    <button mat-raised-button
+            color="primary"
+            class="create-btn"
+            (click)="createBoard()">
+
+      <mat-icon>add</mat-icon>
+      Нова дошка
     </button>
   </div>
 
   <div class="boards-grid">
+
     <mat-card *ngFor="let board of boards"
               class="board-card"
               [routerLink]="['/board', board.id]">
-      <mat-card-header>
-        <mat-card-title>{{ board.title }}</mat-card-title>
-        <mat-card-subtitle>
-          Створено: {{ board.createdAt | date }}
-        </mat-card-subtitle>
-      </mat-card-header>
+
+      <div class="board-card-top">
+        <div class="board-icon">
+          🌱
+        </div>
+
+        <div class="board-menu">
+          <button mat-icon-button
+                  (click)="editBoard(board); $event.stopPropagation()">
+
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <button mat-icon-button
+                  (click)="deleteBoard(board.id); $event.stopPropagation()">
+
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
 
       <mat-card-content>
-        <p>{{ board.description || 'Без опису' }}</p>
+
+        <h2>{{ board.title }}</h2>
+
+        <p>
+          {{ board.description || 'Без опису' }}
+        </p>
+
+        <div class="board-footer">
+          <span>
+            {{ board.createdAt | date:'dd.MM.yyyy' }}
+          </span>
+
+          <div class="open-board">
+            Відкрити
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+
       </mat-card-content>
 
-      <mat-card-actions align="end">
-        <button mat-icon-button (click)="editBoard(board); $event.stopPropagation()">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button (click)="deleteBoard(board.id); $event.stopPropagation()">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-card-actions>
     </mat-card>
+
   </div>
+
 </div>

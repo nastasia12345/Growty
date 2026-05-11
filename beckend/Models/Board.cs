@@ -1,14 +1,22 @@
-﻿namespace beckend.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace beckend.Models;
+
+public partial class Board
 {
-   
-        public class Board
-        {
-            public int Id { get; set; }
-            public string Title { get; set; } = string.Empty;
-            public string? Description { get; set; }
-            public int UserId { get; set; } = 1;
-            public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-            public ICollection<KanbanTask> Tasks { get; set; } = new List<KanbanTask>();
-        }
-        
+    public int Id { get; set; }
+
+    public string Title { get; set; } = null!;
+
+    public string? Description { get; set; }
+
+    public int UserId { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    // ЗМІНЕНО: Tasks -> BoardTasks
+    public virtual ICollection<KanbanTask> BoardTasks { get; set; } = new List<KanbanTask>();
+
+    public virtual User? User { get; set; }
 }

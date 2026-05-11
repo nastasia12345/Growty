@@ -1,16 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Board } from '../models/board.model';
 
-@Injectable({ providedIn: 'root' })
+export interface Board {
+  id: number;
+  title: string;
+  description: string;
+  userId: number;
+  createdAt: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class BoardService {
-  private apiUrl = 'https://localhost:5001/api/boards'; // зміни порт якщо треба
+  private apiUrl = 'https://localhost:5001/api/boards';
 
   constructor(private http: HttpClient) { }
 
   getBoards(): Observable<Board[]> {
     return this.http.get<Board[]>(this.apiUrl);
+  }
+
+  getBoard(id: number): Observable<Board> {
+    return this.http.get<Board>(`${this.apiUrl}/${id}`);
   }
 
   createBoard(board: Partial<Board>): Observable<Board> {

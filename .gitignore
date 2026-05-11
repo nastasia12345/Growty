@@ -1,0 +1,24 @@
+# .NET build output
+beckend/bin/
+beckend/obj/
+beckend/.vs/
+beckend/*.user
+
+# Angular build output
+frontend/dist/
+frontend/.angular/
+frontend/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment / secrets
+appsettings.Development.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/

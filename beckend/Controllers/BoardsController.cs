@@ -20,12 +20,40 @@ namespace beckend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBoards()
         {
-            var boards = await _context.Boards
-                .Include(b => b.Tasks)
-                .Where(b => b.UserId == _tempUserId)
-                .ToListAsync();
+            try
+            {
+                // Тимчасово без Include, тільки дошки
+                var boards = await _context.Boards
+                     .Include(b => b.BoardTasks)
+                    .Where(b => b.UserId == _tempUserId)
+                    .ToListAsync();
 
-            return Ok(boards);
+                return Ok(boards);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBoard(int id)
+        {
+            try
+            {
+                var board = await _context.Boards
+                    .Include(b => b.BoardTasks)
+                    .FirstOrDefaultAsync(b => b.Id == id && b.UserId == _tempUserId);
+
+                if (board == null)
+                    return NotFound();
+
+                return Ok(board);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         [HttpPost]

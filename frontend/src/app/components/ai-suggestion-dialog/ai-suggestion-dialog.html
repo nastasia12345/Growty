@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>
+  <mat-icon>auto_awesome</mat-icon>
+  AI Покращення задачі
+</h2>
+
+<mat-dialog-content>
+  <div class="confidence-badge" [class.high]="data.suggestion.confidence > 70">
+    Впевненість AI: {{ data.suggestion.confidence }}%
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Оригінальний опис -->
+  <div class="section">
+    <h3>📝 Оригінальний опис:</h3>
+    <div class="original-text">
+      {{ data.task.description || 'Опис відсутній' }}
+    </div>
+  </div>
+
+  <!-- Покращений опис -->
+  <div class="section">
+    <h3>✨ Покращений опис (AI):</h3>
+    <div class="improved-text">
+      {{ data.suggestion.improvedText }}
+    </div>
+    <mat-checkbox [(ngModel)]="applyDescription">
+      Застосувати покращений опис
+    </mat-checkbox>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Підзадачі -->
+  <div class="section" *ngIf="data.suggestion.subtasks?.length">
+    <h3>📋 Запропоновані підзадачі:</h3>
+    <ul class="subtasks-list">
+      <li *ngFor="let subtask of data.suggestion.subtasks">
+        <mat-icon>check_circle_outline</mat-icon>
+        {{ subtask }}
+      </li>
+    </ul>
+    <mat-checkbox [(ngModel)]="applySubtasks">
+      Додати підзадачі
+    </mat-checkbox>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="rejectSuggestion()">
+    <mat-icon>close</mat-icon>
+    Відхилити
+  </button>
+  <button mat-raised-button color="primary" (click)="acceptSuggestion()">
+    <mat-icon>check</mat-icon>
+    Прийняти зміни
+  </button>
+</mat-dialog-actions>

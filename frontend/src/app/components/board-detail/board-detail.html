@@ -1,107 +1,234 @@
-<div class="board-view" *ngIf="board">
-  <!-- Header -->
-  <div class="board-header">
-    <button mat-icon-button routerLink="/boards" class="back-btn">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h2>{{ board.title }}</h2>
-    <button mat-raised-button color="primary" (click)="openCreateTaskDialog()">
-      <mat-icon>add</mat-icon> Завдання
-    </button>
-  </div>
+<mat-drawer-container class="drawer-container">
 
-  <!-- Filter Tabs -->
-  <div class="filter-tabs">
-    <button *ngFor="let period of filterPeriods"
-            [class.active]="activeFilter === period.value"
-            (click)="setFilter(period.value)">
-      {{ period.label }}
-    </button>
-  </div>
+  <!-- =========================
+       SIDEBAR (CREATE / EDIT)
+  ========================== -->
 
-  <!-- Kanban Columns -->
-  <div class="kanban-columns">
-    <div *ngFor="let column of columns" class="column">
-      <div class="column-header">
-        <h3>{{ column.name }}</h3>
-        <span class="column-count">{{ getTasksByStatus(column.status).length }}</span>
+  <mat-drawer #drawer
+              mode="over"
+              position="end"
+              class="task-sidebar">
+
+    <!-- HEADER -->
+    <div class="sidebar-header">
+
+      <div>
+        <h2>
+          {{ editingTask ? 'Редагувати завдання' : 'Нове завдання' }}
+        </h2>
+
+        <p>
+          {{ editingTask ? 'Онови дані завдання' : 'Створи нове завдання' }}
+        </p>
       </div>
 
-      <div cdkDropList
-           [cdkDropListData]="getTasksByStatus(column.status)"
-           [cdkDropListConnectedTo]="getConnectedDropLists()"
-           (cdkDropListDropped)="drop($event, column.status)"
-           class="task-list">
+      <button mat-icon-button (click)="drawer.close()">
+        <mat-icon>close</mat-icon>
+      </button>
 
-        <div *ngFor="let task of getTasksByStatus(column.status)"
-             cdkDrag
-             class="task-card">
-
-          <div class="task-title">{{ task.title }}</div>
-
-          <div class="task-meta">
-            <span *ngIf="task.deadline" class="deadline" [class.overdue]="isOverdue(task.deadline)">
-              📅 {{ task.deadline | date:'dd.MM.yyyy' }}
-            </span>
-            <span class="priority" [class]="task.priority.toLowerCase()">
-              {{ task.priority }}
-            </span>
-          </div>
-
-          <div class="task-actions">
-            <button mat-icon-button (click)="editTask(task); $event.stopPropagation()">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button (click)="deleteTask(task.id); $event.stopPropagation()">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-
-        <div *ngIf="getTasksByStatus(column.status).length === 0" class="empty-column">
-          Немає завдань
-        </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<!-- Task Dialog -->
-<ng-template #taskDialog>
-  <h2 mat-dialog-title>{{ editingTask ? 'Редагувати' : 'Нове завдання' }}</h2>
-  <mat-dialog-content>
-    <mat-form-field appearance="outline">
-      <mat-label>Назва</mat-label>
-      <input matInput [(ngModel)]="taskForm.title" required>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Опис</mat-label>
-      <textarea matInput [(ngModel)]="taskForm.description" rows="3"></textarea>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Дедлайн</mat-label>
-      <input matInput type="datetime-local" [(ngModel)]="taskForm.deadline">
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Пріоритет</mat-label>
-      <mat-select [(ngModel)]="taskForm.priority">
-        <mat-option value="Low">Low</mat-option>
-        <mat-option value="Medium">Medium</mat-option>
-        <mat-option value="High">High</mat-option>
-        <mat-option value="Critical">Critical</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Статус</mat-label>
-      <mat-select [(ngModel)]="taskForm.status">
-        <mat-option value="ToDo">To Do</mat-option>
-        <mat-option value="InProgress">In Progress</mat-option>
-        <mat-option value="Done">Done</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-button (click)="dialogRef.close()">Скасувати</button>
-    <button mat-raised-button color="primary" (click)="saveTask()">Зберегти</button>
-  </mat-dialog-actions>
-</ng-template>
+    <!-- FORM -->
+    <div class="sidebar-form">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Назва</mat-label>
+        <input matInput [(ngModel)]="taskForm.title">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Опис</mat-label>
+        <textarea matInput rows="4"
+                  [(ngModel)]="taskForm.description"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Дедлайн</mat-label>
+        <input matInput type="datetime-local"
+               [(ngModel)]="taskForm.deadline">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Пріоритет</mat-label>
+        <mat-select [(ngModel)]="taskForm.priority">
+          <mat-option value="Low">Low</mat-option>
+          <mat-option value="Medium">Medium</mat-option>
+          <mat-option value="High">High</mat-option>
+          <mat-option value="Critical">Critical</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Статус</mat-label>
+        <mat-select [(ngModel)]="taskForm.status">
+          <mat-option value="ToDo">To Do</mat-option>
+          <mat-option value="InProgress">In Progress</mat-option>
+          <mat-option value="Done">Done</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="sidebar-actions">
+
+      <button mat-button
+              class="cancel-btn"
+              (click)="drawer.close()">
+        Скасувати
+      </button>
+
+      <button mat-raised-button
+              color="primary"
+              class="save-btn"
+              (click)="saveTask()">
+
+        {{ editingTask ? 'Оновити' : 'Створити' }}
+
+      </button>
+
+    </div>
+
+  </mat-drawer>
+
+  <!-- =========================
+       MAIN BOARD
+  ========================== -->
+
+  <div class="board-view">
+
+    <!-- HEADER -->
+    <div class="board-header">
+
+      <div class="board-title">
+
+        <button mat-icon-button routerLink="/boards">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        <div>
+          <h1>{{ board?.title }}</h1>
+          <p>Kanban board</p>
+        </div>
+
+      </div>
+
+      <button mat-raised-button
+              color="primary"
+              (click)="openCreateTaskDialog(); drawer.open()">
+
+        <mat-icon>add</mat-icon>
+        Створити завдання
+
+      </button>
+
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-tabs">
+
+      <button *ngFor="let period of filterPeriods"
+              [class.active]="activeFilter === period.value"
+              (click)="setFilter(period.value)">
+
+        {{ period.label }}
+
+      </button>
+
+    </div>
+
+    <!-- =========================
+         KANBAN
+    ========================== -->
+
+    <div class="kanban-columns">
+
+      <div *ngFor="let column of columns"
+           class="column">
+
+        <div class="column-header">
+
+          <h3>{{ column.name }}</h3>
+
+          <span class="column-count">
+            {{ getTasksByStatus(column.status).length }}
+          </span>
+
+        </div>
+
+        <div class="task-list"
+             cdkDropList
+             [cdkDropListData]="getTasksByStatus(column.status)"
+             [cdkDropListConnectedTo]="getConnectedDropLists()"
+             (cdkDropListDropped)="drop($event, column.status)">
+
+          <div *ngFor="let task of getTasksByStatus(column.status)"
+               class="task-card"
+               cdkDrag>
+
+            <div class="task-title">
+              {{ task.title }}
+            </div>
+
+            <div class="task-description">
+              {{ task.description }}
+            </div>
+
+            <div class="task-meta">
+
+              <span class="priority"
+                    [ngClass]="task.priority.toLowerCase()">
+
+                {{ task.priority }}
+
+              </span>
+
+              <span class="deadline"
+                    [class.overdue]="isOverdue(task.deadline)">
+                {{ task.deadline | date:'dd.MM.yyyy HH:mm' }}
+              </span>
+
+            </div>
+
+            <div class="task-actions">
+
+              <button mat-icon-button
+                      (click)="editTask(task); drawer.open()">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      color="warn"
+                      (click)="deleteTask(task.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="task-card" *ngFor="let task of tasks">
+    <div class="task-title">
+      {{ task.title }}
+
+      <!-- Кнопка AI -->
+      <button mat-icon-button
+              (click)="openAISuggestion(task)"
+              [disabled]="aiLoadingTaskId === task.id"
+              matTooltip="Покращити опис за допомогою AI">
+        <mat-icon *ngIf="aiLoadingTaskId !== task.id">auto_awesome</mat-icon>
+        <mat-icon *ngIf="aiLoadingTaskId === task.id" class="spinner">autorenew</mat-icon>
+      </button>
+    </div>
+    <div class="task-description">{{ task.description }}</div>
+  </div>
+
+</mat-drawer-container>

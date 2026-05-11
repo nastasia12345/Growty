@@ -1,16 +1,33 @@
-﻿namespace beckend.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace beckend.Models;
+
+public partial class KanbanTask
 {
-    public class KanbanTask
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public DateTime? Deadline { get; set; }
-        public string Priority { get; set; } = "Medium";
-        public string Status { get; set; } = "ToDo";
-        public int BoardId { get; set; }
-        public Board? Board { get; set; }
-        public int UserId { get; set; } = 1;
-        public DateTime? CompletedAt { get; set; }
-    }
+    public int Id { get; set; }
+
+    public string Title { get; set; } = null!;
+
+    public string? Description { get; set; }
+
+    public DateTime? Deadline { get; set; }
+
+    public string Priority { get; set; } = null!;
+
+    public string Status { get; set; } = null!;
+
+    public int BoardId { get; set; }
+
+    public int UserId { get; set; }
+
+    public DateTime? CompletedAt { get; set; }
+
+    public virtual ICollection<Aisuggestion> Aisuggestions { get; set; } = new List<Aisuggestion>();
+
+    public virtual Board? Board { get; set; }
+
+    public virtual ICollection<TaskFeedback> TaskFeedbacks { get; set; } = new List<TaskFeedback>();
+
+    public virtual User? User { get; set; }
 }

@@ -5,7 +5,6 @@ import { MenuComponent } from './components/shared/menu/menu';
   selector: 'app-root',
   templateUrl: './app.html',
   imports: [MenuComponent],
-  standalone: true,
   styleUrl: './app.css'
 
 })

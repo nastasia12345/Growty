@@ -1,35 +1,43 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { KanbanTask } from '../models/board.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class TaskService {
   private apiUrl = 'https://localhost:5001/api/tasks';
 
   constructor(private http: HttpClient) { }
 
-  getTasksByBoard(boardId: number): Observable<KanbanTask[]> {
-    return this.http.get<KanbanTask[]>(`${this.apiUrl}/board/${boardId}`);
+  getTasksByBoard(boardId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/board/${boardId}`);
   }
 
-  getTask(id: number) {
-    return this.http.get<KanbanTask>(`${this.apiUrl}/${id}`);
+  getTask(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  createTask(task: Partial<KanbanTask>): Observable<KanbanTask> {
-    return this.http.post<KanbanTask>(this.apiUrl, task);
+  createTask(task: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, task);
   }
 
-  updateTask(id: number, task: Partial<KanbanTask>): Observable<KanbanTask> {
-    return this.http.put<KanbanTask>(`${this.apiUrl}/${id}`, task);
+  updateTask(id: number, task: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, task);
   }
 
-  moveTask(id: number, newStatus: string): Observable<KanbanTask> {
-    return this.http.patch<KanbanTask>(`${this.apiUrl}/${id}/move`, newStatus);
+  updateTaskStatus(id: number, status: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/move`, `"${status}"`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
-  deleteTask(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  // Додайте цей метод для сумісності
+  moveTask(id: number, newStatus: string): Observable<any> {
+    return this.updateTaskStatus(id, newStatus);
+  }
+
+  deleteTask(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 }

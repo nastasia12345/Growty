@@ -1,43 +1,66 @@
-import { Component, OnInit, TemplateRef, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { BoardService } from '../../services/board';
 import { TaskService } from '../../services/task';
-import { Board, KanbanTask } from '../../models/board.model';
+import { AIService, AISuggestion } from '../../services/ai';
+import { AiSuggestionDialog } from '../ai-suggestion-dialog/ai-suggestion-dialog';
 
 @Component({
   selector: 'app-board-detail',
   standalone: true,
   imports: [
     CommonModule,
-    DatePipe,
-    RouterModule,
     FormsModule,
-    DragDropModule,
+    MatIconModule,
+    MatButtonModule,
+    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatDialogModule,
-    MatIconModule,
-    MatButtonModule
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSidenavModule,
+    DragDropModule
   ],
   templateUrl: './board-detail.html',
   styleUrls: ['./board-detail.css']
 })
 export class BoardDetailComponent implements OnInit {
-  board: Board | null = null;
-  tasks: KanbanTask[] = [];
+  boardId: number = 0;
+  board: any = null;
+  tasks: any[] = [];
+  isLoading: boolean = false;
+  aiLoadingTaskId: number | null = null;
+
+  filterPeriods = [
+    { label: 'Всі', value: 'all' },
+    { label: 'Сьогодні', value: 'today' },
+    { label: 'Тиждень', value: 'week' },
+    { label: 'Місяць', value: 'month' }
+  ];
+  activeFilter: string = 'all';
+
+  taskForm = {
+    title: '',
+    description: '',
+    deadline: '',
+    priority: 'Medium',
+    status: 'ToDo'
+  };
+  editingTask: any = null;
 
   columns = [
     { name: 'To Do', status: 'ToDo' },
@@ -45,137 +68,210 @@ export class BoardDetailComponent implements OnInit {
     { name: 'Done', status: 'Done' }
   ];
 
-  @ViewChild('taskDialog') taskDialog!: TemplateRef<any>;
-  dialogRef: any;
-  taskForm: any = { title: '', description: '', deadline: '', priority: 'Medium', status: 'ToDo' };
-  editingTask: KanbanTask | null = null;
-
-  filterPeriods = [
-    { label: 'Всі', value: 'all' },
-    { label: 'Сьогодні', value: 'today' },
-    { label: 'Тиждень', value: 'week' },
-    { label: 'Місяць', value: 'month' },
-    { label: 'Виконані', value: 'done' }
-  ];
-
-  activeFilter = 'all';
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private boardService: BoardService,
     private taskService: TaskService,
+    private aiService: AIService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardService.getBoards().subscribe(boards => {
-      this.board = boards.find(b => b.id === id) || null;
-      if (this.board) {
-        this.loadTasks();
-      } else {
-        this.router.navigate(['/boards']);
+    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
+    this.loadBoard();
+    this.loadTasks();
+  }
+
+  loadBoard() {
+    this.boardService.getBoard(this.boardId).subscribe({
+      next: (data: any) => {
+        this.board = data;
+      },
+      error: (err: any) => {
+        console.error('Помилка завантаження дошки:', err);
       }
     });
   }
 
   loadTasks() {
-    if (this.board) {
-      this.taskService.getTasksByBoard(this.board.id).subscribe(tasks => {
-        this.tasks = tasks;
-        this.cdr.detectChanges();
-      });
-    }
+    this.taskService.getTasksByBoard(this.boardId).subscribe({
+      next: (data: any[]) => {
+        this.tasks = this.filterTasks(data);
+      },
+      error: (err: any) => {
+        console.error('Помилка завантаження задач:', err);
+      }
+    });
   }
 
-  setFilter(value: string) {
-    this.activeFilter = value;
-  }
+  filterTasks(tasks: any[]): any[] {
+    if (this.activeFilter === 'all') return tasks;
 
-  getFilteredTasks(): KanbanTask[] {
-    if (!this.tasks) return [];
     const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    switch (this.activeFilter) {
-      case 'today':
-        return this.tasks.filter(t => t.deadline && new Date(t.deadline).toDateString() === now.toDateString());
-      case 'week': {
-        const weekEnd = new Date(now);
-        weekEnd.setDate(now.getDate() + 7);
-        return this.tasks.filter(t => t.deadline && new Date(t.deadline) <= weekEnd);
+    return tasks.filter(task => {
+      if (!task.deadline) return false;
+      const deadline = new Date(task.deadline);
+
+      switch (this.activeFilter) {
+        case 'today':
+          return deadline >= today && deadline < new Date(today.getTime() + 86400000);
+        case 'week':
+          const weekEnd = new Date(today.getTime() + 7 * 86400000);
+          return deadline >= today && deadline <= weekEnd;
+        case 'month':
+          const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+          return deadline >= today && deadline <= monthEnd;
+        default:
+          return true;
       }
-      case 'month': {
-        const monthEnd = new Date(now);
-        monthEnd.setDate(now.getDate() + 30);
-        return this.tasks.filter(t => t.deadline && new Date(t.deadline) <= monthEnd);
-      }
-      case 'done':
-        return this.tasks.filter(t => t.status === 'Done');
-      default:
-        return this.tasks;
-    }
+    });
   }
 
-  getTasksByStatus(status: string): KanbanTask[] {
-    return this.getFilteredTasks().filter(t => t.status === status);
+  setFilter(period: string) {
+    this.activeFilter = period;
+    this.loadTasks();
+  }
+
+  getTasksByStatus(status: string): any[] {
+    return this.tasks.filter(task => task.status === status);
   }
 
   getConnectedDropLists(): string[] {
-    return this.columns.map(c => c.status);
+    return this.columns.map(col => col.status);
   }
 
-  drop(event: CdkDragDrop<KanbanTask[]>, newStatus: string) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-      this.cdr.detectChanges();
-    } else {
-      const task = event.previousContainer.data[event.previousIndex];
-      this.taskService.moveTask(task.id, newStatus).subscribe({
-        next: () => this.loadTasks(),
-        error: (err) => console.error('Помилка переміщення:', err)
+  drop(event: any, newStatus: string) {
+    const task = event.previousContainer.data[event.previousIndex];
+    if (task.status !== newStatus) {
+      this.taskService.updateTaskStatus(task.id, newStatus).subscribe({
+        next: () => {
+          task.status = newStatus;
+          if (newStatus === 'Done') {
+            task.completedAt = new Date().toISOString();
+          }
+          this.loadTasks();
+        },
+        error: (err: any) => console.error('Помилка оновлення статусу:', err)
       });
     }
   }
 
   openCreateTaskDialog() {
     this.editingTask = null;
-    this.taskForm = { title: '', description: '', deadline: '', priority: 'Medium', status: 'ToDo' };
-    this.dialogRef = this.dialog.open(this.taskDialog);
+    this.taskForm = {
+      title: '',
+      description: '',
+      deadline: '',
+      priority: 'Medium',
+      status: 'ToDo'
+    };
   }
 
-  editTask(task: KanbanTask) {
+  editTask(task: any) {
     this.editingTask = task;
-    this.taskForm = { ...task, deadline: task.deadline?.slice(0, 16) || '' };
-    this.dialogRef = this.dialog.open(this.taskDialog);
+    this.taskForm = {
+      title: task.title,
+      description: task.description || '',
+      deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '',
+      priority: task.priority,
+      status: task.status
+    };
   }
 
   saveTask() {
-    const taskData = { ...this.taskForm, boardId: this.board!.id };
+    if (!this.taskForm.title.trim()) {
+      alert('Введіть назву задачі');
+      return;
+    }
+
     if (this.editingTask) {
-      this.taskService.updateTask(this.editingTask.id, taskData).subscribe({
-        next: () => { this.loadTasks(); this.dialogRef.close(); },
-        error: (err) => console.error('Помилка оновлення:', err)
+      this.taskService.updateTask(this.editingTask.id, this.taskForm).subscribe({
+        next: () => {
+          this.loadTasks();
+          this.resetForm();
+        },
+        error: (err: any) => console.error('Помилка оновлення:', err)
       });
     } else {
-      this.taskService.createTask(taskData).subscribe({
-        next: () => { this.loadTasks(); this.dialogRef.close(); },
-        error: (err) => console.error('Помилка створення:', err)
+      this.taskService.createTask({
+        ...this.taskForm,
+        boardId: this.boardId
+      }).subscribe({
+        next: () => {
+          this.loadTasks();
+          this.resetForm();
+        },
+        error: (err: any) => console.error('Помилка створення:', err)
       });
     }
   }
 
   deleteTask(id: number) {
-    if (confirm('Видалити завдання?')) {
+    if (confirm('Видалити це завдання?')) {
       this.taskService.deleteTask(id).subscribe({
         next: () => this.loadTasks(),
-        error: (err) => console.error('Помилка видалення:', err)
+        error: (err: any) => console.error('Помилка видалення:', err)
       });
     }
   }
 
+  resetForm() {
+    this.editingTask = null;
+    this.taskForm = {
+      title: '',
+      description: '',
+      deadline: '',
+      priority: 'Medium',
+      status: 'ToDo'
+    };
+  }
+
+  openAISuggestion(task: any) {
+    if (!this.aiService) {
+      console.error('AIService не ініціалізовано');
+      return;
+    }
+
+    this.aiLoadingTaskId = task.id;
+
+    this.aiService.improveTask(task.id).subscribe({
+      next: (suggestion: AISuggestion) => {
+        this.aiLoadingTaskId = null;
+        this.cdr.detectChanges();
+
+        const dialogRef = this.dialog.open(AiSuggestionDialog, {
+          width: '700px',
+          data: {
+            task: task,
+            suggestion: suggestion
+          }
+        });
+
+        dialogRef.afterClosed().subscribe((result: any) => {
+          if (result?.accepted) {
+            this.loadTasks();
+          }
+        });
+      },
+      error: (err: any) => {
+        console.error('AI помилка:', err);
+        this.aiLoadingTaskId = null;
+        this.cdr.detectChanges();
+        alert('Не вдалося отримати пропозицію від AI. Спробуйте пізніше.');
+      }
+    });
+  }
+
   isOverdue(deadline: string): boolean {
-    return new Date(deadline) < new Date();
+    if (!deadline) return false;
+    const deadlineDate = new Date(deadline);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    deadlineDate.setHours(0, 0, 0, 0);
+    return deadlineDate < today && deadlineDate.getTime() !== today.getTime();
   }
 }

@@ -1,0 +1,67 @@
+.confidence-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+  .confidence-badge.high {
+    background-color: #4caf50;
+    color: white;
+  }
+
+.section {
+  margin: 20px 0;
+}
+
+.original-text {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
+  color: #666;
+  font-style: italic;
+  margin: 8px 0;
+}
+
+.improved-text {
+  background-color: #e8f5e9;
+  padding: 12px;
+  border-radius: 8px;
+  color: #2e7d32;
+  margin: 8px 0;
+  white-space: pre-wrap;
+}
+
+.subtasks-list {
+  list-style: none;
+  padding: 0;
+}
+
+  .subtasks-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    margin: 4px 0;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+  }
+
+  .subtasks-list mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #4caf50;
+  }
+
+mat-checkbox {
+  display: block;
+  margin-top: 12px;
+}
+
+mat-dialog-actions {
+  margin-top: 20px;
+  gap: 12px;
+}

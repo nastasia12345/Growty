@@ -18,6 +18,7 @@ namespace beckend.Controllers
         public async Task<IActionResult> GetTasksByBoard(int boardId)
         {
             var tasks = await _context.Tasks
+                .Include(t => t.Board)  // ← Додайте це, якщо потрібен Board
                 .Where(t => t.BoardId == boardId && t.UserId == _tempUserId)
                 .ToListAsync();
             return Ok(tasks);
