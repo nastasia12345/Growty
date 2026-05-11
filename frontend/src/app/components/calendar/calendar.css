@@ -242,6 +242,7 @@
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
+  margin-right: 152px;
 }
 
 .gcal-left {
@@ -417,6 +418,7 @@
   .gcal-card {
     flex-direction: column;
     align-items: flex-start;
+    margin-right: 112px;
   }
 
   .gcal-btn {
