@@ -303,13 +303,17 @@ export class BoardDetailComponent implements OnInit {
 
   saveTask() {
     if (!this.taskForm.title.trim()) { alert('Enter task title'); return; }
+    const payload = {
+      ...this.taskForm,
+      deadline: this.taskForm.deadline ? this.taskForm.deadline : null
+    };
     if (this.editingTask) {
-      this.taskService.updateTask(this.editingTask.id, this.taskForm).subscribe({
+      this.taskService.updateTask(this.editingTask.id, payload).subscribe({
         next: () => { this.loadTasks(); this.resetForm(); },
         error: (err: any) => console.error('Update error:', err)
       });
     } else {
-      this.taskService.createTask({ ...this.taskForm, boardId: this.boardId }).subscribe({
+      this.taskService.createTask({ ...payload, boardId: this.boardId }).subscribe({
         next: () => { this.loadTasks(); this.resetForm(); },
         error: (err: any) => console.error('Create error:', err)
       });

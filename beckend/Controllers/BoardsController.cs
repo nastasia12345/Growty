@@ -85,11 +85,13 @@ namespace beckend.Controllers
         public async Task<IActionResult> DeleteBoard(int id)
         {
             var board = await _context.Boards
+                .Include(b => b.BoardTasks)
                 .FirstOrDefaultAsync(b => b.Id == id && b.UserId == _tempUserId);
 
             if (board == null)
                 return NotFound();
 
+            _context.Tasks.RemoveRange(board.BoardTasks);
             _context.Boards.Remove(board);
             await _context.SaveChangesAsync();
             return Ok();

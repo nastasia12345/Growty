@@ -1,5 +1,6 @@
-﻿using beckend.Data;
+using beckend.Data;
 using beckend.Models;
+using beckend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,15 +11,19 @@ namespace beckend.Controllers
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IStatisticsService _stats;
         private readonly int _tempUserId = 1;
 
-        public TasksController(AppDbContext context) => _context = context;
+        public TasksController(AppDbContext context, IStatisticsService stats)
+        {
+            _context = context;
+            _stats   = stats;
+        }
 
         [HttpGet("board/{boardId}")]
         public async Task<IActionResult> GetTasksByBoard(int boardId)
         {
             var tasks = await _context.Tasks
-                .Include(t => t.Board)  // ← Додайте це, якщо потрібен Board
                 .Where(t => t.BoardId == boardId && t.UserId == _tempUserId)
                 .ToListAsync();
             return Ok(tasks);
@@ -30,6 +35,7 @@ namespace beckend.Controllers
             task.UserId = _tempUserId;
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
+            await _stats.UpdateAfterTaskCreated(_tempUserId, DateTime.UtcNow);
             return Ok(task);
         }
 
@@ -39,19 +45,27 @@ namespace beckend.Controllers
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
 
-            if (task == null)
-                return NotFound();
+            if (task == null) return NotFound();
 
-            task.Title = updated.Title;
+            var wasDone = task.Status == "Done";
+
+            task.Title       = updated.Title;
             task.Description = updated.Description;
-            task.Deadline = updated.Deadline;
-            task.Priority = updated.Priority;
-            task.Status = updated.Status;
+            task.Deadline    = updated.Deadline;
+            task.Priority    = updated.Priority;
+            task.Status      = updated.Status;
 
-            if (task.Status == "Done")
+            if (!wasDone && task.Status == "Done")
+            {
                 task.CompletedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                await _stats.UpdateAfterTaskCompleted(_tempUserId, DateTime.UtcNow);
+            }
+            else
+            {
+                await _context.SaveChangesAsync();
+            }
 
-            await _context.SaveChangesAsync();
             return Ok(task);
         }
 
@@ -61,15 +75,22 @@ namespace beckend.Controllers
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
 
-            if (task == null)
-                return NotFound();
+            if (task == null) return NotFound();
 
+            var wasDone = task.Status == "Done";
             task.Status = newStatus;
 
-            if (newStatus == "Done")
+            if (!wasDone && newStatus == "Done")
+            {
                 task.CompletedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                await _stats.UpdateAfterTaskCompleted(_tempUserId, DateTime.UtcNow);
+            }
+            else
+            {
+                await _context.SaveChangesAsync();
+            }
 
-            await _context.SaveChangesAsync();
             return Ok(task);
         }
 
@@ -79,8 +100,7 @@ namespace beckend.Controllers
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == _tempUserId);
 
-            if (task == null)
-                return NotFound();
+            if (task == null) return NotFound();
 
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
