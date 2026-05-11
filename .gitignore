@@ -15,6 +15,7 @@ npm-debug.log*
 
 # Environment / secrets
 appsettings.Development.json
+beckend/appsettings.json
 
 # OS
 .DS_Store
