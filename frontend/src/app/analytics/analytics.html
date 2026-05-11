@@ -1,73 +1,315 @@
-<div class="analytics-container">
+<div class="analytics-page">
 
-  <!-- Header -->
-  <div class="analytics-header">
-    <h2>📊 Аналітика продуктивності</h2>
-    <p class="subtitle">Статистика за останні 30 днів</p>
-  </div>
-
-  <!-- Summary Cards -->
-  <div class="summary-cards">
-    <div class="stat-card completed">
-      <div class="stat-icon">✅</div>
-      <div class="stat-value">{{ summary.totalCompleted }}</div>
-      <div class="stat-label">Виконано</div>
+  <!-- ══════════ HEADER ══════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <button mat-icon-button class="back-btn" routerLink="/boards" matTooltip="Back to boards">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Analytics</h1>
+        <p>Aggregated data across all your boards and tasks</p>
+      </div>
     </div>
-    <div class="stat-card overdue">
-      <div class="stat-icon">⚠️</div>
-      <div class="stat-value">{{ summary.totalOverdue }}</div>
-      <div class="stat-label">Прострочено</div>
-    </div>
-    <div class="stat-card created">
-      <div class="stat-icon">📝</div>
-      <div class="stat-value">{{ summary.totalCreated }}</div>
-      <div class="stat-label">Створено</div>
-    </div>
-    <div class="stat-card rate">
-      <div class="stat-icon">📈</div>
-      <div class="stat-value">{{ completionRate }}%</div>
-      <div class="stat-label">Завершення</div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="loadAll()" matTooltip="Refresh data">
+        <mat-icon>refresh</mat-icon> Refresh
+      </button>
+      <button mat-raised-button color="primary" (click)="exportCsv()">
+        <mat-icon>download</mat-icon> Export CSV
+      </button>
     </div>
   </div>
 
-  <!-- Charts -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>📊 Активність по днях</h3>
-        <span class="chart-badge">Стовпчикова</span>
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-icon class="spin">autorenew</mat-icon>
+    <p>Loading data...</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- ══════════ STAT CARDS ══════════ -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon boards-icon"><mat-icon>dashboard</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ boards.length }}</div>
+          <div class="stat-label">Boards</div>
+        </div>
       </div>
-      <div class="chart-body">
-        <canvas baseChart
-                [data]="barChartData"
-                [options]="barChartOptions"
-                type="bar">
-        </canvas>
+
+      <div class="stat-card">
+        <div class="stat-icon all-icon"><mat-icon>assignment</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ total }}</div>
+          <div class="stat-label">Total tasks</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon done-icon"><mat-icon>check_circle</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ totalDone }}</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon prog-icon"><mat-icon>pending</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ totalInProg }}</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon todo-icon"><mat-icon>radio_button_unchecked</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ totalTodo }}</div>
+          <div class="stat-label">To Do</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon overdue-icon"><mat-icon>warning</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ totalOverdue }}</div>
+          <div class="stat-label">Overdue</div>
+        </div>
+      </div>
+
+      <div class="stat-card rate-card">
+        <div class="stat-icon rate-icon"><mat-icon>insights</mat-icon></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ completionRate }}%</div>
+          <div class="stat-label">Completion rate</div>
+          <mat-progress-bar mode="determinate" [value]="completionRate" class="rate-bar"></mat-progress-bar>
+        </div>
+      </div>
+
+      <div class="stat-card priority-breakdown">
+        <div class="stat-label-top">By priority</div>
+        <div class="priority-bars">
+          <div class="pbar-row">
+            <span class="pbadge critical">Critical</span>
+            <div class="pbar-track"><div class="pbar critical" [style.width.%]="total > 0 ? priorityCount('Critical') / total * 100 : 0"></div></div>
+            <span class="pcount">{{ priorityCount('Critical') }}</span>
+          </div>
+          <div class="pbar-row">
+            <span class="pbadge high">High</span>
+            <div class="pbar-track"><div class="pbar high" [style.width.%]="total > 0 ? priorityCount('High') / total * 100 : 0"></div></div>
+            <span class="pcount">{{ priorityCount('High') }}</span>
+          </div>
+          <div class="pbar-row">
+            <span class="pbadge medium">Medium</span>
+            <div class="pbar-track"><div class="pbar medium" [style.width.%]="total > 0 ? priorityCount('Medium') / total * 100 : 0"></div></div>
+            <span class="pcount">{{ priorityCount('Medium') }}</span>
+          </div>
+          <div class="pbar-row">
+            <span class="pbadge low">Low</span>
+            <div class="pbar-track"><div class="pbar low" [style.width.%]="total > 0 ? priorityCount('Low') / total * 100 : 0"></div></div>
+            <span class="pcount">{{ priorityCount('Low') }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>📈 Виконані vs Прострочені</h3>
-        <span class="chart-badge">Лінійна</span>
+    <!-- ══════════ BOARD BREAKDOWN ══════════ -->
+    <section class="section">
+      <h2 class="section-title"><mat-icon>view_column</mat-icon> Board overview</h2>
+      <div class="boards-grid">
+        <div class="board-stat-card" *ngFor="let b of boards">
+          <div class="bsc-header">
+            <div class="bsc-icon">🌱</div>
+            <div>
+              <div class="bsc-title">{{ b.title }}</div>
+              <div class="bsc-sub">{{ boardStats(b.id).total }} tasks · {{ boardStats(b.id).rate }}% done</div>
+            </div>
+            <a mat-icon-button [routerLink]="['/board', b.id]" matTooltip="Open board">
+              <mat-icon>open_in_new</mat-icon>
+            </a>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="boardStats(b.id).rate" class="board-progress"></mat-progress-bar>
+          <div class="bsc-counts">
+            <span class="bsc-badge todo">To Do: {{ boardStats(b.id).todo }}</span>
+            <span class="bsc-badge inprog">In Progress: {{ boardStats(b.id).inProgress }}</span>
+            <span class="bsc-badge done">Done: {{ boardStats(b.id).done }}</span>
+            <span class="bsc-badge overdue" *ngIf="boardStats(b.id).overdue > 0">⚠ {{ boardStats(b.id).overdue }} overdue</span>
+          </div>
+        </div>
       </div>
-      <div class="chart-body">
-        <canvas baseChart
-                [data]="lineChartData"
-                [options]="lineChartOptions"
-                type="line">
-        </canvas>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- Action Buttons -->
-  <div class="actions">
-    <button mat-stroked-button (click)="refreshData()">
-      <mat-icon>refresh</mat-icon> Оновити
-    </button>
-    <button mat-raised-button color="primary" (click)="exportData()">
-      <mat-icon>download</mat-icon> Експорт CSV
-    </button>
-  </div>
+    <!-- ══════════ COMPLETED BY PERIOD ══════════ -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title"><mat-icon>done_all</mat-icon> Completed tasks by period</h2>
+        <div class="period-chips">
+          <button *ngFor="let p of periods"
+                  [class.active]="activePeriod === p.value"
+                  (click)="activePeriod = p.value"
+                  class="pchip">
+            {{ p.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom date range -->
+      <div class="custom-range" *ngIf="activePeriod === 'custom'">
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>From</mat-label>
+          <input matInput type="date" [(ngModel)]="customFrom">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>To</mat-label>
+          <input matInput type="date" [(ngModel)]="customTo">
+        </mat-form-field>
+      </div>
+
+      <div class="completed-summary">
+        <span class="completed-count">{{ completedInPeriod.length }} tasks completed</span>
+      </div>
+
+      <div class="completed-list" *ngIf="completedInPeriod.length > 0">
+        <div class="completed-row" *ngFor="let t of completedInPeriod">
+          <div class="cr-icon"><mat-icon>check_circle</mat-icon></div>
+          <div class="cr-body">
+            <div class="cr-title">{{ t.title }}</div>
+            <div class="cr-meta">
+              <span class="cr-board">{{ t.boardTitle }}</span>
+              <span class="cr-dot">·</span>
+              <span class="priority-badge" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span>
+              <span class="cr-dot">·</span>
+              <span class="cr-date">Completed {{ t.completedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+              <span *ngIf="t.deadline" class="cr-dot">·</span>
+              <span *ngIf="t.deadline" class="cr-deadline"
+                    [class.late]="isOverdue(t.deadline)">
+                Deadline {{ t.deadline | date:'dd MMM' }}
+                <span *ngIf="isOverdue(t.deadline)"> (late)</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="completedInPeriod.length === 0">
+        <mat-icon>inbox</mat-icon>
+        <p>No completed tasks for this period</p>
+      </div>
+    </section>
+
+    <!-- ══════════ ALL TASKS TABLE ══════════ -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title"><mat-icon>table_rows</mat-icon> All tasks</h2>
+        <span class="tasks-count">{{ filteredTasks.length }} of {{ total }}</span>
+      </div>
+
+      <!-- Table filters -->
+      <div class="table-filters">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search tasks...</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [(ngModel)]="tableSearch" placeholder="Title or description">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-select">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="tableStatus">
+            <mat-option value="all">All statuses</mat-option>
+            <mat-option value="ToDo">To Do</mat-option>
+            <mat-option value="InProgress">In Progress</mat-option>
+            <mat-option value="Done">Done</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-select">
+          <mat-label>Priority</mat-label>
+          <mat-select [(ngModel)]="tablePriority">
+            <mat-option value="all">All priorities</mat-option>
+            <mat-option value="Critical">Critical</mat-option>
+            <mat-option value="High">High</mat-option>
+            <mat-option value="Medium">Medium</mat-option>
+            <mat-option value="Low">Low</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-select">
+          <mat-label>Board</mat-label>
+          <mat-select [(ngModel)]="tableBoard">
+            <mat-option value="all">All boards</mat-option>
+            <mat-option *ngFor="let b of boards" [value]="b.id.toString()">{{ b.title }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-select">
+          <mat-label>Sort by</mat-label>
+          <mat-select [(ngModel)]="tableSortBy">
+            <mat-option *ngFor="let s of sortOptions" [value]="s.value">{{ s.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="tasks-table" *ngIf="filteredTasks.length > 0">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Board</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Deadline</th>
+              <th>Completed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of filteredTasks" [class.row-done]="t.status === 'Done'" [class.row-overdue]="t.status !== 'Done' && isOverdue(t.deadline)">
+              <td class="td-title">
+                <div class="task-name">{{ t.title }}</div>
+                <div class="task-desc" *ngIf="t.description">{{ t.description }}</div>
+              </td>
+              <td>
+                <a class="board-link" [routerLink]="['/board', t.boardId]">{{ t.boardTitle }}</a>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="t.status.toLowerCase()">
+                  {{ statusLabel(t.status) }}
+                </span>
+              </td>
+              <td>
+                <span class="priority-badge" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span>
+              </td>
+              <td>
+                <span *ngIf="t.deadline" class="deadline-cell"
+                      [class.overdue-text]="t.status !== 'Done' && isOverdue(t.deadline)"
+                      [class.today-text]="isDueToday(t.deadline)">
+                  {{ t.deadline | date:'dd MMM yyyy' }}
+                  <span class="overdue-tag" *ngIf="t.status !== 'Done' && isOverdue(t.deadline)">overdue</span>
+                  <span class="today-tag" *ngIf="isDueToday(t.deadline) && t.status !== 'Done'">today</span>
+                </span>
+                <span *ngIf="!t.deadline" class="no-deadline">—</span>
+              </td>
+              <td>
+                <span *ngIf="t.completedAt" class="completed-date">
+                  {{ t.completedAt | date:'dd MMM yyyy' }}
+                </span>
+                <span *ngIf="!t.completedAt" class="no-deadline">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty-state" *ngIf="filteredTasks.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <p>No tasks match your filters</p>
+          <button mat-stroked-button (click)="tableSearch=''; tableStatus='all'; tablePriority='all'; tableBoard='all'">
+            Clear filters
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
 </div>

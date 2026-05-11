@@ -10,10 +10,13 @@
   <!-- Desktop nav links -->
   <nav class="desktop-nav">
     <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">
-      <mat-icon>home</mat-icon> Головна
+      <mat-icon>home</mat-icon> Home
     </a>
     <a routerLink="/boards" routerLinkActive="active-link">
-      <mat-icon>dashboard</mat-icon> Дошки
+      <mat-icon>dashboard</mat-icon> Boards
+    </a>
+    <a routerLink="/analytics" routerLinkActive="active-link">
+      <mat-icon>insights</mat-icon> Analytics
     </a>
   </nav>
 
@@ -23,7 +26,7 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav mode="over" class="sidenav">
     <div class="sidenav-brand">
-      🌱 <strong>Growty</strong>
+      🌱 <strong style="color:#10b981">Growty</strong>
     </div>
     <mat-nav-list>
       <a mat-list-item routerLink="/" routerLinkActive="active-item"
@@ -33,7 +36,11 @@
       </a>
       <a mat-list-item routerLink="/boards" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Дошки</span>
+        <span matListItemTitle>Boards</span>
+      </a>
+      <a mat-list-item routerLink="/analytics" routerLinkActive="active-item" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>insights</mat-icon>
+        <span matListItemTitle>Analytics</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
