@@ -17,5 +17,5 @@ public partial class TaskFeedback
 
     public int UserId { get; set; }
 
-    public virtual KanbanTask? Task { get; set; }
+    public virtual KanbanTask Task { get; set; } = null!;
 }

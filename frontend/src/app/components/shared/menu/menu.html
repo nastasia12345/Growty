@@ -18,6 +18,9 @@
     <a routerLink="/analytics" routerLinkActive="active-link">
       <mat-icon>insights</mat-icon> Analytics
     </a>
+    <a routerLink="/plant" routerLinkActive="active-link">
+      <mat-icon>local_florist</mat-icon> Plant
+    </a>
   </nav>
 
   <span class="spacer"></span>
@@ -32,7 +35,7 @@
       <a mat-list-item routerLink="/" routerLinkActive="active-item"
          [routerLinkActiveOptions]="{exact:true}" (click)="sidenav.close()">
         <mat-icon matListItemIcon>home</mat-icon>
-        <span matListItemTitle>Головна</span>
+        <span matListItemTitle>Home</span>
       </a>
       <a mat-list-item routerLink="/boards" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>dashboard</mat-icon>
@@ -41,6 +44,10 @@
       <a mat-list-item routerLink="/analytics" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>insights</mat-icon>
         <span matListItemTitle>Analytics</span>
+      </a>
+      <a mat-list-item routerLink="/plant" routerLinkActive="active-item" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>local_florist</mat-icon>
+        <span matListItemTitle>Plant</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>

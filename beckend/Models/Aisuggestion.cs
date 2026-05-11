@@ -17,5 +17,5 @@ public partial class Aisuggestion
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual KanbanTask? KanbanTask { get; set; }
+    public virtual KanbanTask? Task { get; set; }
 }

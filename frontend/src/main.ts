@@ -9,6 +9,7 @@ import { HomeComponent } from './app/components/home/home';
 import { BoardsComponent } from './app/components/boards/boards';
 import { BoardDetailComponent } from './app/components/board-detail/board-detail';
 import { AnalyticsComponent } from './app/analytics/analytics';
+import { PlantComponent } from './app/components/plant/plant';
 
 bootstrapApplication(App, {
   providers: [
@@ -20,6 +21,7 @@ bootstrapApplication(App, {
       { path: 'boards',    component: BoardsComponent },
       { path: 'board/:id', component: BoardDetailComponent },
       { path: 'analytics', component: AnalyticsComponent },
+      { path: 'plant',     component: PlantComponent },
       { path: '**',        redirectTo: '' }
     ])
   ]

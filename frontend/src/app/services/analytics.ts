@@ -5,11 +5,17 @@ import { Observable } from 'rxjs';
 export interface UserStats {
   id: number;
   userId: string;
-  date: string; // ISO date
+  date: string;
   tasksCreated: number;
   tasksCompleted: number;
   tasksOverdue: number;
   activityScore: number;
+}
+
+export interface TasksByStatus {
+  todo: number;
+  inProgress: number;
+  done: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +30,10 @@ export class AnalyticsService {
 
   getSummary(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/summary`);
+  }
+
+  getTasksByStatus(): Observable<TasksByStatus> {
+    return this.http.get<TasksByStatus>(`${this.apiUrl}/tasks-by-status`);
   }
 
   exportCsv(): Observable<Blob> {

@@ -15,8 +15,5 @@ public partial class Board
 
     public DateTime CreatedAt { get; set; }
 
-    // ЗМІНЕНО: Tasks -> BoardTasks
     public virtual ICollection<KanbanTask> BoardTasks { get; set; } = new List<KanbanTask>();
-
-    public virtual User? User { get; set; }
 }

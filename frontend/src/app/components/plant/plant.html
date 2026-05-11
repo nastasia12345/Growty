@@ -1,0 +1,143 @@
+<div class="plant-page">
+
+  <!-- ══════════ HEADER ══════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <button mat-icon-button class="back-btn" routerLink="/boards" matTooltip="Back to boards">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>My Plant</h1>
+        <p>Complete tasks to keep your plant healthy and growing</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-icon class="spin">autorenew</mat-icon>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Error banner (shown above content if backend unreachable) -->
+  <div class="error-banner" *ngIf="hasError && !isLoading">
+    <mat-icon>warning_amber</mat-icon>
+    Could not reach the server — showing offline data. Make sure the backend is running.
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- ══════════ TOP ROW ══════════ -->
+    <div class="top-row">
+
+      <!-- LEFT: Life panel -->
+      <div class="life-panel">
+
+        <!-- Health bar -->
+        <div class="health-block">
+          <div class="health-header">
+            <div class="section-label">
+              <mat-icon>favorite</mat-icon>
+              Plant Health
+            </div>
+            <span class="health-badge" [style.background]="healthColor">{{ healthLabel }}</span>
+          </div>
+          <div class="health-track">
+            <div class="health-fill"
+                 [style.width.%]="healthPercent"
+                 [style.background]="healthColor"></div>
+          </div>
+          <span class="health-percent">{{ healthPercent }}%</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Task status counts -->
+        <div class="section-label" style="margin-bottom:12px">
+          <mat-icon>assignment</mat-icon>
+          Task Breakdown
+        </div>
+
+        <div class="status-list">
+          <div class="status-row">
+            <div class="stat-icon todo-icon"><mat-icon>radio_button_unchecked</mat-icon></div>
+            <div class="stat-body">
+              <span class="stat-value">{{ todo }}</span>
+              <span class="stat-label">To Do</span>
+            </div>
+          </div>
+          <div class="status-row">
+            <div class="stat-icon prog-icon"><mat-icon>pending</mat-icon></div>
+            <div class="stat-body">
+              <span class="stat-value">{{ inProgress }}</span>
+              <span class="stat-label">In Progress</span>
+            </div>
+          </div>
+          <div class="status-row">
+            <div class="stat-icon done-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-body">
+              <span class="stat-value">{{ done }}</span>
+              <span class="stat-label">Done</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Plant window -->
+      <div class="plant-window">
+        <div class="plant-window-label">
+          <mat-icon>local_florist</mat-icon>
+          Your Plant
+        </div>
+        <div class="plant-placeholder">
+          <span class="placeholder-icon">🌿</span>
+          <span class="placeholder-text">Your plant will appear here</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════════ COLLECTIBLES ══════════ -->
+    <div class="collectibles-section">
+
+      <div class="collectibles-header">
+        <div class="header-left-inner">
+          <div class="section-label">
+            <mat-icon>auto_awesome</mat-icon>
+            Collection
+          </div>
+          <span class="badge-count">{{ unlockedCount }} / {{ collectibles.length }} unlocked</span>
+        </div>
+        <p class="next-hint" *ngIf="tasksUntilNext > 0">
+          <mat-icon>emoji_events</mat-icon>
+          <strong>{{ tasksUntilNext }}</strong> more completed tasks until next reward
+        </p>
+        <p class="next-hint all-done" *ngIf="tasksUntilNext === 0 && unlockedCount === collectibles.length">
+          <mat-icon>star</mat-icon>
+          All items unlocked — amazing work!
+        </p>
+      </div>
+
+      <div class="shelf">
+        <div class="shelf-items">
+          <div
+            class="shelf-item"
+            *ngFor="let item of collectibles"
+            [class.unlocked]="item.unlocked"
+            [class.locked]="!item.unlocked"
+            [matTooltip]="item.unlocked ? item.name : 'Complete ' + item.threshold + ' tasks to unlock'"
+          >
+            <span class="item-emoji">{{ item.unlocked ? item.emoji : '🔒' }}</span>
+            <span class="item-name">{{ item.unlocked ? item.name : '???' }}</span>
+            <span class="item-req">{{ item.threshold }} ✓</span>
+          </div>
+        </div>
+        <div class="shelf-plank"></div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>

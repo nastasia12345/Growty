@@ -20,6 +20,4 @@ public partial class UserStat
     public int ActivityScore { get; set; }
 
     public int ActiveMinutes { get; set; }
-
-    public virtual User User { get; set; } = null!;
 }
