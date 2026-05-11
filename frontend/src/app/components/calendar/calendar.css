@@ -10,17 +10,17 @@
 /* ══════════ CLOCK ══════════ */
 .clock-wrap {
   position: absolute;
-  top: 32px;
+  top: 24px;
   right: 40px;
-  width: 88px;
-  height: 88px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   background: white;
   box-shadow:
-    0 0 0 3px #ecfdf5,
-    0 0 16px 4px rgba(16,185,129,0.25),
-    0 4px 16px rgba(0,0,0,0.08);
-  padding: 6px;
+    0 0 0 4px #ecfdf5,
+    0 0 24px 8px rgba(16,185,129,0.28),
+    0 6px 20px rgba(0,0,0,0.10);
+  padding: 8px;
   z-index: 10;
 }
 
@@ -41,8 +41,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
-  padding-right: 108px;
+  margin-bottom: 24px;
+  padding-right: 152px;
 }
 
 .header-left {
@@ -400,9 +400,9 @@
   }
 
   .clock-wrap {
-    width: 72px;
-    height: 72px;
-    top: 24px;
+    width: 96px;
+    height: 96px;
+    top: 20px;
     right: 16px;
   }
 
