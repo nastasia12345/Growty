@@ -5,8 +5,8 @@
 
     <div class="sidebar-header">
       <div>
-        <h2>{{ editingTask ? 'Редагувати завдання' : 'Нове завдання' }}</h2>
-        <p>{{ editingTask ? 'Онови дані завдання' : 'Створи нове завдання' }}</p>
+        <h2>{{ editingTask ? 'Edit Task' : 'New Task' }}</h2>
+        <p>{{ editingTask ? 'Update task details' : 'Create a new task' }}</p>
       </div>
       <button mat-icon-button (click)="drawer.close()">
         <mat-icon>close</mat-icon>
@@ -15,32 +15,32 @@
 
     <div class="sidebar-form">
       <mat-form-field appearance="outline">
-        <mat-label>Назва</mat-label>
-        <input matInput [(ngModel)]="taskForm.title">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="taskForm.title" placeholder="Task title">
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Опис</mat-label>
-        <textarea matInput rows="4" [(ngModel)]="taskForm.description"></textarea>
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="4" [(ngModel)]="taskForm.description" placeholder="Task description"></textarea>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Дедлайн</mat-label>
+        <mat-label>Deadline</mat-label>
         <input matInput type="datetime-local" [(ngModel)]="taskForm.deadline">
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Пріоритет</mat-label>
+        <mat-label>Priority</mat-label>
         <mat-select [(ngModel)]="taskForm.priority">
-          <mat-option value="Low">Low</mat-option>
-          <mat-option value="Medium">Medium</mat-option>
-          <mat-option value="High">High</mat-option>
-          <mat-option value="Critical">Critical</mat-option>
+          <mat-option value="Low">🟢 Low</mat-option>
+          <mat-option value="Medium">🟡 Medium</mat-option>
+          <mat-option value="High">🔴 High</mat-option>
+          <mat-option value="Critical">🔥 Critical</mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Статус</mat-label>
+        <mat-label>Status</mat-label>
         <mat-select [(ngModel)]="taskForm.status">
           <mat-option value="ToDo">To Do</mat-option>
           <mat-option value="InProgress">In Progress</mat-option>
@@ -50,9 +50,9 @@
     </div>
 
     <div class="sidebar-actions">
-      <button mat-button class="cancel-btn" (click)="drawer.close()">Скасувати</button>
-      <button mat-raised-button color="primary" class="save-btn" (click)="saveTask()">
-        {{ editingTask ? 'Оновити' : 'Створити' }}
+      <button mat-button class="cancel-btn" (click)="drawer.close()">Cancel</button>
+      <button mat-raised-button color="primary" class="save-btn" (click)="saveTask(); drawer.close()">
+        {{ editingTask ? 'Update' : 'Create' }}
       </button>
     </div>
 
@@ -64,29 +64,87 @@
     <!-- HEADER -->
     <div class="board-header">
       <div class="board-title">
-        <button mat-icon-button class="back-btn" (click)="goBack()" matTooltip="Назад">
+        <button mat-icon-button class="back-btn" (click)="goBack()" matTooltip="Go back">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div>
           <h1>{{ board?.title }}</h1>
-          <p>Kanban board</p>
+          <p>Kanban board · {{ totalFiltered() }} tasks shown</p>
         </div>
       </div>
-
       <button mat-raised-button color="primary" class="new-task-btn"
               (click)="openCreateTaskDialog(); drawer.open()">
         <mat-icon>add</mat-icon>
-        <span class="btn-text">Створити завдання</span>
+        <span class="btn-text">New Task</span>
       </button>
     </div>
 
-    <!-- FILTERS -->
-    <div class="filter-tabs">
-      <button *ngFor="let period of filterPeriods"
-              [class.active]="activeFilter === period.value"
-              (click)="setFilter(period.value)">
-        {{ period.label }}
-      </button>
+    <!-- FILTER & SORT BAR -->
+    <div class="filter-bar">
+
+      <!-- Period tabs -->
+      <div class="filter-group">
+        <span class="filter-label">Period</span>
+        <div class="filter-chips">
+          <button *ngFor="let p of filterPeriods"
+                  [class.active]="activeFilter === p.value"
+                  (click)="setFilter(p.value)"
+                  class="chip">
+            {{ p.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-divider"></div>
+
+      <!-- Priority filter -->
+      <div class="filter-group">
+        <span class="filter-label">Priority</span>
+        <div class="filter-chips">
+          <button *ngFor="let pf of priorityFilters"
+                  [class.active]="activePriority === pf.value"
+                  [class]="'chip priority-chip ' + pf.value.toLowerCase()"
+                  (click)="setPriority(pf.value)">
+            {{ pf.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-divider"></div>
+
+      <!-- Sort dropdown -->
+      <div class="filter-group sort-group">
+        <span class="filter-label">Sort by</span>
+        <button mat-stroked-button [matMenuTriggerFor]="sortMenu" class="sort-btn">
+          <mat-icon>sort</mat-icon>
+          <span class="sort-label-text">{{ activeSortLabel }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #sortMenu="matMenu">
+          <button mat-menu-item *ngFor="let s of sortOptions"
+                  (click)="setSort(s.value)"
+                  [class.sort-active]="activeSortBy === s.value">
+            <mat-icon *ngIf="activeSortBy === s.value">check</mat-icon>
+            <mat-icon *ngIf="activeSortBy !== s.value" style="opacity:0">check</mat-icon>
+            {{ s.label }}
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- Saved / Reset indicator -->
+      <div class="filter-actions">
+        <div class="saved-badge" *ngIf="hasActiveFilters" matTooltip="Filters saved to your browser">
+          <mat-icon>bookmark</mat-icon>
+          Saved
+        </div>
+        <button mat-icon-button *ngIf="hasActiveFilters"
+                (click)="clearFilters()"
+                matTooltip="Reset all filters"
+                class="reset-btn">
+          <mat-icon>filter_alt_off</mat-icon>
+        </button>
+      </div>
+
     </div>
 
     <!-- KANBAN COLUMNS -->
@@ -109,45 +167,46 @@
           <div *ngFor="let task of getTasksByStatus(column.status)"
                class="task-card" cdkDrag>
 
-            <!-- Drag handle placeholder -->
             <div class="task-title-row">
               <div class="task-title">{{ task.title }}</div>
               <button mat-icon-button class="ai-btn"
                       [disabled]="aiLoadingTaskId === task.id"
                       (click)="openAISuggestion(task)"
-                      matTooltip="Покращити за допомогою AI">
+                      matTooltip="Improve with AI">
                 <mat-icon *ngIf="aiLoadingTaskId !== task.id">auto_awesome</mat-icon>
                 <mat-icon *ngIf="aiLoadingTaskId === task.id" class="spinner">autorenew</mat-icon>
               </button>
             </div>
 
-            <div class="task-description">{{ task.description }}</div>
+            <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
 
             <div class="task-meta">
               <span class="priority" [ngClass]="task.priority.toLowerCase()">
                 {{ task.priority }}
               </span>
-              <span class="deadline" [class.overdue]="isOverdue(task.deadline)">
+              <span *ngIf="task.deadline"
+                    class="deadline"
+                    [class.overdue]="isOverdue(task.deadline)"
+                    [class.due-today]="isDueToday(task.deadline)">
                 <mat-icon class="deadline-icon">schedule</mat-icon>
                 {{ task.deadline | date:'dd.MM HH:mm' }}
               </span>
             </div>
 
             <div class="task-actions">
-              <button mat-icon-button (click)="editTask(task); drawer.open()" matTooltip="Редагувати">
+              <button mat-icon-button (click)="editTask(task); drawer.open()" matTooltip="Edit">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteTask(task.id)" matTooltip="Видалити">
+              <button mat-icon-button color="warn" (click)="deleteTask(task.id)" matTooltip="Delete">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
 
           </div>
 
-          <!-- Empty state -->
           <div *ngIf="getTasksByStatus(column.status).length === 0" class="empty-column">
             <mat-icon>inbox</mat-icon>
-            <p>Немає задач</p>
+            <p>No tasks</p>
           </div>
 
         </div>
