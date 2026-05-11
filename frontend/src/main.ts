@@ -10,6 +10,7 @@ import { BoardsComponent } from './app/components/boards/boards';
 import { BoardDetailComponent } from './app/components/board-detail/board-detail';
 import { AnalyticsComponent } from './app/analytics/analytics';
 import { PlantComponent } from './app/components/plant/plant';
+import { CalendarComponent } from './app/components/calendar/calendar';
 
 bootstrapApplication(App, {
   providers: [
@@ -22,6 +23,7 @@ bootstrapApplication(App, {
       { path: 'board/:id', component: BoardDetailComponent },
       { path: 'analytics', component: AnalyticsComponent },
       { path: 'plant',     component: PlantComponent },
+      { path: 'calendar',  component: CalendarComponent },
       { path: '**',        redirectTo: '' }
     ])
   ]

@@ -21,6 +21,9 @@
     <a routerLink="/plant" routerLinkActive="active-link">
       <mat-icon>local_florist</mat-icon> Plant
     </a>
+    <a routerLink="/calendar" routerLinkActive="active-link">
+      <mat-icon>calendar_month</mat-icon> Calendar
+    </a>
   </nav>
 
   <span class="spacer"></span>
@@ -48,6 +51,10 @@
       <a mat-list-item routerLink="/plant" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>local_florist</mat-icon>
         <span matListItemTitle>Plant</span>
+      </a>
+      <a mat-list-item routerLink="/calendar" routerLinkActive="active-item" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>calendar_month</mat-icon>
+        <span matListItemTitle>Calendar</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
