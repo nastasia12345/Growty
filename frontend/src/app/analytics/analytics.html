@@ -115,6 +115,98 @@
       </div>
     </div>
 
+    <!-- ══════════ PRODUCTIVITY INSIGHTS ══════════ -->
+    <section class="section insights-section" *ngIf="totalDone > 0">
+      <h2 class="section-title"><mat-icon>psychology</mat-icon> Productivity Insights</h2>
+      <p class="section-sub">Based on {{ totalDone }} completed tasks — when you work best</p>
+
+      <div class="insights-grid">
+
+        <!-- Day of Week Chart -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <mat-icon>calendar_today</mat-icon>
+            <span>Most active day</span>
+            <span class="insight-badge" *ngIf="bestDay">🏆 {{ bestDay }}</span>
+          </div>
+          <div class="dow-chart">
+            <div *ngFor="let d of dayOfWeekActivity"
+                 class="dow-row" [class.top-row]="d.isTop">
+              <span class="dow-label">{{ d.short }}</span>
+              <div class="dow-bar-track">
+                <div class="dow-bar" [style.width.%]="d.pct"
+                     [class.top-bar]="d.isTop"></div>
+              </div>
+              <span class="dow-count">{{ d.count }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Time of Day -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <mat-icon>schedule</mat-icon>
+            <span>Best time of day</span>
+            <span class="insight-badge" *ngIf="bestTimeSlot">⏰ {{ timeOfDayActivity[0].isTop ? '🌅' : timeOfDayActivity[1].isTop ? '☀️' : timeOfDayActivity[2].isTop ? '🌆' : '🌙' }}</span>
+          </div>
+          <div class="tod-chart">
+            <div *ngFor="let s of timeOfDayActivity"
+                 class="tod-row" [class.top-row]="s.isTop">
+              <div class="tod-meta">
+                <mat-icon class="tod-icon">{{ s.icon }}</mat-icon>
+                <div class="tod-labels">
+                  <span class="tod-label">{{ s.label }}</span>
+                  <span class="tod-range">{{ s.range }}</span>
+                </div>
+                <span class="tod-count">{{ s.count }}</span>
+              </div>
+              <div class="tod-bar-track">
+                <div class="tod-bar" [style.width.%]="s.pct"
+                     [class.top-bar]="s.isTop"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Streaks + Recommendation -->
+        <div class="insight-card insight-summary">
+          <div class="insight-header">
+            <mat-icon>emoji_events</mat-icon>
+            <span>Performance</span>
+          </div>
+
+          <div class="streak-grid">
+            <div class="streak-item" [class.streak-alive]="streaks.current > 0">
+              <div class="streak-num">{{ streaks.current }}</div>
+              <div class="streak-lbl">Current streak</div>
+              <div class="streak-unit">days</div>
+            </div>
+            <div class="streak-item best-streak">
+              <div class="streak-num">{{ streaks.best }}</div>
+              <div class="streak-lbl">Best streak</div>
+              <div class="streak-unit">days</div>
+            </div>
+            <div class="streak-item">
+              <div class="streak-num">{{ onTimeRate }}%</div>
+              <div class="streak-lbl">On-time rate</div>
+              <div class="streak-unit">of done tasks</div>
+            </div>
+            <div class="streak-item">
+              <div class="streak-num ww">{{ weekdayVsWeekend.weekday }}<span class="ww-sep">/</span>{{ weekdayVsWeekend.weekend }}</div>
+              <div class="streak-lbl">Weekday/Weekend</div>
+              <div class="streak-unit">completions</div>
+            </div>
+          </div>
+
+          <div class="recommendation">
+            <mat-icon class="rec-icon">{{ smartRecommendation.icon }}</mat-icon>
+            <p class="rec-text">{{ smartRecommendation.text }}</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ══════════ BOARD BREAKDOWN ══════════ -->
     <section class="section">
       <h2 class="section-title"><mat-icon>view_column</mat-icon> Board overview</h2>

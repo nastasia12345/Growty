@@ -160,11 +160,11 @@
         <div class="task-list"
              cdkDropList
              [id]="column.status"
-             [cdkDropListData]="getTasksByStatus(column.status)"
+             [cdkDropListData]="column.status === 'ToDo' ? todoTasks : column.status === 'InProgress' ? inProgressTasks : doneTasks"
              [cdkDropListConnectedTo]="getConnectedDropLists()"
              (cdkDropListDropped)="drop($event, column.status)">
 
-          <div *ngFor="let task of getTasksByStatus(column.status)"
+          <div *ngFor="let task of (column.status === 'ToDo' ? todoTasks : column.status === 'InProgress' ? inProgressTasks : doneTasks)"
                class="task-card" cdkDrag>
 
             <div class="task-title-row">
@@ -181,7 +181,7 @@
             <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
 
             <div class="task-meta">
-              <span class="priority" [ngClass]="task.priority.toLowerCase()">
+              <span class="priority" [ngClass]="task.priority?.toLowerCase()">
                 {{ task.priority }}
               </span>
               <span *ngIf="task.deadline"

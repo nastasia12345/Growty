@@ -20,16 +20,20 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Board> Boards { get; set; }
 
+    public virtual DbSet<GamificationState> GamificationStates { get; set; }
+
     public virtual DbSet<KanbanTask> Tasks { get; set; }
 
     public virtual DbSet<TaskFeedback> TaskFeedbacks { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserStat> UserStats { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
-            optionsBuilder.UseSqlServer("Server=DESKTOP-0GOH1AC\\SQLEXPRESS01;Database=GROWTY;Trusted_Connection=True;TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Server=.;Database=GROWTY;Trusted_Connection=True;TrustServerCertificate=True");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

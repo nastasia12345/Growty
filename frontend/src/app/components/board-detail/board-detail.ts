@@ -65,6 +65,11 @@ export class BoardDetailComponent implements OnInit {
   isLoading: boolean = false;
   aiLoadingTaskId: number | null = null;
 
+  // ── Pre-computed stable task lists for CDK drop lists ──
+  todoTasks:       any[] = [];
+  inProgressTasks: any[] = [];
+  doneTasks:       any[] = [];
+
   // ── Filter & sort state ──────────────────────────
   filterPeriods = [
     { label: 'All',   value: 'all' },
@@ -183,13 +188,24 @@ export class BoardDetailComponent implements OnInit {
 
   loadTasks() {
     this.taskService.getTasksByBoard(this.boardId).subscribe({
-      next: (data: any[]) => { this.tasks = data; },
+      next: (data: any[]) => {
+        this.tasks = data;
+        this.refreshTaskLists();
+      },
       error: (err: any) => console.error('Tasks load error:', err)
     });
   }
 
-  // ── Filter + sort pipeline ───────────────────────
-  getTasksByStatus(status: string): any[] {
+  // ── Rebuild all three column arrays at once (stable references for CDK) ──
+  refreshTaskLists() {
+    this.todoTasks       = this.computeTasksForStatus('ToDo');
+    this.inProgressTasks = this.computeTasksForStatus('InProgress');
+    this.doneTasks       = this.computeTasksForStatus('Done');
+    this.cdr.detectChanges();
+  }
+
+  // ── Filter + sort pipeline (internal — not called from template) ─────────
+  private computeTasksForStatus(status: string): any[] {
     let result = this.tasks.filter(t => t.status === status);
 
     // 1. Period filter
@@ -217,7 +233,7 @@ export class BoardDetailComponent implements OnInit {
     }
 
     // 3. Sort
-    result = [...result].sort((a, b) => {
+    return [...result].sort((a, b) => {
       switch (this.activeSortBy) {
         case 'date_asc': {
           if (!a.deadline && !b.deadline) return 0;
@@ -242,27 +258,37 @@ export class BoardDetailComponent implements OnInit {
         default: return 0;
       }
     });
+  }
 
-    return result;
+  // Keep public getter for totalFiltered() to use
+  getTasksByStatus(status: string): any[] {
+    if (status === 'ToDo')       return this.todoTasks;
+    if (status === 'InProgress') return this.inProgressTasks;
+    if (status === 'Done')       return this.doneTasks;
+    return [];
   }
 
   setFilter(period: string) {
     this.activeFilter = period;
     this.saveFilters();
+    this.refreshTaskLists();
   }
 
   setSort(sortBy: string) {
     this.activeSortBy = sortBy;
     this.saveFilters();
+    this.refreshTaskLists();
   }
 
   setPriority(priority: string) {
     this.activePriority = priority;
     this.saveFilters();
+    this.refreshTaskLists();
   }
 
   clearFilters() {
     this.resetFilters();
+    this.refreshTaskLists();
   }
 
   getConnectedDropLists(): string[] {
@@ -273,13 +299,18 @@ export class BoardDetailComponent implements OnInit {
   drop(event: any, newStatus: string) {
     const task = event.previousContainer.data[event.previousIndex];
     if (task && task.status !== newStatus) {
+      // Optimistically update local state so UI responds instantly
+      task.status = newStatus;
+      if (newStatus === 'Done') task.completedAt = new Date().toISOString();
+      else task.completedAt = null;
+      this.refreshTaskLists();
+
       this.taskService.updateTaskStatus(task.id, newStatus).subscribe({
-        next: () => {
-          task.status = newStatus;
-          if (newStatus === 'Done') task.completedAt = new Date().toISOString();
-          this.loadTasks();
-        },
-        error: (err: any) => console.error('Status update error:', err)
+        next: () => this.loadTasks(),
+        error: (err: any) => {
+          console.error('Status update error:', err);
+          this.loadTasks(); // Reload to restore correct state on error
+        }
       });
     }
   }
@@ -303,19 +334,28 @@ export class BoardDetailComponent implements OnInit {
 
   saveTask() {
     if (!this.taskForm.title.trim()) { alert('Enter task title'); return; }
-    const payload = {
+
+    // Convert empty string deadline to null — backend DateTime? can't parse ""
+    const payload: any = {
       ...this.taskForm,
       deadline: this.taskForm.deadline ? this.taskForm.deadline : null
     };
+
     if (this.editingTask) {
       this.taskService.updateTask(this.editingTask.id, payload).subscribe({
-        next: () => { this.loadTasks(); this.resetForm(); },
-        error: (err: any) => console.error('Update error:', err)
+        next: () => { this.resetForm(); this.loadTasks(); },
+        error: (err: any) => {
+          console.error('Update error:', err);
+          alert(`Failed to update task: ${err?.error?.error ?? err.statusText}`);
+        }
       });
     } else {
       this.taskService.createTask({ ...payload, boardId: this.boardId }).subscribe({
-        next: () => { this.loadTasks(); this.resetForm(); },
-        error: (err: any) => console.error('Create error:', err)
+        next: () => { this.resetForm(); this.loadTasks(); },
+        error: (err: any) => {
+          console.error('Create error:', err);
+          alert(`Failed to create task: ${err?.error?.error ?? err.statusText}`);
+        }
       });
     }
   }

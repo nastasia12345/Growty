@@ -28,17 +28,28 @@ namespace beckend.Controllers
             if (task == null)
                 return NotFound();
 
-            var suggestion = await _aiService.ImproveTaskDescription(
-                task.Description ?? "",
-                task.Title);
-
-            return Ok(new
+            try
             {
-                suggestionId = 0,
-                improvedText = suggestion.ImprovedText,
-                subtasks = suggestion.GeneratedSubtasks,
-                confidence = suggestion.Confidence
-            });
+                var suggestion = await _aiService.ImproveTaskDescription(
+                    task.Description ?? "",
+                    task.Title);
+
+                return Ok(new
+                {
+                    suggestionId = 0,
+                    improvedText = suggestion.ImprovedText,
+                    subtasks = suggestion.GeneratedSubtasks,
+                    confidence = suggestion.Confidence
+                });
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(502, new { error = "AI service unavailable", detail = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "AI request failed", detail = ex.Message });
+            }
         }
     }
 }
