@@ -12,7 +12,7 @@ export interface TaskFeedback {
 
 @Injectable({ providedIn: 'root' })
 export class FeedbackService {
-  private apiUrl = 'https://localhost:5001/api/feedback';
+  private apiUrl = 'http://localhost:5000/api/feedback';
 
   constructor(private http: HttpClient) { }
 

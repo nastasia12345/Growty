@@ -20,7 +20,7 @@ export interface TasksByStatus {
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
-  private apiUrl = 'https://localhost:5001/api/analytics';
+  private apiUrl = 'http://localhost:5000/api/analytics';
 
   constructor(private http: HttpClient) { }
 

@@ -13,7 +13,7 @@ export interface AISuggestion {
   providedIn: 'root'
 })
 export class AIService {
-  private apiUrl = 'https://localhost:5001/api/ai';
+  private apiUrl = 'http://localhost:5000/api/ai';
 
   constructor(private http: HttpClient) { }
 

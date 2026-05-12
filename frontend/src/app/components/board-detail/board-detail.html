@@ -102,8 +102,7 @@
         <span class="filter-label">Priority</span>
         <div class="filter-chips">
           <button *ngFor="let pf of priorityFilters"
-                  [class.active]="activePriority === pf.value"
-                  [class]="'chip priority-chip ' + pf.value.toLowerCase()"
+                  [ngClass]="['chip', 'priority-chip', pf.value.toLowerCase(), activePriority === pf.value ? 'active' : '']"
                   (click)="setPriority(pf.value)">
             {{ pf.label }}
           </button>

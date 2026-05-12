@@ -3,7 +3,7 @@ export interface Board {
   title: string;
   description?: string;
   createdAt: string;
-  tasks?: KanbanTask[];
+  boardTasks?: KanbanTask[];
 }
 
 export interface KanbanTask {

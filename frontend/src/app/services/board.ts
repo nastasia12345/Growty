@@ -14,7 +14,7 @@ export interface Board {
   providedIn: 'root'
 })
 export class BoardService {
-  private apiUrl = 'https://localhost:5001/api/boards';
+  private apiUrl = 'http://localhost:5000/api/boards';
 
   constructor(private http: HttpClient) { }
 

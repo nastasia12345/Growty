@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TaskService {
-  private apiUrl = 'https://localhost:5001/api/tasks';
+  private apiUrl = 'http://localhost:5000/api/tasks';
 
   constructor(private http: HttpClient) { }
 
