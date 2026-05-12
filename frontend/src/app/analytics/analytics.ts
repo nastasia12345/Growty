@@ -359,6 +359,143 @@ export class AnalyticsComponent implements OnInit {
       text: `Your most productive time is ${topDay.day} ${topSlot.label.toLowerCase()}s. Schedule your Critical and High-priority tasks in that window!` };
   }
 
+  // ══════════ CAPACITY FORECAST ALGORITHM ══════════
+  // Based on: RiskCoefficient = PlannedLoad / AvgProductivity
+  // High risk > 1.3, Medium > 1.1, Low ≤ 1.1
+
+  readonly FORECAST_DAYS  = 14;  // look-ahead window
+  readonly HISTORY_DAYS   = 30;  // history window for avg productivity
+
+  // Priority weights for weighted load calculation
+  private readonly PRIORITY_WEIGHT: Record<string, number> = {
+    Critical: 2.0, High: 1.5, Medium: 1.0, Low: 0.5
+  };
+
+  get capacityForecast() {
+    const now          = new Date(); now.setHours(0, 0, 0, 0);
+    const historyStart = new Date(now.getTime() - this.HISTORY_DAYS * 86400000);
+    const forecastEnd  = new Date(now.getTime() + this.FORECAST_DAYS * 86400000);
+
+    // ── Step 2: Load history ────────────────────────
+    const completedInHistory = this.allTasks.filter(t =>
+      t.status === 'Done' && t.completedAt &&
+      new Date(t.completedAt) >= historyStart
+    );
+
+    // ── Step 3: Average productivity (weighted tasks/day, scaled to forecast window)
+    const totalWeight = completedInHistory.reduce(
+      (sum, t) => sum + (this.PRIORITY_WEIGHT[t.priority] ?? 1.0), 0
+    );
+    // Weighted tasks per day, extrapolated to forecast window
+    const avgProductivity = (totalWeight / this.HISTORY_DAYS) * this.FORECAST_DAYS;
+
+    // ── Step 4: Upcoming tasks with deadlines in forecast window ──
+    const upcomingTasks = this.allTasks
+      .filter(t => {
+        if (t.status === 'Done' || !t.deadline) return false;
+        const dl = new Date(t.deadline); dl.setHours(0, 0, 0, 0);
+        return dl >= now && dl <= forecastEnd;
+      })
+      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+
+    // Planned load = weighted sum of upcoming tasks
+    const plannedLoad = upcomingTasks.reduce(
+      (sum, t) => sum + (this.PRIORITY_WEIGHT[t.priority] ?? 1.0), 0
+    );
+
+    // ── Step 5: Risk coefficient ──────────────────────
+    const riskCoefficient = avgProductivity > 0
+      ? plannedLoad / avgProductivity
+      : (plannedLoad > 0 ? 2.0 : 0);
+
+    // ── Step 6: Risk level classification ────────────
+    const isHigh   = riskCoefficient > 1.3;
+    const isMedium = !isHigh && riskCoefficient > 1.1;
+    const riskLevel = isHigh ? 'high' : isMedium ? 'medium' : 'low';
+
+    // ── Step 7: Build prediction ──────────────────────
+    const rawAvgPerDay   = completedInHistory.length / this.HISTORY_DAYS;
+    const capacityRawPct = Math.round(riskCoefficient * 100);
+
+    // Task-count version (unweighted) for human-readable text
+    const upcomingCount  = upcomingTasks.length;
+    const avgCountPeriod = Math.round(rawAvgPerDay * this.FORECAST_DAYS * 10) / 10;
+    const surplus        = Math.round((plannedLoad - avgProductivity) * 10) / 10;
+
+    let warning      = '';
+    let prediction   = '';
+    let suggestion   = '';
+
+    if (isHigh) {
+      warning    = `⚠️ Overload detected — your planned workload is ${Math.round((riskCoefficient - 1) * 100)}% above your capacity.`;
+      prediction = `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${this.FORECAST_DAYS} days. Based on your history you typically complete ~${avgCountPeriod} tasks in this period.`;
+      suggestion = `Consider rescheduling low-priority tasks or splitting large ones. Focus Critical and High items first.`;
+    } else if (isMedium) {
+      warning    = `📋 Slightly above capacity — manageable with good prioritisation.`;
+      prediction = `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${this.FORECAST_DAYS} days, slightly above your average of ~${avgCountPeriod}.`;
+      suggestion = `Try to complete Medium and High tasks early in the week to avoid a last-minute crunch.`;
+    } else {
+      warning    = upcomingCount > 0
+        ? `✅ Workload is within your capacity — you're on track.`
+        : `✅ No tasks due in the next ${this.FORECAST_DAYS} days — great time to plan ahead.`;
+      prediction = upcomingCount > 0
+        ? `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${this.FORECAST_DAYS} days, well within your average capacity of ~${avgCountPeriod}.`
+        : `Your upcoming schedule is clear. Your average capacity is ~${avgCountPeriod} tasks per ${this.FORECAST_DAYS} days.`;
+      suggestion = `Keep your current rhythm. You could take on ${Math.max(0, Math.round(avgCountPeriod - upcomingCount))} more tasks comfortably.`;
+    }
+
+    // Daily breakdown for the forecast chart
+    const dailyMap: Record<string, { count: number; weight: number; tasks: any[] }> = {};
+    for (let i = 0; i < this.FORECAST_DAYS; i++) {
+      const d = new Date(now.getTime() + i * 86400000);
+      const key = d.toISOString().slice(0, 10);
+      dailyMap[key] = { count: 0, weight: 0, tasks: [] };
+    }
+    upcomingTasks.forEach(t => {
+      const key = new Date(t.deadline).toISOString().slice(0, 10);
+      if (dailyMap[key]) {
+        dailyMap[key].count++;
+        dailyMap[key].weight += this.PRIORITY_WEIGHT[t.priority] ?? 1.0;
+        dailyMap[key].tasks.push(t);
+      }
+    });
+
+    const dailyBreakdown = Object.entries(dailyMap).map(([date, val]) => {
+      const d = new Date(date);
+      return {
+        date,
+        dayLabel: d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }),
+        dayShort: d.toLocaleDateString('en-GB', { weekday: 'short' }),
+        dateNum:  d.getDate(),
+        ...val
+      };
+    });
+
+    const maxDailyWeight = Math.max(...dailyBreakdown.map(d => d.weight), 1);
+
+    return {
+      historyDays:      this.HISTORY_DAYS,
+      forecastDays:     this.FORECAST_DAYS,
+      completedCount:   completedInHistory.length,
+      avgProductivity:  Math.round(avgProductivity   * 10) / 10,
+      avgCountPeriod,
+      plannedLoad:      Math.round(plannedLoad        * 10) / 10,
+      upcomingCount,
+      upcomingTasks,
+      riskCoefficient:  Math.round(riskCoefficient   * 100) / 100,
+      capacityPct:      Math.min(capacityRawPct, 200),
+      riskLevel,
+      isHigh,
+      isMedium,
+      warning,
+      prediction,
+      suggestion,
+      dailyBreakdown,
+      maxDailyWeight,
+      noHistory:        completedInHistory.length === 0
+    };
+  }
+
   // ── Helpers ──────────────────────────────────────
   isOverdue(deadline: string): boolean {
     if (!deadline) return false;

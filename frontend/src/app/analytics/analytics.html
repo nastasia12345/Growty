@@ -257,6 +257,145 @@
 
         </div>
 
+        <!-- ── CAPACITY FORECAST ─────────────────────── -->
+        <div class="forecast-section">
+          <h2 class="section-title"><mat-icon>speed</mat-icon> Capacity Forecast
+            <span class="forecast-window">next {{ capacityForecast.forecastDays }} days</span>
+          </h2>
+
+          <!-- No history -->
+          <div class="forecast-no-data" *ngIf="capacityForecast.noHistory">
+            <mat-icon>history</mat-icon>
+            <p>Complete some tasks so we can calculate your average productivity and forecast capacity.</p>
+          </div>
+
+          <ng-container *ngIf="!capacityForecast.noHistory">
+
+            <!-- Risk banner -->
+            <div class="risk-banner"
+                 [class.risk-high]="capacityForecast.isHigh"
+                 [class.risk-medium]="capacityForecast.isMedium"
+                 [class.risk-low]="!capacityForecast.isHigh && !capacityForecast.isMedium">
+              <mat-icon class="risk-icon">
+                {{ capacityForecast.isHigh ? 'warning' : capacityForecast.isMedium ? 'info' : 'check_circle' }}
+              </mat-icon>
+              <div class="risk-text">
+                <strong>{{ capacityForecast.warning }}</strong>
+                <span>{{ capacityForecast.prediction }}</span>
+              </div>
+              <div class="risk-badge"
+                   [class.badge-high]="capacityForecast.isHigh"
+                   [class.badge-medium]="capacityForecast.isMedium"
+                   [class.badge-low]="!capacityForecast.isHigh && !capacityForecast.isMedium">
+                {{ capacityForecast.isHigh ? 'HIGH RISK' : capacityForecast.isMedium ? 'MEDIUM' : 'LOW RISK' }}
+              </div>
+            </div>
+
+            <!-- Metrics row -->
+            <div class="forecast-metrics">
+
+              <div class="fmetric">
+                <div class="fmetric-value">{{ capacityForecast.avgCountPeriod }}</div>
+                <div class="fmetric-label">Avg capacity</div>
+                <div class="fmetric-sub">tasks / {{ capacityForecast.forecastDays }} days</div>
+              </div>
+
+              <div class="fmetric-arrow"><mat-icon>arrow_forward</mat-icon></div>
+
+              <div class="fmetric">
+                <div class="fmetric-value"
+                     [class.value-high]="capacityForecast.isHigh"
+                     [class.value-medium]="capacityForecast.isMedium">
+                  {{ capacityForecast.upcomingCount }}
+                </div>
+                <div class="fmetric-label">Planned tasks</div>
+                <div class="fmetric-sub">with deadline ahead</div>
+              </div>
+
+              <div class="fmetric-arrow"><mat-icon>drag_handle</mat-icon></div>
+
+              <!-- Coefficient gauge -->
+              <div class="fmetric gauge-metric">
+                <div class="gauge-wrap">
+                  <svg viewBox="0 0 120 70" class="gauge-svg">
+                    <!-- Track arc -->
+                    <path d="M10,65 A55,55 0 0,1 110,65" fill="none" stroke="#f1f5f9" stroke-width="12" stroke-linecap="round"/>
+                    <!-- Value arc -->
+                    <path d="M10,65 A55,55 0 0,1 110,65" fill="none"
+                          [attr.stroke]="capacityForecast.isHigh ? '#ef4444' : capacityForecast.isMedium ? '#f59e0b' : '#10b981'"
+                          stroke-width="12" stroke-linecap="round"
+                          stroke-dasharray="172"
+                          [attr.stroke-dashoffset]="172 - (172 * (capacityForecast.capacityPct / 200))"/>
+                    <!-- Threshold markers -->
+                    <line x1="78" y1="18" x2="84" y2="24" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="95" y1="30" x2="102" y2="34" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Label -->
+                    <text x="60" y="56" text-anchor="middle" font-size="18" font-weight="900"
+                          [attr.fill]="capacityForecast.isHigh ? '#ef4444' : capacityForecast.isMedium ? '#f59e0b' : '#10b981'">
+                      {{ capacityForecast.riskCoefficient }}
+                    </text>
+                  </svg>
+                  <div class="gauge-labels">
+                    <span>0</span>
+                    <span>1.1</span>
+                    <span>1.3+</span>
+                  </div>
+                </div>
+                <div class="fmetric-label">Risk coefficient</div>
+                <div class="fmetric-sub">PlannedLoad / AvgCapacity</div>
+              </div>
+
+            </div>
+
+            <!-- Suggestion -->
+            <div class="forecast-suggestion">
+              <mat-icon>tips_and_updates</mat-icon>
+              <span>{{ capacityForecast.suggestion }}</span>
+            </div>
+
+            <!-- Daily timeline -->
+            <div class="forecast-timeline" *ngIf="capacityForecast.upcomingCount > 0">
+              <h3 class="timeline-title"><mat-icon>event</mat-icon> Task distribution — next {{ capacityForecast.forecastDays }} days</h3>
+              <div class="timeline-bars">
+                <div *ngFor="let day of capacityForecast.dailyBreakdown"
+                     class="timeline-day"
+                     [class.has-tasks]="day.count > 0"
+                     [matTooltip]="day.count > 0 ? (day.dayLabel + ': ' + day.count + ' task' + (day.count > 1 ? 's' : '')) : day.dayLabel">
+                  <div class="tl-bar-wrap">
+                    <div class="tl-bar"
+                         [style.height.%]="day.weight / capacityForecast.maxDailyWeight * 100"
+                         [class.tl-bar-high]="day.weight / capacityForecast.maxDailyWeight > 0.7"
+                         [class.tl-bar-med]="day.weight / capacityForecast.maxDailyWeight > 0.3 && day.weight / capacityForecast.maxDailyWeight <= 0.7"
+                         [class.tl-bar-low]="day.weight > 0 && day.weight / capacityForecast.maxDailyWeight <= 0.3">
+                    </div>
+                  </div>
+                  <div class="tl-count" *ngIf="day.count > 0">{{ day.count }}</div>
+                  <div class="tl-label">{{ day.dayShort }}</div>
+                  <div class="tl-date">{{ day.dateNum }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcoming task list -->
+            <div class="upcoming-tasks" *ngIf="capacityForecast.upcomingCount > 0">
+              <h3 class="timeline-title"><mat-icon>assignment_late</mat-icon> Upcoming tasks in forecast window</h3>
+              <div class="upcoming-list">
+                <div *ngFor="let t of capacityForecast.upcomingTasks" class="upcoming-row">
+                  <span class="up-priority" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
+                  <span class="up-title">{{ t.title }}</span>
+                  <span class="up-board">{{ t.boardTitle }}</span>
+                  <span class="up-deadline"
+                        [class.up-urgent]="isDueToday(t.deadline) || isOverdue(t.deadline)">
+                    <mat-icon class="up-dl-icon">schedule</mat-icon>
+                    {{ t.deadline | date:'dd MMM' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </ng-container>
+        </div>
+
       </ng-container>
     </ng-container>
 
