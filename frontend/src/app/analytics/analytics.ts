@@ -45,6 +45,15 @@ export class AnalyticsComponent implements OnInit {
   boards: any[] = [];
   allTasks: EnrichedTask[] = [];
 
+  // ── Tab navigation ───────────────────────────────
+  activeTab = 'overview';
+
+  tabs = [
+    { id: 'overview',  label: 'Overview',  icon: 'dashboard' },
+    { id: 'insights',  label: 'Insights',  icon: 'psychology' },
+    { id: 'tasks',     label: 'Tasks',     icon: 'task_alt' }
+  ];
+
   // ── Period selector ──────────────────────────────
   periods = [
     { label: 'Today',      value: 'today' },

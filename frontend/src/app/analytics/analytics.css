@@ -46,6 +46,60 @@
   flex-wrap: wrap;
 }
 
+/* ══════════ TAB BAR ══════════ */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 32px;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 18px;
+  padding: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: fit-content;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 13px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.tab-btn:hover {
+  background: #f1f5f9;
+  color: #374151;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+
+.tab-desc {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: -8px 0 28px;
+  font-weight: 500;
+}
+
 /* ══════════ LOADING ══════════ */
 .loading-state {
   display: flex;
@@ -497,8 +551,6 @@
 .empty-state p { font-size: 14px; margin: 0; }
 
 /* ══════════ PRODUCTIVITY INSIGHTS ══════════ */
-.insights-section { margin-bottom: 40px; }
-
 .section-sub {
   font-size: 13px;
   color: #94a3b8;
@@ -800,6 +852,8 @@
   .insights-grid { grid-template-columns: 1fr; }
   .insight-summary { flex-direction: column; grid-column: span 1; }
   .streak-grid { grid-template-columns: repeat(4, 1fr); }
+  .tab-bar { width: 100%; justify-content: stretch; }
+  .tab-btn { flex: 1; justify-content: center; padding: 0 12px; }
 }
 
 @media (max-width: 600px) {
@@ -809,4 +863,6 @@
   .search-field, .filter-select { width: 100%; }
   .header-actions { width: 100%; }
   .streak-grid { grid-template-columns: 1fr 1fr; }
+  .tab-btn span:not(mat-icon) { display: none; }
+  .tab-btn { padding: 0 16px; }
 }
