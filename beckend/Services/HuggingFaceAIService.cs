@@ -19,8 +19,23 @@ namespace beckend.Services
 
         public async Task<AISuggestionResult> ImproveTaskDescription(string originalDescription, string taskTitle)
         {
-            var systemPrompt = "You are a project management assistant. Fix spelling and grammar in task titles and descriptions. Be concise and professional. Return a JSON object with keys: improvedText (string) and subtasks (array of 2-3 short action items).";
-            var userPrompt = $"Task title: \"{taskTitle}\"\nDescription: \"{originalDescription}\"\n\nReturn only valid JSON, no explanation.";
+            var systemPrompt = """
+You are a project management expert specializing in SMART goals.
+Rewrite the task description in SMART format:
+- Specific: clear and unambiguous action
+- Measurable: concrete success criteria
+- Achievable: realistic scope
+- Relevant: tied to the task title
+- Time-bound: include a timeframe or milestone if possible
+
+Return ONLY a valid JSON object with exactly these keys:
+{
+  "improvedText": "<one concise SMART-formatted description paragraph>",
+  "subtasks": ["<action step 1>", "<action step 2>", "<action step 3>"]
+}
+Subtasks must be short, concrete action items (max 10 words each). No explanation outside the JSON.
+""";
+            var userPrompt = $"Task title: \"{taskTitle}\"\nOriginal description: \"{originalDescription}\"\n\nReturn only valid JSON.";
 
             var raw = await CallApi(systemPrompt, userPrompt);
             return ParseResponse(raw, originalDescription);

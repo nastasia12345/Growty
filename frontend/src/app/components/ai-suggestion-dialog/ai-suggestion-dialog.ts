@@ -35,28 +35,30 @@ export class AiSuggestionDialog {
   ) { }
 
   acceptSuggestion() {
-    if (this.applyDescription && this.data.suggestion.improvedText) {
-      const updatedTask: any = {
-        ...this.data.task,
-        description: this.data.suggestion.improvedText
-      };
-      this.taskService.updateTask(this.data.task.id, updatedTask).subscribe();
-    }
+    const existingChecklist: { text: string; done: boolean }[] = (() => {
+      try { return this.data.task.checklist ? JSON.parse(this.data.task.checklist) : []; }
+      catch { return []; }
+    })();
 
-    if (this.applySubtasks && this.data.suggestion.subtasks?.length) {
-      this.data.suggestion.subtasks.forEach((subtaskTitle: string) => {
-        const newTask: any = {
-          title: subtaskTitle,
-          description: `Підзадача для: ${this.data.task.title}`,
-          status: 'ToDo',
-          priority: this.data.task.priority || 'Medium',
-          boardId: this.data.task.boardId
-        };
-        this.taskService.createTask(newTask).subscribe();
-      });
-    }
+    const newChecklist = this.applySubtasks && this.data.suggestion.subtasks?.length
+      ? [
+          ...existingChecklist,
+          ...this.data.suggestion.subtasks.map((t: string) => ({ text: t, done: false }))
+        ]
+      : existingChecklist;
 
-    this.dialogRef.close({ accepted: true });
+    const updatedTask: any = {
+      ...this.data.task,
+      description: this.applyDescription && this.data.suggestion.improvedText
+        ? this.data.suggestion.improvedText
+        : this.data.task.description,
+      checklist: newChecklist.length ? JSON.stringify(newChecklist) : (this.data.task.checklist ?? null)
+    };
+
+    this.taskService.updateTask(this.data.task.id, updatedTask).subscribe({
+      next:  () => this.dialogRef.close({ accepted: true }),
+      error: () => this.dialogRef.close({ accepted: true })
+    });
   }
 
   rejectSuggestion() {

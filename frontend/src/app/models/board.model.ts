@@ -1,3 +1,8 @@
+export interface ChecklistItem {
+  text: string;
+  done: boolean;
+}
+
 export interface Board {
   id: number;
   title: string;
@@ -15,4 +20,5 @@ export interface KanbanTask {
   status: 'ToDo' | 'InProgress' | 'Done';
   boardId: number;
   completedAt?: string;
+  checklist?: string; // JSON string: ChecklistItem[]
 }

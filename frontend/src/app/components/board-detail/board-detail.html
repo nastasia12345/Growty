@@ -1,6 +1,6 @@
 <mat-drawer-container class="drawer-container">
 
-  <!-- ========================= SIDEBAR ========================= -->
+  <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
   <mat-drawer #drawer mode="over" position="end" class="task-sidebar">
 
     <div class="sidebar-header">
@@ -8,34 +8,53 @@
         <h2>{{ editingTask ? 'Edit Task' : 'New Task' }}</h2>
         <p>{{ editingTask ? 'Update task details' : 'Create a new task' }}</p>
       </div>
-      <button mat-icon-button (click)="drawer.close()">
+      <button mat-icon-button (click)="drawer.close(); resetForm()">
         <mat-icon>close</mat-icon>
       </button>
     </div>
 
     <div class="sidebar-form">
-      <mat-form-field appearance="outline">
-        <mat-label>Title</mat-label>
-        <input matInput [(ngModel)]="taskForm.title" placeholder="Task title">
-      </mat-form-field>
+
+      <!-- Title with inline validation -->
+      <div class="form-field-wrap">
+        <mat-form-field appearance="outline" [class.field-error]="formErrors.title">
+          <mat-label>Title *</mat-label>
+          <input matInput [(ngModel)]="taskForm.title" placeholder="Task title"
+                 (ngModelChange)="formErrors.title = ''">
+          <mat-hint align="end">{{ taskForm.title.length }}/120</mat-hint>
+        </mat-form-field>
+        <div class="field-error-msg" *ngIf="formErrors.title">
+          <mat-icon>error_outline</mat-icon> {{ formErrors.title }}
+        </div>
+      </div>
 
       <mat-form-field appearance="outline">
         <mat-label>Description</mat-label>
-        <textarea matInput rows="4" [(ngModel)]="taskForm.description" placeholder="Task description"></textarea>
+        <textarea matInput rows="4" [(ngModel)]="taskForm.description"
+                  placeholder="What needs to be done?"></textarea>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Deadline</mat-label>
-        <input matInput type="datetime-local" [(ngModel)]="taskForm.deadline">
-      </mat-form-field>
+      <div class="form-field-wrap">
+        <mat-form-field appearance="outline" [class.field-error]="formErrors.deadline">
+          <mat-label>Deadline *</mat-label>
+          <input matInput [matDatepicker]="deadlinePicker"
+                 [(ngModel)]="deadlineDate"
+                 (ngModelChange)="formErrors.deadline = ''"
+                 placeholder="Pick a date" readonly>
+          <mat-datepicker-toggle matIconSuffix [for]="deadlinePicker"></mat-datepicker-toggle>
+          <mat-datepicker #deadlinePicker></mat-datepicker>
+        </mat-form-field>
+        <div class="field-error-msg" *ngIf="formErrors.deadline">
+          <mat-icon>error_outline</mat-icon> {{ formErrors.deadline }}
+        </div>
+      </div>
 
       <mat-form-field appearance="outline">
         <mat-label>Priority</mat-label>
         <mat-select [(ngModel)]="taskForm.priority">
-          <mat-option value="Low">🟢 Low</mat-option>
-          <mat-option value="Medium">🟡 Medium</mat-option>
-          <mat-option value="High">🔴 High</mat-option>
-          <mat-option value="Critical">🔥 Critical</mat-option>
+          <mat-option value="Low"><span class="opt-dot low"></span> Low</mat-option>
+          <mat-option value="Medium"><span class="opt-dot medium"></span> Medium</mat-option>
+          <mat-option value="High"><span class="opt-dot high"></span> High</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -47,19 +66,83 @@
           <mat-option value="Done">Done</mat-option>
         </mat-select>
       </mat-form-field>
+
+      <!-- Checklist -->
+      <div class="checklist-section">
+        <div class="checklist-header">
+          <mat-icon class="checklist-icon">checklist</mat-icon>
+          <span class="checklist-label">Checklist</span>
+          <span class="checklist-count" *ngIf="checklist.length">
+            {{ checklistDoneInForm() }} / {{ checklist.length }}
+          </span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="checklist-bar-wrap" *ngIf="checklist.length">
+          <div class="checklist-bar-track">
+            <div class="checklist-bar-fill"
+                 [style.width.%]="(checklistDoneInForm()) / checklist.length * 100"></div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="checklist-items">
+          <div *ngFor="let item of checklist; let i = index" class="checklist-item">
+            <div class="checklist-checkbox" [class.checked]="item.done" (click)="toggleChecklistItem(i)">
+              <mat-icon *ngIf="item.done">check</mat-icon>
+            </div>
+            <span class="checklist-text" [class.done-text]="item.done">{{ item.text }}</span>
+            <button class="checklist-remove" (click)="removeChecklistItem(i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Add item input -->
+        <div class="checklist-add">
+          <input class="checklist-add-input"
+                 [(ngModel)]="checklistInput"
+                 placeholder="Add an item…"
+                 (keydown.enter)="addChecklistItem()">
+          <button class="checklist-add-btn" (click)="addChecklistItem()" [disabled]="!checklistInput.trim()">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <div class="sidebar-actions">
-      <button mat-button class="cancel-btn" (click)="drawer.close()">Cancel</button>
-      <button mat-raised-button color="primary" class="save-btn" (click)="saveTask(); drawer.close()">
+      <button mat-button class="cancel-btn" (click)="drawer.close(); resetForm()">Cancel</button>
+      <button mat-raised-button color="primary" class="save-btn"
+              (click)="saveTask(); !formErrors.title && !formErrors.deadline && drawer.close()">
+        <mat-icon>{{ editingTask ? 'save' : 'add' }}</mat-icon>
         {{ editingTask ? 'Update' : 'Create' }}
       </button>
     </div>
 
   </mat-drawer>
 
-  <!-- ========================= MAIN BOARD ========================= -->
+  <!-- ═══════════════════════ MAIN BOARD ═══════════════════════ -->
   <div class="board-view">
+
+    <!-- DELETE CONFIRM OVERLAY -->
+    <div class="delete-overlay" *ngIf="deleteConfirm.show" (click)="cancelDelete()">
+      <div class="delete-dialog" (click)="$event.stopPropagation()">
+        <div class="delete-icon-wrap">
+          <mat-icon>delete_forever</mat-icon>
+        </div>
+        <h3>Delete task?</h3>
+        <p class="delete-task-name">"{{ deleteConfirm.taskTitle }}"</p>
+        <p class="delete-desc">This action cannot be undone.</p>
+        <div class="delete-actions">
+          <button mat-stroked-button (click)="cancelDelete()">Cancel</button>
+          <button mat-raised-button color="warn" (click)="confirmDelete()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- HEADER -->
     <div class="board-header">
@@ -69,109 +152,220 @@
         </button>
         <div>
           <h1>{{ board?.title }}</h1>
-          <p>Kanban board · {{ totalFiltered() }} tasks shown</p>
+          <p>
+            <span class="total-badge">{{ tasks.length }} total</span>
+            <span class="shown-badge" *ngIf="totalFiltered() !== tasks.length">· {{ totalFiltered() }} shown</span>
+            <span class="done-badge" *ngIf="boardCompletionPct > 0">· {{ boardCompletionPct }}% done</span>
+          </p>
         </div>
       </div>
+
+      <!-- Board-level mini progress -->
+      <div class="board-progress-wrap" *ngIf="tasks.length > 0">
+        <div class="board-progress-track">
+          <div class="board-progress-fill" [style.width.%]="boardCompletionPct"></div>
+        </div>
+        <span class="board-progress-label">{{ boardCompletionPct }}%</span>
+      </div>
+
+      <!-- View toggle -->
+      <div class="view-toggle">
+        <button class="view-btn" [class.active]="viewMode === 'kanban'"
+                (click)="setViewMode('kanban')" matTooltip="Kanban view">
+          <mat-icon>view_kanban</mat-icon>
+        </button>
+        <button class="view-btn" [class.active]="viewMode === 'pipeline'"
+                (click)="setViewMode('pipeline')" matTooltip="Pipeline view">
+          <mat-icon>view_timeline</mat-icon>
+        </button>
+      </div>
+
       <button mat-raised-button color="primary" class="new-task-btn"
-              (click)="openCreateTaskDialog(); drawer.open()">
+              (click)="openCreateTaskDialog('ToDo'); drawer.open()">
         <mat-icon>add</mat-icon>
         <span class="btn-text">New Task</span>
       </button>
     </div>
 
-    <!-- FILTER & SORT BAR -->
+    <!-- FILTER BAR -->
     <div class="filter-bar">
 
-      <!-- Period tabs -->
-      <div class="filter-group">
-        <span class="filter-label">Period</span>
-        <div class="filter-chips">
-          <button *ngFor="let p of filterPeriods"
-                  [class.active]="activeFilter === p.value"
-                  (click)="setFilter(p.value)"
-                  class="chip">
-            {{ p.label }}
-          </button>
-        </div>
-      </div>
-
-      <div class="filter-divider"></div>
-
-      <!-- Priority filter -->
-      <div class="filter-group">
-        <span class="filter-label">Priority</span>
-        <div class="filter-chips">
-          <button *ngFor="let pf of priorityFilters"
-                  [ngClass]="['chip', 'priority-chip', pf.value.toLowerCase(), activePriority === pf.value ? 'active' : '']"
-                  (click)="setPriority(pf.value)">
-            {{ pf.label }}
-          </button>
-        </div>
-      </div>
-
-      <div class="filter-divider"></div>
-
-      <!-- Sort dropdown -->
-      <div class="filter-group sort-group">
-        <span class="filter-label">Sort by</span>
-        <button mat-stroked-button [matMenuTriggerFor]="sortMenu" class="sort-btn">
-          <mat-icon>sort</mat-icon>
-          <span class="sort-label-text">{{ activeSortLabel }}</span>
-          <mat-icon>expand_more</mat-icon>
+      <!-- Search -->
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input class="search-input" type="text" placeholder="Search tasks…"
+               [(ngModel)]="taskSearch" (ngModelChange)="onSearchChange()">
+        <button mat-icon-button class="search-clear" *ngIf="taskSearch" (click)="taskSearch = ''; onSearchChange()">
+          <mat-icon>close</mat-icon>
         </button>
-        <mat-menu #sortMenu="matMenu">
-          <button mat-menu-item *ngFor="let s of sortOptions"
-                  (click)="setSort(s.value)"
-                  [class.sort-active]="activeSortBy === s.value">
-            <mat-icon *ngIf="activeSortBy === s.value">check</mat-icon>
-            <mat-icon *ngIf="activeSortBy !== s.value" style="opacity:0">check</mat-icon>
-            {{ s.label }}
-          </button>
-        </mat-menu>
       </div>
 
-      <!-- Saved / Reset indicator -->
+      <div class="filter-divider"></div>
+
+      <!-- Priority dropdown -->
+      <div class="filter-group">
+        <mat-icon class="filter-cal-icon">flag</mat-icon>
+        <select class="priority-select"
+                [ngModel]="activePriority"
+                (ngModelChange)="setPriority($event)"
+                [class.priority-active]="activePriority !== 'all'">
+          <option *ngFor="let pf of priorityFilters" [value]="pf.value">{{ pf.label }}</option>
+        </select>
+      </div>
+
+      <!-- Clear -->
       <div class="filter-actions">
-        <div class="saved-badge" *ngIf="hasActiveFilters" matTooltip="Filters saved to your browser">
-          <mat-icon>bookmark</mat-icon>
-          Saved
-        </div>
         <button mat-icon-button *ngIf="hasActiveFilters"
-                (click)="clearFilters()"
-                matTooltip="Reset all filters"
-                class="reset-btn">
+                (click)="clearFilters()" matTooltip="Clear all filters" class="reset-btn">
           <mat-icon>filter_alt_off</mat-icon>
         </button>
       </div>
 
     </div>
 
+    <!-- ═══════════════════ PIPELINE VIEW ═══════════════════ -->
+    <div class="pipeline-view" *ngIf="viewMode === 'pipeline'">
+
+      <!-- No-deadline strip -->
+      <div class="pipeline-no-dl" *ngIf="pipelineNoDeadlineTasks.length > 0">
+        <span class="pipeline-no-dl-label">No deadline</span>
+        <div class="pipeline-no-dl-tasks">
+          <span *ngFor="let t of pipelineNoDeadlineTasks"
+                class="no-dl-task" [class]="'ndl-' + t.priority?.toLowerCase()">
+            {{ t.title }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Timeline grid -->
+      <div class="pipeline-scroll">
+
+        <!-- Jump to today -->
+        <button class="pipeline-today-btn" (click)="jumpToToday()" matTooltip="Jump to today">
+          <mat-icon>today</mat-icon>
+          Today
+        </button>
+
+        <div class="pipeline-grid">
+
+          <div *ngFor="let day of pipelineDays"
+               class="pipeline-col"
+               [class.is-today]="isPipelineToday(day)"
+               [class.is-past]="isPipelinePast(day) && !isPipelineToday(day)"
+               [class.is-monday]="isMonday(day) && !isPipelineToday(day)">
+
+            <!-- Column header -->
+            <div class="pipeline-col-header">
+              <div class="pipeline-month-label">{{ pipelineMonthLabel(day) }}</div>
+              <div class="pipeline-week-label" *ngIf="isMonday(day)">Wk {{ weekNumber(day) }}</div>
+              <div class="pipeline-day-num">{{ day | date:'d' }}</div>
+              <div class="pipeline-day-name">{{ day | date:'EEE' }}</div>
+            </div>
+
+            <!-- Tasks in this day -->
+            <div class="pipeline-col-body">
+              <div *ngFor="let t of getTasksForDay(day)"
+                   class="pipeline-task"
+                   [class]="'pt-' + t.priority?.toLowerCase()"
+                   [class.pt-done]="t.status === 'Done'"
+                   (click)="editTask(t); drawer.open()"
+                   [matTooltip]="t.title">
+                <div class="pt-status-dot" [class]="'psd-' + t.status?.toLowerCase()"></div>
+                <span class="pt-title">{{ t.title }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /pipeline-scroll -->
+    </div><!-- /pipeline-view -->
+
     <!-- KANBAN COLUMNS -->
-    <div class="kanban-columns">
+    <div class="kanban-columns" *ngIf="viewMode === 'kanban'">
 
-      <div *ngFor="let column of columns" class="column">
+      <div *ngFor="let column of columns" class="column"
+           [class.col-todo]="column.status === 'ToDo'"
+           [class.col-inprog]="column.status === 'InProgress'"
+           [class.col-done]="column.status === 'Done'">
 
+        <!-- Column header -->
         <div class="column-header">
-          <h3>{{ column.name }}</h3>
-          <span class="column-count">{{ getTasksByStatus(column.status).length }}</span>
+          <div class="col-header-left">
+            <mat-icon class="col-icon">{{ column.icon }}</mat-icon>
+
+            <!-- Normal view -->
+            <ng-container *ngIf="editingColumnStatus !== column.status">
+              <h3 class="col-name">{{ colName(column.status) }}</h3>
+              <button mat-icon-button class="col-edit-btn"
+                      (click)="startEditColumn(column.status)"
+                      matTooltip="Rename column">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </ng-container>
+
+            <!-- Edit mode -->
+            <ng-container *ngIf="editingColumnStatus === column.status">
+              <input class="col-name-input"
+                     [(ngModel)]="columnNameInput"
+                     (keydown.enter)="saveColumnName()"
+                     (keydown.escape)="cancelEditColumn()"
+                     maxlength="40"
+                     autofocus>
+              <button mat-icon-button class="col-save-btn" (click)="saveColumnName()" matTooltip="Save">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button class="col-cancel-btn" (click)="cancelEditColumn()" matTooltip="Cancel">
+                <mat-icon>close</mat-icon>
+              </button>
+            </ng-container>
+          </div>
+
+          <div class="col-header-right">
+            <span class="overdue-badge" *ngIf="columnOverdueCount(column.status) > 0"
+                  matTooltip="{{ columnOverdueCount(column.status) }} overdue">
+              <mat-icon>warning</mat-icon>{{ columnOverdueCount(column.status) }}
+            </span>
+            <span class="column-count"
+                  [class.count-filtered]="getTasksByStatus(column.status).length !== totalTaskCount(column.status)">
+              {{ getTasksByStatus(column.status).length }}
+              <span *ngIf="getTasksByStatus(column.status).length !== totalTaskCount(column.status)"
+                    class="count-total">/ {{ totalTaskCount(column.status) }}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Mini progress bar for Done column -->
+        <div class="col-progress" *ngIf="column.status === 'Done' && tasks.length > 0">
+          <div class="col-progress-fill" [style.width.%]="boardCompletionPct"></div>
         </div>
 
         <div class="task-list"
              cdkDropList
              [id]="column.status"
-             [cdkDropListData]="column.status === 'ToDo' ? todoTasks : column.status === 'InProgress' ? inProgressTasks : doneTasks"
+             [cdkDropListData]="getTasksByStatus(column.status)"
              [cdkDropListConnectedTo]="getConnectedDropLists()"
              (cdkDropListDropped)="drop($event, column.status)">
 
-          <div *ngFor="let task of (column.status === 'ToDo' ? todoTasks : column.status === 'InProgress' ? inProgressTasks : doneTasks)"
-               class="task-card" cdkDrag>
+          <div *ngFor="let task of getTasksByStatus(column.status)"
+               class="task-card"
+               cdkDrag
+               [class.card-overdue]="isOverdue(task.deadline) && task.status !== 'Done'"
+               [class.card-due-today]="isDueToday(task.deadline) && task.status !== 'Done'"
+               [class.card-done]="task.status === 'Done'">
+
+            <!-- Drag handle indicator -->
+            <div class="drag-handle" cdkDragHandle>
+              <mat-icon>drag_indicator</mat-icon>
+            </div>
 
             <div class="task-title-row">
               <div class="task-title">{{ task.title }}</div>
+              <!-- AI button -->
               <button mat-icon-button class="ai-btn"
                       [disabled]="aiLoadingTaskId === task.id"
                       (click)="openAISuggestion(task)"
-                      matTooltip="Improve with AI">
+                      matTooltip="Improve with AI (SMART format)">
                 <mat-icon *ngIf="aiLoadingTaskId !== task.id">auto_awesome</mat-icon>
                 <mat-icon *ngIf="aiLoadingTaskId === task.id" class="spinner">autorenew</mat-icon>
               </button>
@@ -179,36 +373,67 @@
 
             <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
 
+            <!-- Checklist mini progress (only when task has checklist items) -->
+            <div class="card-checklist" *ngIf="checklistTotalCount(task) > 0">
+              <div class="card-checklist-bar">
+                <div class="card-checklist-fill" [style.width.%]="checklistPct(task)"></div>
+              </div>
+              <span class="card-checklist-label">
+                <mat-icon class="card-checklist-icon">check_box</mat-icon>
+                {{ checklistDoneCount(task) }}/{{ checklistTotalCount(task) }}
+              </span>
+            </div>
+
             <div class="task-meta">
               <span class="priority" [ngClass]="task.priority?.toLowerCase()">
                 {{ task.priority }}
               </span>
-              <span *ngIf="task.deadline"
-                    class="deadline"
-                    [class.overdue]="isOverdue(task.deadline)"
-                    [class.due-today]="isDueToday(task.deadline)">
+              <span *ngIf="task.deadline" class="deadline"
+                    [class.overdue]="isOverdue(task.deadline) && task.status !== 'Done'"
+                    [class.due-today]="isDueToday(task.deadline) && task.status !== 'Done'"
+                    [class.due-soon]="isDueSoon(task.deadline) && task.status !== 'Done'">
                 <mat-icon class="deadline-icon">schedule</mat-icon>
-                {{ task.deadline | date:'dd.MM HH:mm' }}
+                {{ task.deadline | date:'dd MMM HH:mm' }}
+                <span class="deadline-tag" *ngIf="isOverdue(task.deadline) && task.status !== 'Done'">overdue</span>
+                <span class="deadline-tag today-tag" *ngIf="isDueToday(task.deadline) && task.status !== 'Done'">today</span>
               </span>
             </div>
 
             <div class="task-actions">
-              <button mat-icon-button (click)="editTask(task); drawer.open()" matTooltip="Edit">
+              <!-- Quick complete button (only for non-Done tasks) -->
+              <button mat-icon-button class="quick-done-btn"
+                      *ngIf="task.status !== 'Done'"
+                      (click)="quickComplete(task)"
+                      matTooltip="Mark as Done">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+              <button mat-icon-button class="edit-btn"
+                      (click)="editTask(task); drawer.open()" matTooltip="Edit task">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteTask(task.id)" matTooltip="Delete">
+              <button mat-icon-button class="delete-btn"
+                      (click)="deleteTask(task.id, task.title)" matTooltip="Delete task">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
 
           </div>
 
+          <!-- Empty column state -->
           <div *ngIf="getTasksByStatus(column.status).length === 0" class="empty-column">
-            <mat-icon>inbox</mat-icon>
-            <p>No tasks</p>
+            <mat-icon>{{ taskSearch ? 'search_off' : 'inbox' }}</mat-icon>
+            <p>{{ taskSearch ? 'No match for "' + taskSearch + '"' : 'No tasks' }}</p>
           </div>
 
         </div>
+
+        <!-- Per-column add task button -->
+        <button class="col-add-btn" *ngIf="!taskSearch"
+                (click)="openCreateTaskDialog(column.status); drawer.open()">
+          <mat-icon>add</mat-icon>
+          Add task
+        </button>
+
       </div>
 
     </div>

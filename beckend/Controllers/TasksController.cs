@@ -20,6 +20,20 @@ namespace beckend.Controllers
             _stats   = stats;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllTasks()
+        {
+            var tasks = await _context.Tasks
+                .Where(t => t.UserId == _tempUserId)
+                .Select(t => new {
+                    t.Id, t.Title, t.Description, t.Deadline,
+                    t.Priority, t.Status, t.BoardId, t.UserId,
+                    t.CompletedAt, t.Checklist
+                })
+                .ToListAsync();
+            return Ok(tasks);
+        }
+
         [HttpGet("board/{boardId}")]
         public async Task<IActionResult> GetTasksByBoard(int boardId)
         {
@@ -28,7 +42,7 @@ namespace beckend.Controllers
                 .Select(t => new {
                     t.Id, t.Title, t.Description, t.Deadline,
                     t.Priority, t.Status, t.BoardId, t.UserId,
-                    t.CompletedAt
+                    t.CompletedAt, t.Checklist
                 })
                 .ToListAsync();
             return Ok(tasks);
@@ -46,7 +60,7 @@ namespace beckend.Controllers
                 return Ok(new {
                     task.Id, task.Title, task.Description, task.Deadline,
                     task.Priority, task.Status, task.BoardId, task.UserId,
-                    task.CompletedAt
+                    task.CompletedAt, task.Checklist
                 });
             }
             catch (Exception ex)
@@ -73,6 +87,7 @@ namespace beckend.Controllers
                 task.Deadline    = updated.Deadline;
                 task.Priority    = updated.Priority;
                 task.Status      = updated.Status;
+                task.Checklist   = updated.Checklist;
 
                 if (!wasDone && task.Status == "Done")
                 {
@@ -89,7 +104,7 @@ namespace beckend.Controllers
                 return Ok(new {
                     task.Id, task.Title, task.Description, task.Deadline,
                     task.Priority, task.Status, task.BoardId, task.UserId,
-                    task.CompletedAt
+                    task.CompletedAt, task.Checklist
                 });
             }
             catch (Exception ex)

@@ -1,39 +1,48 @@
 <h2 mat-dialog-title>
   <mat-icon>auto_awesome</mat-icon>
-  AI Покращення задачі
+  Допомога від AI: покращення опису завдання
 </h2>
 
 <mat-dialog-content>
   <div class="confidence-badge" [class.high]="data.suggestion.confidence > 70">
-    Впевненість AI: {{ data.suggestion.confidence }}%
+    <mat-icon>psychology</mat-icon>
+    AI confidence: {{ data.suggestion.confidence }}%
+    <span class="smart-tag">SMART format</span>
   </div>
 
   <mat-divider></mat-divider>
 
-  <!-- Оригінальний опис -->
+  <!-- Original description -->
   <div class="section">
-    <h3>📝 Оригінальний опис:</h3>
+    <h3><span class="sec-icon">📝</span> Original description</h3>
     <div class="original-text">
-      {{ data.task.description || 'Опис відсутній' }}
+      {{ data.task.description || 'No description provided' }}
     </div>
   </div>
 
-  <!-- Покращений опис -->
+  <!-- SMART improved description -->
   <div class="section">
-    <h3>✨ Покращений опис (AI):</h3>
+    <h3><span class="sec-icon">✨</span> SMART-formatted description</h3>
+    <div class="smart-pills">
+      <span class="smart-pill">Specific</span>
+      <span class="smart-pill">Measurable</span>
+      <span class="smart-pill">Achievable</span>
+      <span class="smart-pill">Relevant</span>
+      <span class="smart-pill">Time-bound</span>
+    </div>
     <div class="improved-text">
       {{ data.suggestion.improvedText }}
     </div>
     <mat-checkbox [(ngModel)]="applyDescription">
-      Застосувати покращений опис
+      Apply improved description
     </mat-checkbox>
   </div>
 
   <mat-divider></mat-divider>
 
-  <!-- Підзадачі -->
+  <!-- Subtasks -->
   <div class="section" *ngIf="data.suggestion.subtasks?.length">
-    <h3>📋 Запропоновані підзадачі:</h3>
+    <h3><span class="sec-icon">📋</span> Auto-generated subtasks</h3>
     <ul class="subtasks-list">
       <li *ngFor="let subtask of data.suggestion.subtasks">
         <mat-icon>check_circle_outline</mat-icon>
@@ -41,7 +50,7 @@
       </li>
     </ul>
     <mat-checkbox [(ngModel)]="applySubtasks">
-      Додати підзадачі
+      Add to checklist
     </mat-checkbox>
   </div>
 </mat-dialog-content>
@@ -49,10 +58,10 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="rejectSuggestion()">
     <mat-icon>close</mat-icon>
-    Відхилити
+    Reject
   </button>
   <button mat-raised-button color="primary" (click)="acceptSuggestion()">
     <mat-icon>check</mat-icon>
-    Прийняти зміни
+    Apply changes
   </button>
 </mat-dialog-actions>

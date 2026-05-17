@@ -23,6 +23,8 @@ public partial class KanbanTask
 
     public DateTime? CompletedAt { get; set; }
 
+    public string? Checklist { get; set; } // JSON: [{"text":"...","done":false}]
+
     public virtual ICollection<Aisuggestion> Aisuggestions { get; set; } = new List<Aisuggestion>();
 
     public virtual Board? Board { get; set; }

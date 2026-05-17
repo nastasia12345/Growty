@@ -8,155 +8,218 @@
       </button>
       <div>
         <h1>Analytics</h1>
-        <p>{{ isLoading ? 'Loading…' : total + ' tasks across ' + boards.length + ' boards' }}</p>
+        <p>{{ isLoading ? 'Loading…' : total + ' tasks · ' + boards.length + ' boards' }}</p>
       </div>
     </div>
     <div class="header-actions">
-      <button mat-stroked-button (click)="loadAll()" matTooltip="Refresh data">
-        <mat-icon>refresh</mat-icon> Refresh
+      <button mat-icon-button class="back-btn" (click)="loadAll()" matTooltip="Refresh">
+        <mat-icon>refresh</mat-icon>
       </button>
-      <button mat-raised-button color="primary" (click)="exportCsv()" *ngIf="activeTab === 'tasks'">
-        <mat-icon>download</mat-icon> Export CSV
+
+      <!-- Period selector -->
+      <div class="export-period-wrap">
+        <select class="export-period-select" [(ngModel)]="xlsExportPeriod">
+          <option *ngFor="let o of xlsPeriodOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+        <div *ngIf="xlsExportPeriod === 'custom'" class="export-custom-dates">
+          <input type="date" class="date-input" [(ngModel)]="xlsExportFrom" placeholder="From">
+          <span class="date-sep">–</span>
+          <input type="date" class="date-input" [(ngModel)]="xlsExportTo" placeholder="To">
+        </div>
+      </div>
+
+      <button mat-stroked-button class="excel-btn" (click)="generateExcelReport()" [disabled]="isExporting">
+        <mat-icon>table_view</mat-icon>
+        {{ isExporting ? 'Generating…' : 'Export Excel' }}
       </button>
     </div>
   </div>
 
   <!-- ══════════ TAB BAR ══════════ -->
   <div class="tab-bar">
-    <button *ngFor="let t of tabs"
-            class="tab-btn"
-            [class.active]="activeTab === t.id"
-            (click)="activeTab = t.id">
-      <mat-icon>{{ t.icon }}</mat-icon>
-      {{ t.label }}
+    <button *ngFor="let t of tabs" class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
+      <mat-icon>{{ t.icon }}</mat-icon>{{ t.label }}
     </button>
   </div>
 
-  <!-- Loading -->
   <div class="loading-state" *ngIf="isLoading">
     <mat-icon class="spin">autorenew</mat-icon>
-    <p>Loading data…</p>
+    <p>Loading…</p>
   </div>
 
   <ng-container *ngIf="!isLoading">
 
     <!-- ══════════════════════════════════════════════ -->
-    <!--  TAB 1 · OVERVIEW                             -->
+    <!--  TAB 1 · OVERVIEW  — Bento dashboard grid     -->
     <!-- ══════════════════════════════════════════════ -->
     <ng-container *ngIf="activeTab === 'overview'">
 
-      <!-- Stat cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon boards-icon"><mat-icon>dashboard</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ boards.length }}</div>
-            <div class="stat-label">Boards</div>
-          </div>
-        </div>
+      <div class="bento-grid">
 
-        <div class="stat-card">
-          <div class="stat-icon all-icon"><mat-icon>assignment</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ total }}</div>
-            <div class="stat-label">Total tasks</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon done-icon"><mat-icon>check_circle</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ totalDone }}</div>
-            <div class="stat-label">Completed</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon prog-icon"><mat-icon>pending</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ totalInProg }}</div>
-            <div class="stat-label">In Progress</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon todo-icon"><mat-icon>radio_button_unchecked</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ totalTodo }}</div>
-            <div class="stat-label">To Do</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon overdue-icon"><mat-icon>warning</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ totalOverdue }}</div>
-            <div class="stat-label">Overdue</div>
-          </div>
-        </div>
-
-        <div class="stat-card rate-card">
-          <div class="stat-icon rate-icon"><mat-icon>insights</mat-icon></div>
-          <div class="stat-body">
-            <div class="stat-value">{{ completionRate }}%</div>
-            <div class="stat-label">Completion rate</div>
-            <mat-progress-bar mode="determinate" [value]="completionRate" class="rate-bar"></mat-progress-bar>
-          </div>
-        </div>
-
-        <div class="stat-card priority-breakdown">
-          <div class="stat-label-top">By priority</div>
-          <div class="priority-bars">
-            <div class="pbar-row">
-              <span class="pbadge critical">Critical</span>
-              <div class="pbar-track"><div class="pbar critical" [style.width.%]="total > 0 ? priorityCount('Critical') / total * 100 : 0"></div></div>
-              <span class="pcount">{{ priorityCount('Critical') }}</span>
-            </div>
-            <div class="pbar-row">
-              <span class="pbadge high">High</span>
-              <div class="pbar-track"><div class="pbar high" [style.width.%]="total > 0 ? priorityCount('High') / total * 100 : 0"></div></div>
-              <span class="pcount">{{ priorityCount('High') }}</span>
-            </div>
-            <div class="pbar-row">
-              <span class="pbadge medium">Medium</span>
-              <div class="pbar-track"><div class="pbar medium" [style.width.%]="total > 0 ? priorityCount('Medium') / total * 100 : 0"></div></div>
-              <span class="pcount">{{ priorityCount('Medium') }}</span>
-            </div>
-            <div class="pbar-row">
-              <span class="pbadge low">Low</span>
-              <div class="pbar-track"><div class="pbar low" [style.width.%]="total > 0 ? priorityCount('Low') / total * 100 : 0"></div></div>
-              <span class="pcount">{{ priorityCount('Low') }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Board breakdown -->
-      <section class="section">
-        <h2 class="section-title"><mat-icon>view_column</mat-icon> Board overview</h2>
-        <div class="boards-grid">
-          <div class="board-stat-card" *ngFor="let b of boards">
-            <div class="bsc-header">
-              <div class="bsc-icon">🌱</div>
-              <div>
-                <div class="bsc-title">{{ b.title }}</div>
-                <div class="bsc-sub">{{ boardStats(b.id).total }} tasks · {{ boardStats(b.id).rate }}% done</div>
+        <!-- ① At a glance ─────────────────────────── -->
+        <div class="bento-card glance-card">
+          <div class="bc-label">At a glance</div>
+          <div class="glance-ring-row">
+            <svg class="glance-donut" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#f1f5f9" stroke-width="8"/>
+              <circle cx="40" cy="40" r="30" fill="none"
+                      [attr.stroke]="completionRate>=66?'#10b981':completionRate>=33?'#f59e0b':'#ef4444'"
+                      stroke-width="8" stroke-linecap="round"
+                      stroke-dasharray="188.5"
+                      [attr.stroke-dashoffset]="188.5-(188.5*completionRate/100)"
+                      transform="rotate(-90 40 40)"/>
+              <text x="40" y="44" text-anchor="middle" font-size="14" font-weight="900" fill="#0f172a">{{ completionRate }}%</text>
+            </svg>
+            <div class="glance-stats">
+              <div class="gs-row clickable" (click)="activeTab='tasks'; tableStatus='Done'">
+                <span class="gs-dot g-green"></span><span class="gs-lbl">Done</span>
+                <span class="gs-val g-green">{{ totalDone }}</span>
               </div>
-              <a mat-icon-button [routerLink]="['/board', b.id]" matTooltip="Open board">
-                <mat-icon>open_in_new</mat-icon>
-              </a>
-            </div>
-            <mat-progress-bar mode="determinate" [value]="boardStats(b.id).rate" class="board-progress"></mat-progress-bar>
-            <div class="bsc-counts">
-              <span class="bsc-badge todo">To Do: {{ boardStats(b.id).todo }}</span>
-              <span class="bsc-badge inprog">In Progress: {{ boardStats(b.id).inProgress }}</span>
-              <span class="bsc-badge done">Done: {{ boardStats(b.id).done }}</span>
-              <span class="bsc-badge overdue" *ngIf="boardStats(b.id).overdue > 0">⚠ {{ boardStats(b.id).overdue }} overdue</span>
+              <div class="gs-row clickable" (click)="activeTab='tasks'; tableStatus='InProgress'">
+                <span class="gs-dot g-amber"></span><span class="gs-lbl">In Progress</span>
+                <span class="gs-val">{{ totalInProg }}</span>
+              </div>
+              <div class="gs-row clickable" (click)="activeTab='tasks'; tableStatus='ToDo'">
+                <span class="gs-dot g-slate"></span><span class="gs-lbl">To Do</span>
+                <span class="gs-val">{{ totalTodo }}</span>
+              </div>
+              <div class="gs-row" *ngIf="totalOverdue > 0">
+                <span class="gs-dot g-red"></span><span class="gs-lbl">Overdue</span>
+                <span class="gs-val g-red">{{ totalOverdue }}</span>
+              </div>
             </div>
           </div>
+          <div class="glance-total">{{ total }} tasks total across {{ boards.length }} boards</div>
         </div>
-      </section>
 
+        <!-- ② Priority breakdown ───────────────────── -->
+        <div class="bento-card">
+          <div class="bc-label">By priority</div>
+          <div class="bento-priority-list">
+            <div class="bpl-row">
+              <div class="bpl-head">
+                <span class="bpl-dot bpl-high"></span>
+                <span class="bpl-name">High</span>
+                <span class="bpl-num">{{ priorityCount('High') }}</span>
+              </div>
+              <div class="bpl-track"><div class="bpl-fill bpl-fill-high" [style.width.%]="total>0?priorityCount('High')/total*100:0"></div></div>
+            </div>
+            <div class="bpl-row">
+              <div class="bpl-head">
+                <span class="bpl-dot bpl-med"></span>
+                <span class="bpl-name">Medium</span>
+                <span class="bpl-num">{{ priorityCount('Medium') }}</span>
+              </div>
+              <div class="bpl-track"><div class="bpl-fill bpl-fill-med" [style.width.%]="total>0?priorityCount('Medium')/total*100:0"></div></div>
+            </div>
+            <div class="bpl-row">
+              <div class="bpl-head">
+                <span class="bpl-dot bpl-low"></span>
+                <span class="bpl-name">Low</span>
+                <span class="bpl-num">{{ priorityCount('Low') }}</span>
+              </div>
+              <div class="bpl-track"><div class="bpl-fill bpl-fill-low" [style.width.%]="total>0?priorityCount('Low')/total*100:0"></div></div>
+            </div>
+          </div>
+          <div class="bento-trend-row">
+            <span class="bt-chip"
+                  [class.bt-up]="trendCompleted.dir==='up'"
+                  [class.bt-down]="trendCompleted.dir==='down'"
+                  [class.bt-flat]="trendCompleted.dir==='flat'"
+                  matTooltip="Completed tasks vs prev 30 days">
+              <mat-icon>{{ trendCompleted.dir==='up'?'trending_up':trendCompleted.dir==='down'?'trending_down':'trending_flat' }}</mat-icon>
+              {{ trendCompleted.value }} this month
+            </span>
+          </div>
+        </div>
+
+        <!-- ③ Activity snapshot ─────────────────────── -->
+        <div class="bento-card activity-card">
+          <div class="bc-label">Activity</div>
+          <div class="activity-metrics">
+            <div class="am-item">
+              <div class="am-val">{{ streaks.current }}<span class="am-unit">d</span></div>
+              <div class="am-lbl">Current streak</div>
+            </div>
+            <div class="am-sep"></div>
+            <div class="am-item">
+              <div class="am-val">{{ onTimeRate }}<span class="am-unit">%</span></div>
+              <div class="am-lbl">On time</div>
+            </div>
+            <div class="am-sep"></div>
+            <div class="am-item">
+              <div class="am-val">{{ heatmapActiveDays }}</div>
+              <div class="am-lbl">Active days</div>
+            </div>
+          </div>
+          <div class="activity-ww">
+            <span class="ww-label">Weekday</span>
+            <div class="ww-bar-track">
+              <div class="ww-bar ww-weekday"
+                   [style.width.%]="(weekdayVsWeekend.weekday+weekdayVsWeekend.weekend)>0 ? weekdayVsWeekend.weekday/(weekdayVsWeekend.weekday+weekdayVsWeekend.weekend)*100 : 50">
+              </div>
+            </div>
+            <span class="ww-label">Weekend</span>
+          </div>
+          <div class="activity-ww-nums">
+            <span>{{ weekdayVsWeekend.weekday }}</span>
+            <span class="ww-vs">vs</span>
+            <span>{{ weekdayVsWeekend.weekend }}</span>
+          </div>
+        </div>
+
+        <!-- ④ Completion trend (full width) ──────────────────────── -->
+        <div class="bento-card bento-full">
+          <div class="bento-row-header">
+            <div class="bc-label">
+              Completion trend
+              <span class="bc-sub">tasks done per day</span>
+            </div>
+            <div class="heatmap-view-toggle">
+              <button *ngFor="let opt of lineChartWindowOptions" class="view-btn"
+                      [class.active]="lineChartWindow===opt.days"
+                      (click)="lineChartWindow=opt.days">
+                {{ opt.label }}
+              </button>
+            </div>
+          </div>
+
+          <div class="line-chart-wrap">
+            <svg class="line-chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <!-- grid lines -->
+              <line x1="40" y1="20" x2="590" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="40" y1="75" x2="590" y2="75" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="40" y1="130" x2="590" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+              <!-- y-axis labels -->
+              <text x="36" y="24" text-anchor="end" font-size="9" fill="#94a3b8">{{ lineChartMax }}</text>
+              <text x="36" y="79" text-anchor="end" font-size="9" fill="#94a3b8">{{ lineChartYMid }}</text>
+              <text x="36" y="134" text-anchor="end" font-size="9" fill="#94a3b8">0</text>
+              <!-- area fill -->
+              <polygon [attr.points]="lineChartArea" fill="url(#lineGrad)"/>
+              <!-- polyline -->
+              <polyline [attr.points]="lineChartPolyline" fill="none" stroke="#10b981" stroke-width="2"
+                        stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- dots for non-zero days -->
+              <ng-container *ngFor="let d of lineChartData">
+                <circle *ngIf="d.count > 0"
+                        [attr.cx]="d.x" [attr.cy]="d.y" r="3"
+                        fill="white" stroke="#10b981" stroke-width="2"
+                        [matTooltip]="d.label + ': ' + d.count + ' task' + (d.count !== 1 ? 's' : '')"/>
+              </ng-container>
+              <!-- x-axis labels -->
+              <text *ngFor="let lbl of lineChartXLabels"
+                    [attr.x]="lbl.x" y="150" text-anchor="middle" font-size="9" fill="#94a3b8">{{ lbl.label }}</text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
     </ng-container>
 
     <!-- ══════════════════════════════════════════════ -->
@@ -164,7 +227,6 @@
     <!-- ══════════════════════════════════════════════ -->
     <ng-container *ngIf="activeTab === 'insights'">
 
-      <!-- Empty state -->
       <div class="empty-state" *ngIf="totalDone === 0">
         <mat-icon>bar_chart</mat-icon>
         <p>Complete some tasks to unlock productivity insights</p>
@@ -172,38 +234,41 @@
 
       <ng-container *ngIf="totalDone > 0">
 
-        <p class="tab-desc">Based on {{ totalDone }} completed tasks — patterns in when you work best</p>
+        <!-- Controls -->
+        <div class="insights-controls">
+          <p class="tab-desc">{{ totalDone }} completed tasks analysed</p>
+          <div class="insights-period-selector">
+            <span class="insights-period-label">Period:</span>
+            <div class="insights-period-chips">
+              <button *ngFor="let opt of insightsPeriodOptions" class="pchip"
+                      [class.active]="insightsPeriodDays===opt.days" (click)="insightsPeriodDays=opt.days">
+                {{ opt.label }}
+              </button>
+            </div>
+          </div>
+        </div>
 
+        <!-- Patterns grid (4 equal cards) -->
+        <div class="insight-section-label"><mat-icon>psychology</mat-icon> Your Patterns</div>
         <div class="insights-grid">
 
-          <!-- Day of Week Chart -->
           <div class="insight-card">
-            <div class="insight-header">
-              <mat-icon>calendar_today</mat-icon>
-              <span>Most active day</span>
+            <div class="insight-header"><mat-icon>calendar_today</mat-icon><span>Most active day</span>
               <span class="insight-badge" *ngIf="bestDay">🏆 {{ bestDay }}</span>
             </div>
             <div class="dow-chart">
-              <div *ngFor="let d of dayOfWeekActivity"
-                   class="dow-row" [class.top-row]="d.isTop">
+              <div *ngFor="let d of dayOfWeekActivity" class="dow-row" [class.top-row]="d.isTop">
                 <span class="dow-label">{{ d.short }}</span>
-                <div class="dow-bar-track">
-                  <div class="dow-bar" [style.width.%]="d.pct" [class.top-bar]="d.isTop"></div>
-                </div>
+                <div class="dow-bar-track"><div class="dow-bar" [style.width.%]="d.pct" [class.top-bar]="d.isTop"></div></div>
                 <span class="dow-count">{{ d.count }}</span>
               </div>
             </div>
           </div>
 
-          <!-- Time of Day -->
           <div class="insight-card">
-            <div class="insight-header">
-              <mat-icon>schedule</mat-icon>
-              <span>Best time of day</span>
-            </div>
+            <div class="insight-header"><mat-icon>schedule</mat-icon><span>Best time of day</span></div>
             <div class="tod-chart">
-              <div *ngFor="let s of timeOfDayActivity"
-                   class="tod-row" [class.top-row]="s.isTop">
+              <div *ngFor="let s of timeOfDayActivity" class="tod-row" [class.top-row]="s.isTop">
                 <div class="tod-meta">
                   <mat-icon class="tod-icon">{{ s.icon }}</mat-icon>
                   <div class="tod-labels">
@@ -212,22 +277,36 @@
                   </div>
                   <span class="tod-count">{{ s.count }}</span>
                 </div>
-                <div class="tod-bar-track">
-                  <div class="tod-bar" [style.width.%]="s.pct" [class.top-bar]="s.isTop"></div>
-                </div>
+                <div class="tod-bar-track"><div class="tod-bar" [style.width.%]="s.pct" [class.top-bar]="s.isTop"></div></div>
               </div>
             </div>
           </div>
 
-          <!-- Performance + Recommendation -->
-          <div class="insight-card insight-summary">
-            <div class="insight-header">
-              <mat-icon>emoji_events</mat-icon>
-              <span>Performance</span>
+          <div class="insight-card power-days-card" *ngIf="powerDays.length > 0">
+            <div class="insight-header"><mat-icon>bolt</mat-icon><span>Power Days</span>
+              <span class="insight-badge">🔥 Top {{ powerDays.length }}</span>
             </div>
+            <p class="power-days-desc">Day + time combinations where you finish the most</p>
+            <div class="power-days-list">
+              <div *ngFor="let pd of powerDays" class="power-day-row" [class.peak-row]="pd.isPeak">
+                <div class="pd-rank">{{ pd.rank===1?'🥇':pd.rank===2?'🥈':'🥉' }}</div>
+                <div class="pd-info">
+                  <span class="pd-day">{{ pd.day }}</span>
+                  <span class="pd-slot"><mat-icon class="pd-icon">{{ pd.icon }}</mat-icon>{{ pd.slot }}</span>
+                </div>
+                <div class="pd-count"><span class="pd-num">{{ pd.count }}</span><span class="pd-unit">tasks</span></div>
+              </div>
+            </div>
+            <div class="power-tip" *ngIf="powerDays.length > 0">
+              <mat-icon>tips_and_updates</mat-icon>
+              Best window: <strong>{{ powerDays[0].day }} {{ powerDays[0].slot }}</strong>
+            </div>
+          </div>
 
+          <div class="insight-card insight-summary">
+            <div class="insight-header"><mat-icon>emoji_events</mat-icon><span>Performance</span></div>
             <div class="streak-grid">
-              <div class="streak-item" [class.streak-alive]="streaks.current > 0">
+              <div class="streak-item" [class.streak-alive]="streaks.current>0">
                 <div class="streak-num">{{ streaks.current }}</div>
                 <div class="streak-lbl">Current streak</div>
                 <div class="streak-unit">days</div>
@@ -248,7 +327,6 @@
                 <div class="streak-unit">completions</div>
               </div>
             </div>
-
             <div class="recommendation">
               <mat-icon class="rec-icon">{{ smartRecommendation.icon }}</mat-icon>
               <p class="rec-text">{{ smartRecommendation.text }}</p>
@@ -257,28 +335,32 @@
 
         </div>
 
-        <!-- ── CAPACITY FORECAST ─────────────────────── -->
-        <div class="forecast-section">
-          <h2 class="section-title"><mat-icon>speed</mat-icon> Capacity Forecast
-            <span class="forecast-window">next {{ capacityForecast.forecastDays }} days</span>
-          </h2>
+        <!-- Capacity Forecast -->
+        <div class="insight-section-label forecast-label"><mat-icon>speed</mat-icon> Capacity Forecast</div>
 
-          <!-- No history -->
+        <div class="forecast-panel">
+          <div class="forecast-header">
+            <div class="forecast-window-selector">
+              <span class="fw-label">Window:</span>
+              <button *ngFor="let opt of forecastWindowOptions" class="pchip"
+                      [class.active]="forecastWindowDays===opt.days" (click)="forecastWindowDays=opt.days">
+                {{ opt.label }}
+              </button>
+            </div>
+            <span class="forecast-window-badge">next {{ capacityForecast.forecastDays }} days</span>
+          </div>
+
           <div class="forecast-no-data" *ngIf="capacityForecast.noHistory">
             <mat-icon>history</mat-icon>
-            <p>Complete some tasks so we can calculate your average productivity and forecast capacity.</p>
+            <p>Complete some tasks to enable capacity forecasting.</p>
           </div>
 
           <ng-container *ngIf="!capacityForecast.noHistory">
-
-            <!-- Risk banner -->
             <div class="risk-banner"
                  [class.risk-high]="capacityForecast.isHigh"
                  [class.risk-medium]="capacityForecast.isMedium"
                  [class.risk-low]="!capacityForecast.isHigh && !capacityForecast.isMedium">
-              <mat-icon class="risk-icon">
-                {{ capacityForecast.isHigh ? 'warning' : capacityForecast.isMedium ? 'info' : 'check_circle' }}
-              </mat-icon>
+              <mat-icon class="risk-icon">{{ capacityForecast.isHigh?'warning':capacityForecast.isMedium?'info':'check_circle' }}</mat-icon>
               <div class="risk-text">
                 <strong>{{ capacityForecast.warning }}</strong>
                 <span>{{ capacityForecast.prediction }}</span>
@@ -287,113 +369,138 @@
                    [class.badge-high]="capacityForecast.isHigh"
                    [class.badge-medium]="capacityForecast.isMedium"
                    [class.badge-low]="!capacityForecast.isHigh && !capacityForecast.isMedium">
-                {{ capacityForecast.isHigh ? 'HIGH RISK' : capacityForecast.isMedium ? 'MEDIUM' : 'LOW RISK' }}
+                {{ capacityForecast.isHigh?'HIGH RISK':capacityForecast.isMedium?'MEDIUM':'LOW RISK' }}
               </div>
             </div>
 
-            <!-- Metrics row -->
             <div class="forecast-metrics">
-
               <div class="fmetric">
                 <div class="fmetric-value">{{ capacityForecast.avgCountPeriod }}</div>
                 <div class="fmetric-label">Avg capacity</div>
                 <div class="fmetric-sub">tasks / {{ capacityForecast.forecastDays }} days</div>
               </div>
-
               <div class="fmetric-arrow"><mat-icon>arrow_forward</mat-icon></div>
-
               <div class="fmetric">
-                <div class="fmetric-value"
-                     [class.value-high]="capacityForecast.isHigh"
-                     [class.value-medium]="capacityForecast.isMedium">
+                <div class="fmetric-value" [class.value-high]="capacityForecast.isHigh" [class.value-medium]="capacityForecast.isMedium">
                   {{ capacityForecast.upcomingCount }}
                 </div>
                 <div class="fmetric-label">Planned tasks</div>
                 <div class="fmetric-sub">with deadline ahead</div>
               </div>
-
               <div class="fmetric-arrow"><mat-icon>drag_handle</mat-icon></div>
-
-              <!-- Coefficient gauge -->
               <div class="fmetric gauge-metric">
                 <div class="gauge-wrap">
                   <svg viewBox="0 0 120 70" class="gauge-svg">
-                    <!-- Track arc -->
                     <path d="M10,65 A55,55 0 0,1 110,65" fill="none" stroke="#f1f5f9" stroke-width="12" stroke-linecap="round"/>
-                    <!-- Value arc -->
                     <path d="M10,65 A55,55 0 0,1 110,65" fill="none"
-                          [attr.stroke]="capacityForecast.isHigh ? '#ef4444' : capacityForecast.isMedium ? '#f59e0b' : '#10b981'"
-                          stroke-width="12" stroke-linecap="round"
-                          stroke-dasharray="172"
-                          [attr.stroke-dashoffset]="172 - (172 * (capacityForecast.capacityPct / 200))"/>
-                    <!-- Threshold markers -->
+                          [attr.stroke]="capacityForecast.isHigh?'#ef4444':capacityForecast.isMedium?'#f59e0b':'#10b981'"
+                          stroke-width="12" stroke-linecap="round" stroke-dasharray="172"
+                          [attr.stroke-dashoffset]="172-(172*(capacityForecast.capacityPct/200))"/>
                     <line x1="78" y1="18" x2="84" y2="24" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
                     <line x1="95" y1="30" x2="102" y2="34" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
-                    <!-- Label -->
                     <text x="60" y="56" text-anchor="middle" font-size="18" font-weight="900"
-                          [attr.fill]="capacityForecast.isHigh ? '#ef4444' : capacityForecast.isMedium ? '#f59e0b' : '#10b981'">
+                          [attr.fill]="capacityForecast.isHigh?'#ef4444':capacityForecast.isMedium?'#f59e0b':'#10b981'">
                       {{ capacityForecast.riskCoefficient }}
                     </text>
                   </svg>
-                  <div class="gauge-labels">
-                    <span>0</span>
-                    <span>1.1</span>
-                    <span>1.3+</span>
-                  </div>
+                  <div class="gauge-labels"><span>0</span><span>1.1</span><span>1.3+</span></div>
                 </div>
                 <div class="fmetric-label">Risk coefficient</div>
                 <div class="fmetric-sub">PlannedLoad / AvgCapacity</div>
               </div>
-
             </div>
 
-            <!-- Suggestion -->
             <div class="forecast-suggestion">
               <mat-icon>tips_and_updates</mat-icon>
               <span>{{ capacityForecast.suggestion }}</span>
             </div>
 
-            <!-- Daily timeline -->
-            <div class="forecast-timeline" *ngIf="capacityForecast.upcomingCount > 0">
-              <h3 class="timeline-title"><mat-icon>event</mat-icon> Task distribution — next {{ capacityForecast.forecastDays }} days</h3>
-              <div class="timeline-bars">
-                <div *ngFor="let day of capacityForecast.dailyBreakdown"
-                     class="timeline-day"
-                     [class.has-tasks]="day.count > 0"
-                     [matTooltip]="day.count > 0 ? (day.dayLabel + ': ' + day.count + ' task' + (day.count > 1 ? 's' : '')) : day.dayLabel">
-                  <div class="tl-bar-wrap">
-                    <div class="tl-bar"
-                         [style.height.%]="day.weight / capacityForecast.maxDailyWeight * 100"
-                         [class.tl-bar-high]="day.weight / capacityForecast.maxDailyWeight > 0.7"
-                         [class.tl-bar-med]="day.weight / capacityForecast.maxDailyWeight > 0.3 && day.weight / capacityForecast.maxDailyWeight <= 0.7"
-                         [class.tl-bar-low]="day.weight > 0 && day.weight / capacityForecast.maxDailyWeight <= 0.3">
-                    </div>
-                  </div>
-                  <div class="tl-count" *ngIf="day.count > 0">{{ day.count }}</div>
-                  <div class="tl-label">{{ day.dayShort }}</div>
-                  <div class="tl-date">{{ day.dateNum }}</div>
-                </div>
+            <div class="forecast-timeline">
+              <h3 class="timeline-title"><mat-icon>event</mat-icon> Distribution — next {{ capacityForecast.forecastDays }} days</h3>
+              <div class="line-chart-wrap">
+                <svg class="line-chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="distGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.02"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- grid lines -->
+                  <line x1="40" y1="20" x2="590" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+                  <line x1="40" y1="75" x2="590" y2="75" stroke="#f1f5f9" stroke-width="1"/>
+                  <line x1="40" y1="130" x2="590" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                  <!-- y-axis labels -->
+                  <text x="36" y="24" text-anchor="end" font-size="9" fill="#94a3b8">{{ distributionMax }}</text>
+                  <text x="36" y="79" text-anchor="end" font-size="9" fill="#94a3b8">{{ distributionYMid }}</text>
+                  <text x="36" y="134" text-anchor="end" font-size="9" fill="#94a3b8">0</text>
+                  <!-- area fill -->
+                  <polygon [attr.points]="distributionArea" fill="url(#distGrad)"/>
+                  <!-- polyline -->
+                  <polyline [attr.points]="distributionPolyline" fill="none" stroke="#f59e0b" stroke-width="2"
+                            stroke-linejoin="round" stroke-linecap="round"/>
+                  <!-- dots for days with tasks -->
+                  <ng-container *ngFor="let d of distributionChartData">
+                    <circle *ngIf="d.count > 0"
+                            [attr.cx]="d.x" [attr.cy]="d.y" r="3"
+                            fill="white" stroke="#f59e0b" stroke-width="2"
+                            [matTooltip]="d.label + ': ' + d.count + ' task' + (d.count !== 1 ? 's' : '')"/>
+                  </ng-container>
+                  <!-- x-axis labels -->
+                  <text *ngFor="let lbl of distributionXLabels"
+                        [attr.x]="lbl.x" y="150" text-anchor="middle" font-size="9" fill="#94a3b8">{{ lbl.label }}</text>
+                </svg>
               </div>
             </div>
 
-            <!-- Upcoming task list -->
             <div class="upcoming-tasks" *ngIf="capacityForecast.upcomingCount > 0">
-              <h3 class="timeline-title"><mat-icon>assignment_late</mat-icon> Upcoming tasks in forecast window</h3>
+              <h3 class="timeline-title"><mat-icon>assignment_late</mat-icon> Upcoming in window</h3>
               <div class="upcoming-list">
                 <div *ngFor="let t of capacityForecast.upcomingTasks" class="upcoming-row">
                   <span class="up-priority" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
                   <span class="up-title">{{ t.title }}</span>
                   <span class="up-board">{{ t.boardTitle }}</span>
-                  <span class="up-deadline"
-                        [class.up-urgent]="isDueToday(t.deadline) || isOverdue(t.deadline)">
-                    <mat-icon class="up-dl-icon">schedule</mat-icon>
-                    {{ t.deadline | date:'dd MMM' }}
+                  <span class="up-deadline" [class.up-urgent]="isDueToday(t.deadline)||isOverdue(t.deadline)">
+                    <mat-icon class="up-dl-icon">schedule</mat-icon>{{ t.deadline | date:'dd MMM' }}
                   </span>
                 </div>
               </div>
             </div>
-
           </ng-container>
+        </div>
+
+        <!-- Methodology -->
+        <div class="methodology-section">
+          <button class="methodology-toggle" (click)="showMethodology=!showMethodology">
+            <mat-icon>{{ showMethodology?'expand_less':'expand_more' }}</mat-icon>
+            <mat-icon>science</mat-icon>
+            How these algorithms work
+          </button>
+          <div class="methodology-content" *ngIf="showMethodology">
+            <div class="methodology-grid">
+              <div class="method-card">
+                <div class="method-title"><mat-icon>speed</mat-icon> Capacity Forecast</div>
+                <p>The <strong>Risk Coefficient</strong> = PlannedLoad / AvgCapacity. Tasks weighted: High × 1.5, Medium × 1.0, Low × 0.5. History window: last 30 days.</p>
+                <div class="method-formula">RiskCoefficient = PlannedLoad / AvgCapacity</div>
+                <div class="method-thresholds">
+                  <span class="mth high">Risk &gt; 1.3 → High</span>
+                  <span class="mth medium">Risk &gt; 1.1 → Medium</span>
+                  <span class="mth low">Risk ≤ 1.1 → On track</span>
+                </div>
+              </div>
+              <div class="method-card">
+                <div class="method-title"><mat-icon>bolt</mat-icon> Power Days</div>
+                <p>Cross-references day of week × time slot (Morning 6–11, Afternoon 12–16, Evening 17–21, Night). Top 3 combos ranked by completion frequency.</p>
+              </div>
+              <div class="method-card">
+                <div class="method-title"><mat-icon>local_fire_department</mat-icon> Streaks</div>
+                <p>Consecutive days with ≥ 1 completion. Alive if last active day = today or yesterday. On-time rate: <code>completedAt ≤ deadline</code> among Done tasks with deadline.</p>
+              </div>
+              <div class="method-card">
+                <div class="method-title"><mat-icon>show_chart</mat-icon> Completion Trend</div>
+                <p>Daily completed task count plotted as a polyline over the chosen window (7 / 30 / 90 days). Dots appear only on active days. Distribution chart shows upcoming weighted task load per day in the forecast window.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
       </ng-container>
@@ -404,97 +511,36 @@
     <!-- ══════════════════════════════════════════════ -->
     <ng-container *ngIf="activeTab === 'tasks'">
 
-      <!-- Completed by period -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title"><mat-icon>done_all</mat-icon> Completed by period</h2>
-          <div class="period-chips">
-            <button *ngFor="let p of periods"
-                    [class.active]="activePeriod === p.value"
-                    (click)="activePeriod = p.value"
-                    class="pchip">
-              {{ p.label }}
-            </button>
-          </div>
-        </div>
-
-        <div class="custom-range" *ngIf="activePeriod === 'custom'">
-          <mat-form-field appearance="outline" class="date-field">
-            <mat-label>From</mat-label>
-            <input matInput type="date" [(ngModel)]="customFrom">
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="date-field">
-            <mat-label>To</mat-label>
-            <input matInput type="date" [(ngModel)]="customTo">
-          </mat-form-field>
-        </div>
-
-        <div class="completed-summary">
-          <span class="completed-count">{{ completedInPeriod.length }} tasks completed</span>
-        </div>
-
-        <div class="completed-list" *ngIf="completedInPeriod.length > 0">
-          <div class="completed-row" *ngFor="let t of completedInPeriod">
-            <div class="cr-icon"><mat-icon>check_circle</mat-icon></div>
-            <div class="cr-body">
-              <div class="cr-title">{{ t.title }}</div>
-              <div class="cr-meta">
-                <span class="cr-board">{{ t.boardTitle }}</span>
-                <span class="cr-dot">·</span>
-                <span class="priority-badge" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
-                <span class="cr-dot">·</span>
-                <span class="cr-date">Completed {{ t.completedAt | date:'dd MMM yyyy, HH:mm' }}</span>
-                <span *ngIf="t.deadline" class="cr-dot">·</span>
-                <span *ngIf="t.deadline" class="cr-deadline" [class.late]="isOverdue(t.deadline)">
-                  Deadline {{ t.deadline | date:'dd MMM' }}
-                  <span *ngIf="isOverdue(t.deadline)"> (late)</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="empty-state" *ngIf="completedInPeriod.length === 0">
-          <mat-icon>inbox</mat-icon>
-          <p>No completed tasks for this period</p>
-        </div>
-      </section>
-
       <!-- All tasks table -->
       <section class="section">
         <div class="section-header">
           <h2 class="section-title"><mat-icon>table_rows</mat-icon> All tasks</h2>
           <span class="tasks-count">{{ filteredTasks.length }} of {{ total }}</span>
         </div>
-
         <div class="table-filters">
           <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Search tasks…</mat-label>
+            <mat-label>Search…</mat-label>
             <mat-icon matPrefix>search</mat-icon>
-            <input matInput [(ngModel)]="tableSearch" placeholder="Title or description">
+            <input matInput [(ngModel)]="tableSearch">
           </mat-form-field>
-
           <mat-form-field appearance="outline" class="filter-select">
             <mat-label>Status</mat-label>
             <mat-select [(ngModel)]="tableStatus">
-              <mat-option value="all">All statuses</mat-option>
+              <mat-option value="all">All</mat-option>
               <mat-option value="ToDo">To Do</mat-option>
               <mat-option value="InProgress">In Progress</mat-option>
               <mat-option value="Done">Done</mat-option>
             </mat-select>
           </mat-form-field>
-
           <mat-form-field appearance="outline" class="filter-select">
             <mat-label>Priority</mat-label>
             <mat-select [(ngModel)]="tablePriority">
-              <mat-option value="all">All priorities</mat-option>
-              <mat-option value="Critical">Critical</mat-option>
+              <mat-option value="all">All</mat-option>
               <mat-option value="High">High</mat-option>
               <mat-option value="Medium">Medium</mat-option>
               <mat-option value="Low">Low</mat-option>
             </mat-select>
           </mat-form-field>
-
           <mat-form-field appearance="outline" class="filter-select">
             <mat-label>Board</mat-label>
             <mat-select [(ngModel)]="tableBoard">
@@ -502,51 +548,36 @@
               <mat-option *ngFor="let b of boards" [value]="b.id.toString()">{{ b.title }}</mat-option>
             </mat-select>
           </mat-form-field>
-
           <mat-form-field appearance="outline" class="filter-select">
-            <mat-label>Sort by</mat-label>
+            <mat-label>Sort</mat-label>
             <mat-select [(ngModel)]="tableSortBy">
               <mat-option *ngFor="let s of sortOptions" [value]="s.value">{{ s.label }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
-
         <div class="table-wrap">
           <table class="tasks-table" *ngIf="filteredTasks.length > 0">
-            <thead>
-              <tr>
-                <th>Task</th>
-                <th>Board</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Deadline</th>
-                <th>Completed</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th>Task</th><th>Board</th><th>Status</th><th>Priority</th><th>Deadline</th><th>Completed</th>
+            </tr></thead>
             <tbody>
               <tr *ngFor="let t of filteredTasks"
-                  [class.row-done]="t.status === 'Done'"
-                  [class.row-overdue]="t.status !== 'Done' && isOverdue(t.deadline)">
+                  [class.row-done]="t.status==='Done'"
+                  [class.row-overdue]="t.status!=='Done'&&isOverdue(t.deadline)">
                 <td class="td-title">
                   <div class="task-name">{{ t.title }}</div>
                   <div class="task-desc" *ngIf="t.description">{{ t.description }}</div>
                 </td>
-                <td>
-                  <a class="board-link" [routerLink]="['/board', t.boardId]">{{ t.boardTitle }}</a>
-                </td>
-                <td>
-                  <span class="status-badge" [ngClass]="t.status.toLowerCase()">{{ statusLabel(t.status) }}</span>
-                </td>
-                <td>
-                  <span class="priority-badge" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
-                </td>
+                <td><a class="board-link" [routerLink]="['/board', t.boardId]">{{ t.boardTitle }}</a></td>
+                <td><span class="status-badge" [ngClass]="t.status.toLowerCase()">{{ statusLabel(t.status) }}</span></td>
+                <td><span class="priority-badge" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span></td>
                 <td>
                   <span *ngIf="t.deadline" class="deadline-cell"
-                        [class.overdue-text]="t.status !== 'Done' && isOverdue(t.deadline)"
+                        [class.overdue-text]="t.status!=='Done'&&isOverdue(t.deadline)"
                         [class.today-text]="isDueToday(t.deadline)">
                     {{ t.deadline | date:'dd MMM yyyy' }}
-                    <span class="overdue-tag" *ngIf="t.status !== 'Done' && isOverdue(t.deadline)">overdue</span>
-                    <span class="today-tag" *ngIf="isDueToday(t.deadline) && t.status !== 'Done'">today</span>
+                    <span class="overdue-tag" *ngIf="t.status!=='Done'&&isOverdue(t.deadline)">overdue</span>
+                    <span class="today-tag" *ngIf="isDueToday(t.deadline)&&t.status!=='Done'">today</span>
                   </span>
                   <span *ngIf="!t.deadline" class="no-deadline">—</span>
                 </td>
@@ -557,16 +588,60 @@
               </tr>
             </tbody>
           </table>
-
           <div class="empty-state" *ngIf="filteredTasks.length === 0">
             <mat-icon>search_off</mat-icon>
             <p>No tasks match your filters</p>
-            <button mat-stroked-button (click)="tableSearch=''; tableStatus='all'; tablePriority='all'; tableBoard='all'">
-              Clear filters
-            </button>
+            <button mat-stroked-button (click)="tableSearch='';tableStatus='all';tablePriority='all';tableBoard='all'">Clear filters</button>
           </div>
         </div>
       </section>
+
+      <!-- Completed by period -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title"><mat-icon>done_all</mat-icon> Completed by period</h2>
+          <div class="period-chips">
+            <button *ngFor="let p of periods" [class.active]="activePeriod===p.value" (click)="activePeriod=p.value" class="pchip">{{ p.label }}</button>
+          </div>
+        </div>
+        <div class="custom-range" *ngIf="activePeriod==='custom'">
+          <mat-form-field appearance="outline" class="date-field" [class.field-error-mat]="dateRangeError">
+            <mat-label>From</mat-label><input matInput type="date" [(ngModel)]="customFrom">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="date-field" [class.field-error-mat]="dateRangeError">
+            <mat-label>To</mat-label><input matInput type="date" [(ngModel)]="customTo">
+          </mat-form-field>
+          <div class="date-range-error" *ngIf="dateRangeError"><mat-icon>error_outline</mat-icon> {{ dateRangeError }}</div>
+        </div>
+        <div class="completed-summary">
+          <span class="completed-count">{{ completedInPeriod.length }} tasks completed</span>
+        </div>
+        <div class="completed-list" *ngIf="completedInPeriod.length > 0">
+          <div class="completed-row" *ngFor="let t of completedInPeriod">
+            <div class="cr-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="cr-body">
+              <div class="cr-title">{{ t.title }}</div>
+              <div class="cr-meta">
+                <span class="cr-board">{{ t.boardTitle }}</span>
+                <span class="cr-dot">·</span>
+                <span class="priority-badge" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
+                <span class="cr-dot">·</span>
+                <span class="cr-date">{{ t.completedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+                <ng-container *ngIf="t.deadline">
+                  <span class="cr-dot">·</span>
+                  <span class="cr-deadline" [class.late]="isOverdue(t.deadline)">
+                    Due {{ t.deadline | date:'dd MMM' }}<span *ngIf="isOverdue(t.deadline)"> (late)</span>
+                  </span>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="completedInPeriod.length === 0">
+          <mat-icon>inbox</mat-icon><p>No completed tasks for this period</p>
+        </div>
+      </section>
+
 
     </ng-container>
 

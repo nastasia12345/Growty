@@ -19,13 +19,25 @@
     <p>Loading...</p>
   </div>
 
-  <!-- Error banner (shown above content if backend unreachable) -->
+  <!-- Error banner -->
   <div class="error-banner" *ngIf="hasError && !isLoading">
     <mat-icon>warning_amber</mat-icon>
     Could not reach the server — showing offline data. Make sure the backend is running.
   </div>
 
   <ng-container *ngIf="!isLoading">
+
+    <!-- Wilting alert banner -->
+    <div class="wilting-banner"
+         *ngIf="wiltingMessage"
+         [class.wilting-critical]="wiltingLevel === 'critical'"
+         [class.wilting-moderate]="wiltingLevel === 'moderate'"
+         [class.wilting-mild]="wiltingLevel === 'mild'">
+      <span class="wilting-icon">
+        {{ wiltingLevel === 'critical' ? '🥀' : wiltingLevel === 'moderate' ? '🍂' : '⚠️' }}
+      </span>
+      <span>{{ wiltingMessage }}</span>
+    </div>
 
     <!-- ══════════ TOP ROW ══════════ -->
     <div class="top-row">
@@ -48,6 +60,18 @@
                  [style.background]="healthColor"></div>
           </div>
           <span class="health-percent">{{ healthPercent }}%</span>
+        </div>
+
+        <!-- Inactivity / overdue indicators -->
+        <div class="wilt-stats" *ngIf="wiltingLevel !== 'healthy'">
+          <div class="wilt-stat" *ngIf="inactiveDays > 0">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ inactiveDays }} day{{ inactiveDays !== 1 ? 's' : '' }} inactive</span>
+          </div>
+          <div class="wilt-stat wilt-overdue" *ngIf="overdueCount > 0">
+            <mat-icon>warning</mat-icon>
+            <span>{{ overdueCount }} overdue task{{ overdueCount !== 1 ? 's' : '' }}</span>
+          </div>
         </div>
 
         <div class="divider"></div>
@@ -85,14 +109,26 @@
       </div>
 
       <!-- RIGHT: Plant window -->
-      <div class="plant-window">
-        <div class="plant-window-label">
+      <div class="plant-window"
+           [class.plant-wilting-mild]="wiltingLevel === 'mild'"
+           [class.plant-wilting-moderate]="wiltingLevel === 'moderate'"
+           [class.plant-wilting-critical]="wiltingLevel === 'critical'">
+        <div class="plant-window-label"
+             [class.label-wilting]="wiltingLevel !== 'healthy'">
           <mat-icon>local_florist</mat-icon>
           Your Plant
         </div>
-        <div class="plant-placeholder">
-          <span class="placeholder-icon">🌿</span>
-          <span class="placeholder-text">Your plant will appear here</span>
+
+        <div class="plant-display">
+          <div class="plant-emoji" [class.wilting-anim]="wiltingLevel !== 'healthy'">
+            {{ plantEmoji }}
+          </div>
+          <div class="plant-status-label" [style.color]="healthColor">
+            {{ healthLabel }}
+          </div>
+          <div class="plant-health-mini">
+            <div class="phm-fill" [style.width.%]="healthPercent" [style.background]="healthColor"></div>
+          </div>
         </div>
       </div>
 
