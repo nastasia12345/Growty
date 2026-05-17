@@ -17,8 +17,6 @@ public partial class User
 
     public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
 
-    public virtual GamificationState? GamificationState { get; set; }
-
     public virtual ICollection<TaskFeedback> TaskFeedbacks { get; set; } = new List<TaskFeedback>();
 
     public virtual ICollection<KanbanTask> Tasks { get; set; } = new List<KanbanTask>();

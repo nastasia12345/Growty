@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using beckend.Data;
 
@@ -11,9 +12,11 @@ using beckend.Data;
 namespace beckend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260517195504_AddGamificationState")]
+    partial class AddGamificationState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,6 +278,16 @@ namespace beckend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("beckend.Models.GamificationState", b =>
+                {
+                    b.HasOne("beckend.Models.User", "User")
+                        .WithOne("GamificationState")
+                        .HasForeignKey("beckend.Models.GamificationState", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
 
             modelBuilder.Entity("beckend.Models.KanbanTask", b =>
                 {
@@ -336,6 +349,8 @@ namespace beckend.Migrations
             modelBuilder.Entity("beckend.Models.User", b =>
                 {
                     b.Navigation("Boards");
+
+                    b.Navigation("GamificationState");
 
                     b.Navigation("TaskFeedbacks");
 

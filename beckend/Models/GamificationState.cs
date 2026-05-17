@@ -16,6 +16,4 @@ public partial class GamificationState
     public DateOnly? LastActivityDate { get; set; }
 
     public DateTime UpdatedAt { get; set; }
-
-    public virtual User User { get; set; } = null!;
 }
