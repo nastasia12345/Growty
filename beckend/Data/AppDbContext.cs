@@ -22,6 +22,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<GamificationState> GamificationStates { get; set; }
 
+    public virtual DbSet<GoogleToken> GoogleTokens { get; set; }
+
     public virtual DbSet<KanbanTask> Tasks { get; set; }
 
     public virtual DbSet<TaskFeedback> TaskFeedbacks { get; set; }

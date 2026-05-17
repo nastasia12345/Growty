@@ -1,17 +1,19 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { timeout, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AnalyticsService, UserStats } from '../../services/analytics';
+import { GoogleCalendarService, GoogleEvent } from '../../services/google-calendar';
 
 interface CalendarDay {
   date: Date | null;
   dayNum: number | null;
   stats: UserStats | null;
+  googleEvents: GoogleEvent[];
   isToday: boolean;
   isCurrentMonth: boolean;
 }
@@ -28,18 +30,24 @@ export class CalendarComponent implements OnInit, OnDestroy {
   viewDate = new Date();
   today    = new Date();
   days: CalendarDay[] = [];
-  statsMap: Map<string, UserStats> = new Map();
-  isLoading = true;
-  hasError  = false;
+  statsMap: Map<string, UserStats>    = new Map();
+  googleEventsMap: Map<string, GoogleEvent[]> = new Map();
+  allGoogleEvents: GoogleEvent[] = [];
 
-  googleConnected = false;
+  isLoading  = true;
+  hasError   = false;
+
+  googleConnected  = false;
   googleConnecting = false;
+  googleSyncing    = false;
+  googleImporting  = false;
+  googleMessage    = '';
+  googleError      = '';
 
   hoveredDay: CalendarDay | null = null;
   tooltipX = 0;
   tooltipY = 0;
 
-  // Clock hands
   secondDeg = 0;
   minuteDeg = 0;
   hourDeg   = 0;
@@ -49,11 +57,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   constructor(
     private analyticsService: AnalyticsService,
+    private googleService: GoogleCalendarService,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.startClock();
+    this.handleCallbackParams();
+    this.checkGoogleStatus();
     this.loadStats();
   }
 
@@ -61,12 +73,64 @@ export class CalendarComponent implements OnInit, OnDestroy {
     clearInterval(this.clockTimer);
   }
 
+  // ── OAuth callback handling ──────────────────────────────────────────────
+
+  private handleCallbackParams() {
+    this.route.queryParams.subscribe(params => {
+      if (params['gcal'] === 'connected') {
+        this.googleConnected = true;
+        this.googleMessage   = '✓ Google Calendar connected! Your tasks have been synced.';
+        this.loadGoogleEvents();
+        window.history.replaceState({}, '', '/calendar');
+        this.cdr.markForCheck();
+      } else if (params['gcal_error']) {
+        const msg = params['gcal_error'];
+        this.googleError = msg === 'access_denied'
+          ? 'Access was denied. Please try again and allow the required permissions.'
+          : 'Could not connect to Google Calendar. Please try again.';
+        window.history.replaceState({}, '', '/calendar');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // ── Google status & events ───────────────────────────────────────────────
+
+  private checkGoogleStatus() {
+    this.googleService.getStatus().pipe(
+      catchError(() => of({ connected: false, connectedAt: null }))
+    ).subscribe(status => {
+      this.googleConnected = status.connected;
+      if (status.connected) this.loadGoogleEvents();
+      this.cdr.markForCheck();
+    });
+  }
+
+  private loadGoogleEvents() {
+    this.googleService.getEvents().pipe(
+      catchError(() => of([] as GoogleEvent[]))
+    ).subscribe(events => {
+      this.allGoogleEvents = events;
+      this.googleEventsMap.clear();
+      events.forEach(ev => {
+        if (!ev.start) return;
+        const key = ev.start.slice(0, 10);
+        if (!this.googleEventsMap.has(key)) this.googleEventsMap.set(key, []);
+        this.googleEventsMap.get(key)!.push(ev);
+      });
+      this.buildCalendar();
+      this.cdr.markForCheck();
+    });
+  }
+
+  // ── Clock ───────────────────────────────────────────────────────────────
+
   private startClock() {
     const tick = () => {
-      const now  = new Date();
-      const s    = now.getSeconds();
-      const m    = now.getMinutes() + s / 60;
-      const h    = (now.getHours() % 12) + m / 60;
+      const now = new Date();
+      const s   = now.getSeconds();
+      const m   = now.getMinutes() + s / 60;
+      const h   = (now.getHours() % 12) + m / 60;
       this.secondDeg = s * 6;
       this.minuteDeg = m * 6;
       this.hourDeg   = h * 30;
@@ -75,6 +139,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     tick();
     this.clockTimer = setInterval(tick, 1000);
   }
+
+  // ── Task stats ──────────────────────────────────────────────────────────
 
   private loadStats() {
     this.isLoading = true;
@@ -98,6 +164,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Calendar grid ───────────────────────────────────────────────────────
+
   buildCalendar() {
     const year  = this.viewDate.getFullYear();
     const month = this.viewDate.getMonth();
@@ -106,23 +174,29 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const cells: CalendarDay[] = [];
 
     for (let i = 0; i < first.getDay(); i++) {
-      cells.push({ date: null, dayNum: null, stats: null, isToday: false, isCurrentMonth: false });
+      cells.push({ date: null, dayNum: null, stats: null, googleEvents: [], isToday: false, isCurrentMonth: false });
     }
 
     for (let d = 1; d <= last.getDate(); d++) {
-      const date  = new Date(year, month, d);
-      const key   = this.isoKey(date);
+      const date    = new Date(year, month, d);
+      const key     = this.isoKey(date);
       const isToday = this.isoKey(this.today) === key;
-      cells.push({ date, dayNum: d, stats: this.statsMap.get(key) ?? null, isToday, isCurrentMonth: true });
+      cells.push({
+        date,
+        dayNum: d,
+        stats:        this.statsMap.get(key) ?? null,
+        googleEvents: this.googleEventsMap.get(key) ?? [],
+        isToday,
+        isCurrentMonth: true
+      });
     }
 
     const remainder = cells.length % 7;
     if (remainder !== 0) {
       for (let i = 0; i < 7 - remainder; i++) {
-        cells.push({ date: null, dayNum: null, stats: null, isToday: false, isCurrentMonth: false });
+        cells.push({ date: null, dayNum: null, stats: null, googleEvents: [], isToday: false, isCurrentMonth: false });
       }
     }
-
     this.days = cells;
   }
 
@@ -144,6 +218,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     return this.viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
   }
 
+  // ── Tooltip ─────────────────────────────────────────────────────────────
+
   onDayEnter(day: CalendarDay, event: MouseEvent) {
     if (!day.date) return;
     this.hoveredDay = day;
@@ -160,25 +236,115 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private positionTooltip(event: MouseEvent) {
-    this.tooltipX = event.clientX + 12;
-    this.tooltipY = event.clientY - 10;
+  private positionTooltip(e: MouseEvent) {
+    this.tooltipX = e.clientX + 12;
+    this.tooltipY = e.clientY - 10;
   }
 
   activityLevel(day: CalendarDay): string {
     if (!day.stats) return 'none';
-    const score = day.stats.activityScore;
-    if (score >= 8) return 'high';
-    if (score >= 4) return 'mid';
-    if (score >= 1) return 'low';
+    const s = day.stats.activityScore;
+    if (s >= 8) return 'high';
+    if (s >= 4) return 'mid';
+    if (s >= 1) return 'low';
     return 'none';
   }
 
+  // ── Google Calendar actions ──────────────────────────────────────────────
+
   connectGoogle() {
-    const clientId    = 'YOUR_GOOGLE_CLIENT_ID';
-    const redirectUri = encodeURIComponent(window.location.origin + '/calendar');
-    const scope       = encodeURIComponent('https://www.googleapis.com/auth/calendar.readonly');
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&prompt=consent`;
-    window.open(url, '_blank', 'width=500,height=600');
+    this.googleConnecting = true;
+    this.googleError      = '';
+    this.cdr.markForCheck();
+
+    this.googleService.getAuthUrl().subscribe({
+      next: ({ url }) => {
+        // Redirect in the same tab — Google returns back to /calendar?gcal=connected
+        window.location.href = url;
+      },
+      error: (err) => {
+        this.googleConnecting = false;
+        this.googleError = err?.error?.error
+          ?? 'Google OAuth is not configured. Please follow the setup instructions.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  syncNow() {
+    this.googleSyncing = true;
+    this.googleMessage = '';
+    this.googleError   = '';
+    this.cdr.markForCheck();
+
+    this.googleService.syncTasks().subscribe({
+      next: ({ synced }) => {
+        this.googleSyncing = false;
+        this.googleMessage = `✓ Synced ${synced} task${synced !== 1 ? 's' : ''} to Google Calendar.`;
+        this.loadGoogleEvents();
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.googleSyncing = false;
+        this.googleError   = 'Sync failed. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  importFromGoogle() {
+    this.googleImporting = true;
+    this.googleMessage   = '';
+    this.googleError     = '';
+    this.cdr.markForCheck();
+
+    this.googleService.importEvents().subscribe({
+      next: ({ imported }) => {
+        this.googleImporting = false;
+        this.googleMessage = imported > 0
+          ? `✓ Imported ${imported} event${imported !== 1 ? 's' : ''} as tasks.`
+          : '✓ No new events to import (all events already exist as tasks).';
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.googleImporting = false;
+        this.googleError = 'Import failed. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  disconnectGoogle() {
+    this.googleService.disconnect().subscribe({
+      next: () => {
+        this.googleConnected   = false;
+        this.allGoogleEvents   = [];
+        this.googleEventsMap.clear();
+        this.googleMessage     = '';
+        this.googleError       = '';
+        this.buildCalendar();
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // ── Upcoming events list ─────────────────────────────────────────────────
+
+  get upcomingEvents(): GoogleEvent[] {
+    const now = new Date().toISOString().slice(0, 10);
+    return this.allGoogleEvents
+      .filter(e => e.start && e.start.slice(0, 10) >= now)
+      .slice(0, 8);
+  }
+
+  formatEventTime(dateStr: string | null): string {
+    if (!dateStr) return '';
+    if (dateStr.length === 10) return 'All day';
+    return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  formatEventDate(dateStr: string | null): string {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
   }
 }
