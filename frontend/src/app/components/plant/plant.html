@@ -120,9 +120,17 @@
         </div>
 
         <div class="plant-display">
-          <div class="plant-emoji" [class.wilting-anim]="wiltingLevel !== 'healthy'">
-            {{ plantEmoji }}
+
+          <!-- ══ 3-D Plant ══ -->
+          <div class="plant-3d-wrap">
+            <app-plant-viewer
+              [healthPercent]="healthPercent"
+              [wiltingLevel]="wiltingLevel"
+              [done]="done"
+              [total]="total">
+            </app-plant-viewer>
           </div>
+
           <div class="plant-status-label" [style.color]="healthColor">
             {{ healthLabel }}
           </div>

@@ -413,7 +413,15 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 20px 0;
+  padding: 12px 0;
+}
+
+/* 3-D viewer container */
+.plant-3d-wrap {
+  width: 100%;
+  flex: 1;
+  min-height: 260px;
+  max-height: 380px;
 }
 
 .plant-emoji {

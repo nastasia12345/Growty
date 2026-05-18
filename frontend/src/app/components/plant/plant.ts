@@ -8,6 +8,7 @@ import { forkJoin, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { AnalyticsService } from '../../services/analytics';
 import { GamificationService, GamificationState } from '../../services/gamification';
+import { PlantViewerComponent } from './plant-viewer/plant-viewer';
 
 interface Collectible {
   emoji: string;
@@ -29,7 +30,7 @@ const ALL_COLLECTIBLES: Collectible[] = [
 @Component({
   selector: 'app-plant',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule, PlantViewerComponent],
   templateUrl: './plant.html',
   styleUrls: ['./plant.css']
 })
