@@ -221,11 +221,11 @@ export class PlantViewerComponent implements OnInit, OnDestroy, OnChanges {
         child.receiveShadow = true;
         const mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach(m => {
-          if (m instanceof THREE.MeshStandardMaterial || m instanceof THREE.MeshPhongMaterial) {
-            m.roughness  = 0.75;
-            m.metalness  = 0.0;
-            (m as any).needsUpdate = true;
+          if (m instanceof THREE.MeshStandardMaterial) {
+            m.roughness = 0.75;
+            m.metalness = 0.0;
           }
+          m.needsUpdate = true;
         });
       }
     });
