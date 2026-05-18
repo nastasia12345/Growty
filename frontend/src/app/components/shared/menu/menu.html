@@ -27,13 +27,76 @@
   </nav>
 
   <span class="spacer"></span>
+
+  <!-- ── User avatar / login button ── -->
+  <div class="user-area">
+
+    <!-- Not logged in: show person icon -->
+    <button
+      *ngIf="!auth.isLoggedIn"
+      class="user-btn guest"
+      (click)="openAuth()"
+      matTooltip="Sign in"
+    >
+      <mat-icon>person_outline</mat-icon>
+      <span class="user-btn-label">Sign in</span>
+    </button>
+
+    <!-- Logged in: show initials avatar -->
+    <div *ngIf="auth.isLoggedIn" class="avatar-wrap" (clickOutside)="closeDropdown()">
+      <button
+        class="user-btn avatar"
+        (click)="toggleDropdown()"
+        [matTooltip]="auth.currentUser()?.displayName || ''"
+      >
+        <span class="avatar-initials">{{ auth.initials }}</span>
+      </button>
+
+      <!-- Dropdown -->
+      <div class="user-dropdown" *ngIf="showUserDropdown" (click)="$event.stopPropagation()">
+        <div class="dropdown-header">
+          <div class="dropdown-avatar">{{ auth.initials }}</div>
+          <div>
+            <div class="dropdown-name">{{ auth.currentUser()?.displayName }}</div>
+            <div class="dropdown-email">{{ auth.currentUser()?.email }}</div>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item logout" (click)="logout()">
+          <mat-icon>logout</mat-icon> Sign out
+        </button>
+      </div>
+    </div>
+
+  </div>
 </mat-toolbar>
+
+<!-- Auth modal -->
+<app-auth-modal *ngIf="showAuthModal" (closed)="closeAuth()"></app-auth-modal>
+
+<!-- Close dropdown when clicking outside -->
+<div *ngIf="showUserDropdown" class="dropdown-overlay" (click)="closeDropdown()"></div>
 
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav mode="over" class="sidenav">
     <div class="sidenav-brand">
       🌱 <strong style="color:#10b981">Growty</strong>
     </div>
+
+    <!-- Sidenav user section -->
+    <div class="sidenav-user" *ngIf="auth.isLoggedIn">
+      <div class="sidenav-avatar">{{ auth.initials }}</div>
+      <div>
+        <div class="sidenav-name">{{ auth.currentUser()?.displayName }}</div>
+        <div class="sidenav-email">{{ auth.currentUser()?.email }}</div>
+      </div>
+    </div>
+    <div class="sidenav-login" *ngIf="!auth.isLoggedIn">
+      <button class="sidenav-login-btn" (click)="openAuth(); sidenav.close()">
+        <mat-icon>person_outline</mat-icon> Sign in
+      </button>
+    </div>
+
     <mat-nav-list>
       <a mat-list-item routerLink="/" routerLinkActive="active-item"
          [routerLinkActiveOptions]="{exact:true}" (click)="sidenav.close()">
@@ -55,6 +118,11 @@
       <a mat-list-item routerLink="/calendar" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>calendar_month</mat-icon>
         <span matListItemTitle>Calendar</span>
+      </a>
+      <div class="sidenav-divider" *ngIf="auth.isLoggedIn"></div>
+      <a mat-list-item *ngIf="auth.isLoggedIn" (click)="logout(); sidenav.close()" class="logout-item">
+        <mat-icon matListItemIcon>logout</mat-icon>
+        <span matListItemTitle>Sign out</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>

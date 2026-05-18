@@ -1,0 +1,125 @@
+<!-- Backdrop -->
+<div class="backdrop" (click)="close()"></div>
+
+<!-- Panel -->
+<div class="auth-panel">
+
+  <!-- Close -->
+  <button class="close-btn" (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <!-- Logo -->
+  <div class="auth-brand">🌱 <span>Growty</span></div>
+
+  <!-- Tabs -->
+  <div class="auth-tabs">
+    <button [class.active]="tab === 'login'"    (click)="switchTab('login')">Sign in</button>
+    <button [class.active]="tab === 'register'" (click)="switchTab('register')">Create account</button>
+  </div>
+
+  <!-- Success -->
+  <div class="auth-success" *ngIf="success">
+    <mat-icon>check_circle</mat-icon> {{ success }}
+  </div>
+
+  <!-- Error -->
+  <div class="auth-error" *ngIf="error">
+    <mat-icon>error_outline</mat-icon> {{ error }}
+  </div>
+
+  <!-- ── LOGIN FORM ── -->
+  <form *ngIf="tab === 'login'" (ngSubmit)="submitLogin()" class="auth-form" autocomplete="on">
+    <div class="field">
+      <label>Email address</label>
+      <div class="input-wrap">
+        <mat-icon>email</mat-icon>
+        <input type="email" [(ngModel)]="loginEmail" name="email"
+               placeholder="you@example.com" autocomplete="email" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <div class="input-wrap">
+        <mat-icon>lock</mat-icon>
+        <input [type]="showLoginPwd ? 'text' : 'password'"
+               [(ngModel)]="loginPassword" name="password"
+               placeholder="••••••••" autocomplete="current-password" required/>
+        <button type="button" class="eye-btn" (click)="showLoginPwd = !showLoginPwd" tabindex="-1">
+          <mat-icon>{{ showLoginPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="loading">
+      <mat-icon *ngIf="loading" class="spin">autorenew</mat-icon>
+      <mat-icon *ngIf="!loading">login</mat-icon>
+      {{ loading ? 'Signing in…' : 'Sign in' }}
+    </button>
+
+    <p class="switch-hint">
+      Don't have an account?
+      <button type="button" class="link-btn" (click)="switchTab('register')">Create one</button>
+    </p>
+  </form>
+
+  <!-- ── REGISTER FORM ── -->
+  <form *ngIf="tab === 'register'" (ngSubmit)="submitRegister()" class="auth-form" autocomplete="on">
+    <div class="field">
+      <label>Display name</label>
+      <div class="input-wrap">
+        <mat-icon>person</mat-icon>
+        <input type="text" [(ngModel)]="regName" name="displayName"
+               placeholder="Your name" autocomplete="name" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Email address</label>
+      <div class="input-wrap">
+        <mat-icon>email</mat-icon>
+        <input type="email" [(ngModel)]="regEmail" name="email"
+               placeholder="you@example.com" autocomplete="email" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password <span class="hint">(min. 6 characters)</span></label>
+      <div class="input-wrap">
+        <mat-icon>lock</mat-icon>
+        <input [type]="showRegPwd ? 'text' : 'password'"
+               [(ngModel)]="regPassword" name="password"
+               placeholder="••••••••" autocomplete="new-password" required/>
+        <button type="button" class="eye-btn" (click)="showRegPwd = !showRegPwd" tabindex="-1">
+          <mat-icon>{{ showRegPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Confirm password</label>
+      <div class="input-wrap">
+        <mat-icon>lock_outline</mat-icon>
+        <input [type]="showRegConfirm ? 'text' : 'password'"
+               [(ngModel)]="regConfirm" name="confirm"
+               placeholder="••••••••" autocomplete="new-password" required/>
+        <button type="button" class="eye-btn" (click)="showRegConfirm = !showRegConfirm" tabindex="-1">
+          <mat-icon>{{ showRegConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="loading">
+      <mat-icon *ngIf="loading" class="spin">autorenew</mat-icon>
+      <mat-icon *ngIf="!loading">person_add</mat-icon>
+      {{ loading ? 'Creating account…' : 'Create account' }}
+    </button>
+
+    <p class="switch-hint">
+      Already have an account?
+      <button type="button" class="link-btn" (click)="switchTab('login')">Sign in</button>
+    </p>
+  </form>
+
+</div>

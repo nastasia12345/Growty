@@ -1,6 +1,9 @@
 using beckend.Data;
 using beckend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient();
+
+// JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey         = new SymmetricSecurityKey(
+                                           Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            ValidateIssuer           = true,
+            ValidIssuer              = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience         = true,
+            ValidAudience            = builder.Configuration["Jwt:Audience"],
+            ValidateLifetime         = true
+        };
+    });
 builder.Services.AddScoped<IAIService, HuggingFaceAIService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddHostedService<OverdueStatsBackgroundService>();
@@ -69,6 +89,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAngular");
+app.UseAuthentication();
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
