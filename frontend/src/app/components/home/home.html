@@ -3,39 +3,38 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-content">
-      <div class="hero-badge">🌱 Growty — твій менеджер задач</div>
+      <div class="hero-badge">🌱 {{ 'home.badge' | translate }}</div>
       <h1 class="hero-title">
-        Організуй роботу.<br>
-        <span class="gradient-text">Досягай більшого.</span>
+        {{ 'home.heroTitle1' | translate }}<br>
+        <span class="gradient-text">{{ 'home.heroTitle2' | translate }}</span>
       </h1>
       <p class="hero-subtitle">
-        Kanban-дошки, AI-помічник та зручний трекінг задач —
-        все що потрібно для продуктивної роботи в одному місці.
+        {{ 'home.heroSubtitle' | translate }}
       </p>
       <div class="hero-actions">
         <button mat-raised-button class="cta-btn" (click)="goToBoards()">
           <mat-icon>rocket_launch</mat-icon>
-          Почати роботу
+          {{ 'home.startButton' | translate }}
         </button>
         <button mat-stroked-button class="secondary-btn" (click)="goToBoards()">
-          Мої дошки
+          {{ 'home.myBoards' | translate }}
           <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
       <div class="hero-stats">
         <div class="stat">
           <span class="stat-number">Kanban</span>
-          <span class="stat-label">Дошки</span>
+          <span class="stat-label">{{ 'boards.title' | translate }}</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
           <span class="stat-number">AI</span>
-          <span class="stat-label">Помічник</span>
+          <span class="stat-label">{{ 'board.aiImprove' | translate }}</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
           <span class="stat-number">∞</span>
-          <span class="stat-label">Завдань</span>
+          <span class="stat-label">{{ 'analytics.tasks' | translate }}</span>
         </div>
       </div>
     </div>
@@ -43,26 +42,26 @@
       <div class="kanban-preview">
         <div class="preview-column todo">
           <div class="preview-col-header">
-            <span class="dot red"></span> To Do
+            <span class="dot red"></span> {{ 'board.todo' | translate }}
           </div>
-          <div class="preview-card">Дизайн головної сторінки</div>
-          <div class="preview-card">Налаштувати CI/CD</div>
+          <div class="preview-card">Design</div>
+          <div class="preview-card">CI/CD</div>
         </div>
         <div class="preview-column inprogress">
           <div class="preview-col-header">
-            <span class="dot yellow"></span> In Progress
+            <span class="dot yellow"></span> {{ 'board.inProgress' | translate }}
           </div>
           <div class="preview-card active">
-            Розробка API
-            <span class="preview-badge">High</span>
+            API
+            <span class="preview-badge">{{ 'board.high' | translate }}</span>
           </div>
         </div>
         <div class="preview-column done">
           <div class="preview-col-header">
-            <span class="dot green"></span> Done
+            <span class="dot green"></span> {{ 'board.done' | translate }}
           </div>
-          <div class="preview-card done-card">✓ Аналіз вимог</div>
-          <div class="preview-card done-card">✓ Прототип</div>
+          <div class="preview-card done-card">✓ Analysis</div>
+          <div class="preview-card done-card">✓ Prototype</div>
         </div>
       </div>
     </div>
@@ -71,16 +70,16 @@
   <!-- FEATURES -->
   <section class="features">
     <div class="features-header">
-      <h2>Все що тобі потрібно</h2>
-      <p>Потужні інструменти для організації роботи</p>
+      <h2>{{ 'home.featuresTitle' | translate }}</h2>
+      <p>{{ 'home.featuresSubtitle' | translate }}</p>
     </div>
     <div class="features-grid">
       <div class="feature-card" *ngFor="let f of features">
         <div class="feature-icon">
           <mat-icon>{{ f.icon }}</mat-icon>
         </div>
-        <h3>{{ f.title }}</h3>
-        <p>{{ f.description }}</p>
+        <h3>{{ f.titleKey | translate }}</h3>
+        <p>{{ f.descKey | translate }}</p>
       </div>
     </div>
   </section>
@@ -88,18 +87,18 @@
   <!-- CTA BOTTOM -->
   <section class="cta-section">
     <div class="cta-card">
-      <h2>Готовий почати?</h2>
-      <p>Твої перші задачі — за одним кліком</p>
+      <h2>{{ 'home.ctaTitle' | translate }}</h2>
+      <p>{{ 'home.ctaSubtitle' | translate }}</p>
       <button mat-raised-button class="cta-btn-white" (click)="goToBoards()">
         <mat-icon>add_circle</mat-icon>
-        Перейти до дошок
+        {{ 'home.goToBoards' | translate }}
       </button>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer class="footer">
-    <span>🌱 Growty — 2026</span>
+    <span>{{ 'home.footer' | translate }}</span>
   </footer>
 
 </div>

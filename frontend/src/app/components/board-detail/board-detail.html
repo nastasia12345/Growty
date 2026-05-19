@@ -5,8 +5,8 @@
 
     <div class="sidebar-header">
       <div>
-        <h2>{{ editingTask ? 'Edit Task' : 'New Task' }}</h2>
-        <p>{{ editingTask ? 'Update task details' : 'Create a new task' }}</p>
+        <h2>{{ editingTask ? ('board.editTask' | translate) : ('board.newTask' | translate) }}</h2>
+        <p>{{ editingTask ? ('board.updateTaskSub' | translate) : ('board.createTaskSub' | translate) }}</p>
       </div>
       <button mat-icon-button (click)="drawer.close(); resetForm()">
         <mat-icon>close</mat-icon>
@@ -18,8 +18,8 @@
       <!-- Title with inline validation -->
       <div class="form-field-wrap">
         <mat-form-field appearance="outline" [class.field-error]="formErrors.title">
-          <mat-label>Title *</mat-label>
-          <input matInput [(ngModel)]="taskForm.title" placeholder="Task title"
+          <mat-label>{{ 'board.titleLabel' | translate }} *</mat-label>
+          <input matInput [(ngModel)]="taskForm.title" [placeholder]="'board.titlePlaceholder' | translate"
                  (ngModelChange)="formErrors.title = ''">
           <mat-hint align="end">{{ taskForm.title.length }}/120</mat-hint>
         </mat-form-field>
@@ -29,18 +29,18 @@
       </div>
 
       <mat-form-field appearance="outline">
-        <mat-label>Description</mat-label>
+        <mat-label>{{ 'board.descriptionLabel' | translate }}</mat-label>
         <textarea matInput rows="4" [(ngModel)]="taskForm.description"
-                  placeholder="What needs to be done?"></textarea>
+                  [placeholder]="'board.descriptionPlaceholder' | translate"></textarea>
       </mat-form-field>
 
       <div class="form-field-wrap">
         <mat-form-field appearance="outline" [class.field-error]="formErrors.deadline">
-          <mat-label>Deadline *</mat-label>
+          <mat-label>{{ 'board.deadlineLabel' | translate }} *</mat-label>
           <input matInput [matDatepicker]="deadlinePicker"
                  [(ngModel)]="deadlineDate"
                  (ngModelChange)="formErrors.deadline = ''"
-                 placeholder="Pick a date" readonly>
+                 [placeholder]="'board.deadlinePlaceholder' | translate" readonly>
           <mat-datepicker-toggle matIconSuffix [for]="deadlinePicker"></mat-datepicker-toggle>
           <mat-datepicker #deadlinePicker></mat-datepicker>
         </mat-form-field>
@@ -50,20 +50,20 @@
       </div>
 
       <mat-form-field appearance="outline">
-        <mat-label>Priority</mat-label>
+        <mat-label>{{ 'board.priorityLabel' | translate }}</mat-label>
         <mat-select [(ngModel)]="taskForm.priority">
-          <mat-option value="Low"><span class="opt-dot low"></span> Low</mat-option>
-          <mat-option value="Medium"><span class="opt-dot medium"></span> Medium</mat-option>
-          <mat-option value="High"><span class="opt-dot high"></span> High</mat-option>
+          <mat-option value="Low"><span class="opt-dot low"></span> {{ 'board.low' | translate }}</mat-option>
+          <mat-option value="Medium"><span class="opt-dot medium"></span> {{ 'board.medium' | translate }}</mat-option>
+          <mat-option value="High"><span class="opt-dot high"></span> {{ 'board.high' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Status</mat-label>
+        <mat-label>{{ 'board.statusLabel' | translate }}</mat-label>
         <mat-select [(ngModel)]="taskForm.status">
-          <mat-option value="ToDo">To Do</mat-option>
-          <mat-option value="InProgress">In Progress</mat-option>
-          <mat-option value="Done">Done</mat-option>
+          <mat-option value="ToDo">{{ 'board.todo' | translate }}</mat-option>
+          <mat-option value="InProgress">{{ 'board.inProgress' | translate }}</mat-option>
+          <mat-option value="Done">{{ 'board.done' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -71,7 +71,7 @@
       <div class="checklist-section">
         <div class="checklist-header">
           <mat-icon class="checklist-icon">checklist</mat-icon>
-          <span class="checklist-label">Checklist</span>
+          <span class="checklist-label">{{ 'board.checklist' | translate }}</span>
           <span class="checklist-count" *ngIf="checklist.length">
             {{ checklistDoneInForm() }} / {{ checklist.length }}
           </span>
@@ -102,7 +102,7 @@
         <div class="checklist-add">
           <input class="checklist-add-input"
                  [(ngModel)]="checklistInput"
-                 placeholder="Add an item…"
+                 [placeholder]="'board.addItem' | translate"
                  (keydown.enter)="addChecklistItem()">
           <button class="checklist-add-btn" (click)="addChecklistItem()" [disabled]="!checklistInput.trim()">
             <mat-icon>add</mat-icon>
@@ -113,11 +113,11 @@
     </div>
 
     <div class="sidebar-actions">
-      <button mat-button class="cancel-btn" (click)="drawer.close(); resetForm()">Cancel</button>
+      <button mat-button class="cancel-btn" (click)="drawer.close(); resetForm()">{{ 'board.cancel' | translate }}</button>
       <button mat-raised-button color="primary" class="save-btn"
               (click)="saveTask(); !formErrors.title && !formErrors.deadline && drawer.close()">
         <mat-icon>{{ editingTask ? 'save' : 'add' }}</mat-icon>
-        {{ editingTask ? 'Update' : 'Create' }}
+        {{ editingTask ? ('board.update' | translate) : ('board.create' | translate) }}
       </button>
     </div>
 
@@ -132,13 +132,13 @@
         <div class="delete-icon-wrap">
           <mat-icon>delete_forever</mat-icon>
         </div>
-        <h3>Delete task?</h3>
+        <h3>{{ 'board.deleteTitle' | translate }}</h3>
         <p class="delete-task-name">"{{ deleteConfirm.taskTitle }}"</p>
-        <p class="delete-desc">This action cannot be undone.</p>
+        <p class="delete-desc">{{ 'board.deleteDesc' | translate }}</p>
         <div class="delete-actions">
-          <button mat-stroked-button (click)="cancelDelete()">Cancel</button>
+          <button mat-stroked-button (click)="cancelDelete()">{{ 'board.cancel' | translate }}</button>
           <button mat-raised-button color="warn" (click)="confirmDelete()">
-            <mat-icon>delete</mat-icon> Delete
+            <mat-icon>delete</mat-icon> {{ 'board.confirmDelete' | translate }}
           </button>
         </div>
       </div>
@@ -147,7 +147,7 @@
     <!-- HEADER -->
     <div class="board-header">
       <div class="board-title">
-        <button mat-icon-button class="back-btn" (click)="goBack()" matTooltip="Go back">
+        <button mat-icon-button class="back-btn" (click)="goBack()" [matTooltip]="'board.backToBoards' | translate">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div>
@@ -183,7 +183,7 @@
       <button mat-raised-button color="primary" class="new-task-btn"
               (click)="openCreateTaskDialog('ToDo'); drawer.open()">
         <mat-icon>add</mat-icon>
-        <span class="btn-text">New Task</span>
+        <span class="btn-text">{{ 'board.newTask' | translate }}</span>
       </button>
     </div>
 
@@ -193,7 +193,7 @@
       <!-- Search -->
       <div class="search-wrap">
         <mat-icon class="search-icon">search</mat-icon>
-        <input class="search-input" type="text" placeholder="Search tasks…"
+        <input class="search-input" type="text" [placeholder]="'analytics.searchTasks' | translate"
                [(ngModel)]="taskSearch" (ngModelChange)="onSearchChange()">
         <button mat-icon-button class="search-clear" *ngIf="taskSearch" (click)="taskSearch = ''; onSearchChange()">
           <mat-icon>close</mat-icon>
@@ -243,7 +243,7 @@
         <!-- Jump to today -->
         <button class="pipeline-today-btn" (click)="jumpToToday()" matTooltip="Jump to today">
           <mat-icon>today</mat-icon>
-          Today
+          {{ 'calendar.today' | translate }}
         </button>
 
         <div class="pipeline-grid">
@@ -365,7 +365,7 @@
               <button mat-icon-button class="ai-btn"
                       [disabled]="aiLoadingTaskId === task.id"
                       (click)="openAISuggestion(task)"
-                      matTooltip="Improve with AI (SMART format)">
+                      [matTooltip]="'board.aiImprove' | translate">
                 <mat-icon *ngIf="aiLoadingTaskId !== task.id">auto_awesome</mat-icon>
                 <mat-icon *ngIf="aiLoadingTaskId === task.id" class="spinner">autorenew</mat-icon>
               </button>
@@ -394,8 +394,8 @@
                     [class.due-soon]="isDueSoon(task.deadline) && task.status !== 'Done'">
                 <mat-icon class="deadline-icon">schedule</mat-icon>
                 {{ task.deadline | date:'dd MMM HH:mm' }}
-                <span class="deadline-tag" *ngIf="isOverdue(task.deadline) && task.status !== 'Done'">overdue</span>
-                <span class="deadline-tag today-tag" *ngIf="isDueToday(task.deadline) && task.status !== 'Done'">today</span>
+                <span class="deadline-tag" *ngIf="isOverdue(task.deadline) && task.status !== 'Done'">{{ 'board.overdue' | translate }}</span>
+                <span class="deadline-tag today-tag" *ngIf="isDueToday(task.deadline) && task.status !== 'Done'">{{ 'calendar.today' | translate }}</span>
               </span>
             </div>
 
@@ -408,11 +408,11 @@
                 <mat-icon>check_circle</mat-icon>
               </button>
               <button mat-icon-button class="edit-btn"
-                      (click)="editTask(task); drawer.open()" matTooltip="Edit task">
+                      (click)="editTask(task); drawer.open()" [matTooltip]="'board.editTask' | translate">
                 <mat-icon>edit</mat-icon>
               </button>
               <button mat-icon-button class="delete-btn"
-                      (click)="deleteTask(task.id, task.title)" matTooltip="Delete task">
+                      (click)="deleteTask(task.id, task.title)" [matTooltip]="'board.deleteTitle' | translate">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -422,7 +422,7 @@
           <!-- Empty column state -->
           <div *ngIf="getTasksByStatus(column.status).length === 0" class="empty-column">
             <mat-icon>{{ taskSearch ? 'search_off' : 'inbox' }}</mat-icon>
-            <p>{{ taskSearch ? 'No match for "' + taskSearch + '"' : 'No tasks' }}</p>
+            <p>{{ taskSearch ? 'No match for "' + taskSearch + '"' : ('board.noTasks' | translate) }}</p>
           </div>
 
         </div>
@@ -431,7 +431,7 @@
         <button class="col-add-btn" *ngIf="!taskSearch"
                 (click)="openCreateTaskDialog(column.status); drawer.open()">
           <mat-icon>add</mat-icon>
-          Add task
+          {{ 'board.newTask' | translate }}
         </button>
 
       </div>

@@ -8,6 +8,10 @@ import { timeout, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AnalyticsService, UserStats } from '../../services/analytics';
 import { GoogleCalendarService, GoogleEvent } from '../../services/google-calendar';
+import { NotificationService, DeadlineItem } from '../../services/notification.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { TaskService } from '../../services/task';
+import { LanguageService } from '../../services/language.service';
 
 interface CalendarDay {
   date: Date | null;
@@ -22,7 +26,7 @@ interface CalendarDay {
   selector: 'app-calendar',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule, TranslateModule],
   templateUrl: './calendar.html',
   styleUrls: ['./calendar.css']
 })
@@ -44,6 +48,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   googleMessage    = '';
   googleError      = '';
 
+  notifPermission: NotificationPermission = 'default';
+  notifRequesting = false;
+
   hoveredDay: CalendarDay | null = null;
   tooltipX = 0;
   tooltipY = 0;
@@ -53,13 +60,19 @@ export class CalendarComponent implements OnInit, OnDestroy {
   hourDeg   = 0;
   private clockTimer: any;
 
-  readonly weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  readonly weekDays = [
+    'calendar.weekSun','calendar.weekMon','calendar.weekTue','calendar.weekWed',
+    'calendar.weekThu','calendar.weekFri','calendar.weekSat'
+  ];
 
   constructor(
     private analyticsService: AnalyticsService,
-    private googleService: GoogleCalendarService,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private googleService:    GoogleCalendarService,
+    private taskService:      TaskService,
+    private notifService:     NotificationService,
+    private route:            ActivatedRoute,
+    private cdr:              ChangeDetectorRef,
+    public  langService:      LanguageService,
   ) {}
 
   ngOnInit() {
@@ -67,10 +80,52 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.handleCallbackParams();
     this.checkGoogleStatus();
     this.loadStats();
+    this.notifPermission = this.notifService.permissionStatus;
+    // Auto-request if not yet decided
+    if (this.notifPermission === 'default') this.requestNotifPermission();
   }
 
   ngOnDestroy() {
     clearInterval(this.clockTimer);
+    this.notifService.clearAllTimers();
+  }
+
+  // ── Notifications ────────────────────────────────────────────────────────
+
+  async requestNotifPermission() {
+    this.notifRequesting = true;
+    this.cdr.markForCheck();
+    const granted = await this.notifService.requestPermission();
+    this.notifPermission = granted ? 'granted' : 'denied';
+    this.notifRequesting = false;
+    if (granted) this.scheduleDeadlineReminders();
+    this.cdr.markForCheck();
+  }
+
+  private scheduleDeadlineReminders() {
+    const items: DeadlineItem[] = [];
+
+    // 1. From Google Calendar events already loaded
+    this.allGoogleEvents.forEach(ev => {
+      if (!ev.start) return;
+      const dl = new Date(ev.start);
+      if (isNaN(dl.getTime())) return;
+      items.push({ id: `gcal_${ev.id ?? ev.start}`, title: ev.title ?? 'Google Event', deadline: dl, type: 'event' });
+    });
+
+    // 2. From Growty tasks with deadlines
+    this.taskService.getAllTasks().pipe(
+      catchError(() => of([] as any[]))
+    ).subscribe(tasks => {
+      tasks.forEach((t: any) => {
+        if (!t.deadline) return;
+        const dl = new Date(t.deadline);
+        if (isNaN(dl.getTime())) return;
+        if (t.status === 'Done') return;
+        items.push({ id: `task_${t.id}`, title: t.title ?? t.name ?? 'Task', deadline: dl, type: 'task', boardTitle: t.boardTitle });
+      });
+      this.notifService.scheduleReminders(items);
+    });
   }
 
   // ── OAuth callback handling ──────────────────────────────────────────────
@@ -119,6 +174,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.googleEventsMap.get(key)!.push(ev);
       });
       this.buildCalendar();
+      if (this.notifPermission === 'granted') this.scheduleDeadlineReminders();
       this.cdr.markForCheck();
     });
   }
@@ -215,7 +271,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   get monthLabel(): string {
-    return this.viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const locale = this.langService.current === 'uk' ? 'uk-UA' : 'en-US';
+    return this.viewDate.toLocaleString(locale, { month: 'long', year: 'numeric' });
   }
 
   // ── Tooltip ─────────────────────────────────────────────────────────────

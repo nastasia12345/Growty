@@ -8,6 +8,13 @@ beckend/*.user
 frontend/dist/
 frontend/.angular/
 frontend/node_modules/
+frontend/obj/
+
+# Visual Studio IDE
+.vs/
+
+# npm cache
+.npm-cache/
 
 # Logs
 *.log

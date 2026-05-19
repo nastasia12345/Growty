@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { WellbeingService } from './wellbeing.service';
 
 export interface AuthUser {
   id: number;
@@ -22,7 +23,7 @@ export class AuthService {
 
   currentUser = signal<AuthUser | null>(this.loadUser());
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private wb: WellbeingService) {}
 
   get isLoggedIn(): boolean {
     return this.currentUser() !== null;
@@ -57,6 +58,8 @@ export class AuthService {
     localStorage.setItem(this.TOKEN_KEY, res.token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
     this.currentUser.set(res.user);
+    // Small delay so the login modal can close first
+    setTimeout(() => this.wb.triggerIfNeeded('login'), 800);
   }
 
   private loadUser(): AuthUser | null {

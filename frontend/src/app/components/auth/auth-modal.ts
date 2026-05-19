@@ -1,11 +1,12 @@
 import {
-  Component, EventEmitter, Output, ChangeDetectionStrategy,
-  ChangeDetectorRef, signal
+  Component, EventEmitter, Input, OnInit, Output,
+  ChangeDetectionStrategy, ChangeDetectorRef, signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 
 type Tab = 'login' | 'register';
@@ -14,14 +15,17 @@ type Tab = 'login' | 'register';
   selector: 'app-auth-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslateModule],
   templateUrl: './auth-modal.html',
   styleUrls: ['./auth-modal.css']
 })
-export class AuthModalComponent {
+export class AuthModalComponent implements OnInit {
+  @Input()  initialTab: Tab = 'login';
   @Output() closed = new EventEmitter<void>();
 
   tab: Tab = 'login';
+
+  ngOnInit() { this.tab = this.initialTab; }
 
   // Login form
   loginEmail    = '';

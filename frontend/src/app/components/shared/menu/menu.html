@@ -10,39 +10,56 @@
   <!-- Desktop nav links -->
   <nav class="desktop-nav">
     <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">
-      <mat-icon>home</mat-icon> Home
+      <mat-icon>home</mat-icon> {{ 'nav.home' | translate }}
     </a>
     <a routerLink="/boards" routerLinkActive="active-link">
-      <mat-icon>dashboard</mat-icon> Boards
+      <mat-icon>dashboard</mat-icon> {{ 'nav.boards' | translate }}
     </a>
     <a routerLink="/analytics" routerLinkActive="active-link">
-      <mat-icon>insights</mat-icon> Analytics
+      <mat-icon>insights</mat-icon> {{ 'nav.analytics' | translate }}
     </a>
     <a routerLink="/plant" routerLinkActive="active-link">
-      <mat-icon>local_florist</mat-icon> Plant
+      <mat-icon>local_florist</mat-icon> {{ 'nav.plant' | translate }}
     </a>
     <a routerLink="/calendar" routerLinkActive="active-link">
-      <mat-icon>calendar_month</mat-icon> Calendar
+      <mat-icon>calendar_month</mat-icon> {{ 'nav.calendar' | translate }}
     </a>
   </nav>
 
   <span class="spacer"></span>
 
+  <!-- ── Language switcher ── -->
+  <div class="lang-switcher">
+    <button
+      class="lang-btn"
+      [class.lang-active]="lang.current === 'en'"
+      (click)="lang.use('en')"
+      matTooltip="English"
+    >EN</button>
+    <span class="lang-sep">|</span>
+    <button
+      class="lang-btn"
+      [class.lang-active]="lang.current === 'uk'"
+      (click)="lang.use('uk')"
+      matTooltip="Українська"
+    >УК</button>
+  </div>
+
   <!-- ── User avatar / login button ── -->
   <div class="user-area">
 
-    <!-- Not logged in: show person icon -->
+    <!-- Not logged in -->
     <button
       *ngIf="!auth.isLoggedIn"
       class="user-btn guest"
       (click)="openAuth()"
-      matTooltip="Sign in"
+      [matTooltip]="'nav.signIn' | translate"
     >
       <mat-icon>person_outline</mat-icon>
-      <span class="user-btn-label">Sign in</span>
+      <span class="user-btn-label">{{ 'nav.signIn' | translate }}</span>
     </button>
 
-    <!-- Logged in: show initials avatar -->
+    <!-- Logged in -->
     <div *ngIf="auth.isLoggedIn" class="avatar-wrap" (clickOutside)="closeDropdown()">
       <button
         class="user-btn avatar"
@@ -52,7 +69,6 @@
         <span class="avatar-initials">{{ auth.initials }}</span>
       </button>
 
-      <!-- Dropdown -->
       <div class="user-dropdown" *ngIf="showUserDropdown" (click)="$event.stopPropagation()">
         <div class="dropdown-header">
           <div class="dropdown-avatar">{{ auth.initials }}</div>
@@ -63,7 +79,7 @@
         </div>
         <div class="dropdown-divider"></div>
         <button class="dropdown-item logout" (click)="logout()">
-          <mat-icon>logout</mat-icon> Sign out
+          <mat-icon>logout</mat-icon> {{ 'nav.signOut' | translate }}
         </button>
       </div>
     </div>
@@ -71,10 +87,7 @@
   </div>
 </mat-toolbar>
 
-<!-- Auth modal -->
 <app-auth-modal *ngIf="showAuthModal" (closed)="closeAuth()"></app-auth-modal>
-
-<!-- Close dropdown when clicking outside -->
 <div *ngIf="showUserDropdown" class="dropdown-overlay" (click)="closeDropdown()"></div>
 
 <mat-sidenav-container class="sidenav-container">
@@ -93,36 +106,43 @@
     </div>
     <div class="sidenav-login" *ngIf="!auth.isLoggedIn">
       <button class="sidenav-login-btn" (click)="openAuth(); sidenav.close()">
-        <mat-icon>person_outline</mat-icon> Sign in
+        <mat-icon>person_outline</mat-icon> {{ 'nav.signIn' | translate }}
       </button>
+    </div>
+
+    <!-- Sidenav lang switcher -->
+    <div class="sidenav-lang">
+      <button class="lang-btn" [class.lang-active]="lang.current === 'en'" (click)="lang.use('en')">EN</button>
+      <span class="lang-sep">|</span>
+      <button class="lang-btn" [class.lang-active]="lang.current === 'uk'" (click)="lang.use('uk')">УК</button>
     </div>
 
     <mat-nav-list>
       <a mat-list-item routerLink="/" routerLinkActive="active-item"
          [routerLinkActiveOptions]="{exact:true}" (click)="sidenav.close()">
         <mat-icon matListItemIcon>home</mat-icon>
-        <span matListItemTitle>Home</span>
+        <span matListItemTitle>{{ 'nav.home' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/boards" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Boards</span>
+        <span matListItemTitle>{{ 'nav.boards' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/analytics" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>insights</mat-icon>
-        <span matListItemTitle>Analytics</span>
+        <span matListItemTitle>{{ 'nav.analytics' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/plant" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>local_florist</mat-icon>
-        <span matListItemTitle>Plant</span>
+        <span matListItemTitle>{{ 'nav.plant' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/calendar" routerLinkActive="active-item" (click)="sidenav.close()">
         <mat-icon matListItemIcon>calendar_month</mat-icon>
-        <span matListItemTitle>Calendar</span>
+        <span matListItemTitle>{{ 'nav.calendar' | translate }}</span>
       </a>
       <div class="sidenav-divider" *ngIf="auth.isLoggedIn"></div>
       <a mat-list-item *ngIf="auth.isLoggedIn" (click)="logout(); sidenav.close()" class="logout-item">
         <mat-icon matListItemIcon>logout</mat-icon>
-        <span matListItemTitle>Sign out</span>
+        <span matListItemTitle>{{ 'nav.signOut' | translate }}</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>

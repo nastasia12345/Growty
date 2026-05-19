@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+type WiltLevel = 'healthy' | 'mild' | 'moderate' | 'critical';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -88,8 +89,10 @@ export class PlantComponent implements OnInit {
     return Math.min(100, Math.round(rate * 100));
   }
 
-  get wiltingLevel(): string {
-    return this.gamState?.wiltingLevel ?? 'healthy';
+  get wiltingLevel(): WiltLevel {
+    const val = this.gamState?.wiltingLevel ?? 'healthy';
+    const valid: WiltLevel[] = ['healthy', 'mild', 'moderate', 'critical'];
+    return valid.includes(val as WiltLevel) ? (val as WiltLevel) : 'healthy';
   }
 
   get inactiveDays(): number {

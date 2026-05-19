@@ -1,0 +1,123 @@
+<ng-container *ngIf="visible">
+
+  <!-- ══ BACKDROP ══ -->
+  <div class="wb-backdrop" (click)="onDismiss()"></div>
+
+  <!-- ══ MODAL ══ -->
+  <div class="wb-modal" [class.wb-phase-prompt]="phase === 'prompt'"
+       [class.wb-phase-survey]="phase === 'survey' || phase === 'submitting'"
+       [class.wb-phase-final]="phase === 'final'">
+
+    <!-- Close btn -->
+    <button class="wb-close" (click)="onDismiss()" *ngIf="phase !== 'final'" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <!-- ══════════════ PROMPT PHASE ══════════════ -->
+    <div class="wb-body" *ngIf="phase === 'prompt'">
+      <div class="wb-prompt-icon">🌱</div>
+      <div class="wb-period-badge">{{ periodLabel | translate }}</div>
+      <h2 class="wb-title">{{ 'wellbeing.promptTitle' | translate }}</h2>
+      <p class="wb-subtitle">
+        {{ 'wellbeing.promptSubtitle' | translate }}
+      </p>
+
+      <div class="wb-prompt-actions">
+        <button class="wb-btn wb-btn-primary" (click)="onNotYet()">
+          <span class="wb-btn-emoji">✨</span> {{ 'wellbeing.startCheckin' | translate }}
+        </button>
+        <button class="wb-btn wb-btn-ghost" (click)="onAlreadyDone()">
+          {{ 'wellbeing.skipToday' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════ LOADING PHASE ══════════════ -->
+    <div class="wb-body wb-loading" *ngIf="phase === 'loading'">
+      <div class="wb-loader">
+        <div class="wb-leaf wb-leaf-1">🍃</div>
+        <div class="wb-leaf wb-leaf-2">🌿</div>
+        <div class="wb-leaf wb-leaf-3">🍃</div>
+      </div>
+      <p class="wb-loading-text">{{ 'wellbeing.preparing' | translate }}</p>
+    </div>
+
+    <!-- ══════════════ SURVEY PHASE ══════════════ -->
+    <div class="wb-body" *ngIf="phase === 'survey' || phase === 'submitting'">
+
+      <!-- Progress bar -->
+      <div class="wb-progress-track">
+        <div class="wb-progress-fill" [style.width.%]="progress"></div>
+      </div>
+      <div class="wb-step-count">{{ currentIndex + 1 }} / {{ questions.length }}</div>
+
+      <!-- Question card -->
+      <div class="wb-question-wrap"
+           [class.wb-slide-out-left]="sliding && slideDir === 'left'"
+           [class.wb-slide-out-right]="sliding && slideDir === 'right'"
+           *ngIf="currentQuestion">
+
+        <div class="wb-category-emoji">{{ categoryEmoji }}</div>
+        <p class="wb-question-text">{{ currentQuestion.text }}</p>
+
+        <!-- Rating row -->
+        <div class="wb-ratings">
+          <button
+            class="wb-rating-btn"
+            *ngFor="let r of ratings; trackBy: trackByScore"
+            [class.wb-rating-selected]="currentAnswer === r.score"
+            [class.wb-rating-hovered]="hoveredScore === r.score"
+            (mouseenter)="hoveredScore = r.score"
+            (mouseleave)="hoveredScore = null"
+            (click)="selectRating(r)"
+          >
+            <span class="wb-rating-emoji">{{ r.emoji }}</span>
+            <span class="wb-rating-label">{{ r.labelKey | translate }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Nav buttons -->
+      <div class="wb-nav" *ngIf="phase === 'survey'">
+        <button class="wb-btn wb-btn-back" (click)="prev()" [disabled]="currentIndex === 0">
+          <mat-icon>arrow_back</mat-icon> {{ 'wellbeing.back' | translate }}
+        </button>
+        <button class="wb-btn wb-btn-primary"
+                (click)="next()"
+                [disabled]="!currentAnswer">
+          {{ currentIndex === questions.length - 1 ? ('wellbeing.finish' | translate) : ('wellbeing.next' | translate) }}
+          <mat-icon *ngIf="currentIndex < questions.length - 1">arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <!-- Submitting state -->
+      <div class="wb-submitting" *ngIf="phase === 'submitting'">
+        <div class="wb-leaf wb-leaf-spin">🌿</div>
+        <p>{{ 'wellbeing.gettingQuote' | translate }}</p>
+      </div>
+    </div>
+
+    <!-- ══════════════ FINAL PHASE ══════════════ -->
+    <div class="wb-body wb-final" *ngIf="phase === 'final'">
+      <div class="wb-final-stars">
+        <span class="wb-star wb-star-1">✦</span>
+        <span class="wb-star wb-star-2">✦</span>
+        <span class="wb-star wb-star-3">✦</span>
+        <span class="wb-star wb-star-4">✦</span>
+      </div>
+
+      <div class="wb-final-emoji">{{ finalEmoji }}</div>
+      <h2 class="wb-final-title">{{ 'wellbeing.wellDone' | translate }}</h2>
+
+      <blockquote class="wb-quote">{{ finalQuote }}</blockquote>
+
+      <p class="wb-final-sub">{{ 'wellbeing.checkInLogged' | translate }}</p>
+
+      <button class="wb-btn wb-btn-primary wb-btn-close-final" (click)="onDismiss()">
+        {{ 'wellbeing.letsGo' | translate }}
+      </button>
+    </div>
+
+  </div>
+
+</ng-container>

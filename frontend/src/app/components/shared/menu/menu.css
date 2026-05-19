@@ -159,11 +159,12 @@
 .dropdown-item.logout:hover { background: #fff1f2; }
 .dropdown-item mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
-/* Transparent overlay to close dropdown */
+/* Transparent overlay to close dropdown — must be BELOW toolbar (z-index 100)
+   so clicks inside the toolbar/dropdown still reach their targets */
 .dropdown-overlay {
   position: fixed;
   inset: 0;
-  z-index: 299;
+  z-index: 99;
 }
 
 /* ── Sidenav ─────────────────────────────────────────────────────────────── */
@@ -233,6 +234,44 @@ mat-nav-list a.active-item {
   border-radius: 12px;
 }
 mat-nav-list a.active-item mat-icon { color: #10b981 !important; }
+
+/* ── Language switcher ── */
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f1f5f9;
+  border-radius: 20px;
+  padding: 3px 6px;
+  margin-right: 8px;
+}
+.lang-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 3px 7px;
+  border-radius: 14px;
+  letter-spacing: .4px;
+  transition: background 0.18s, color 0.18s;
+  line-height: 1;
+}
+.lang-btn:hover { color: #475569; }
+.lang-btn.lang-active {
+  background: #10b981;
+  color: #fff;
+}
+.lang-sep { color: #cbd5e1; font-size: 11px; user-select: none; }
+
+/* Sidenav lang switcher */
+.sidenav-lang {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 16px 4px;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

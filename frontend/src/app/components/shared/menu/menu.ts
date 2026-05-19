@@ -1,4 +1,4 @@
-import { Component, ViewChild, signal } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -7,8 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { AuthModalComponent } from '../../auth/auth-modal';
+import { LanguageService } from '../../../services/language.service';
 
 @Component({
   selector: 'app-menu',
@@ -22,7 +25,8 @@ import { AuthModalComponent } from '../../auth/auth-modal';
     MatButtonModule,
     MatListModule,
     MatTooltipModule,
-    AuthModalComponent
+    TranslateModule,
+    AuthModalComponent,
   ],
   templateUrl: './menu.html',
   styleUrls: ['./menu.css']
@@ -30,10 +34,14 @@ import { AuthModalComponent } from '../../auth/auth-modal';
 export class MenuComponent {
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
-  showAuthModal   = false;
+  showAuthModal    = false;
   showUserDropdown = false;
 
-  constructor(public auth: AuthService) {}
+  constructor(
+    public  auth:   AuthService,
+    public  lang:   LanguageService,
+    private router: Router,
+  ) {}
 
   openAuth()  { this.showAuthModal = true;  this.showUserDropdown = false; }
   closeAuth() { this.showAuthModal = false; }
@@ -44,5 +52,6 @@ export class MenuComponent {
   logout() {
     this.auth.logout();
     this.showUserDropdown = false;
+    this.router.navigate(['/']);
   }
 }

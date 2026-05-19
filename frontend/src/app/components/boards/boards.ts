@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { BoardService } from '../../services/board';
 import { Board } from '../../models/board.model';
 
@@ -25,7 +26,8 @@ import { Board } from '../../models/board.model';
     MatFormFieldModule,
     MatInputModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    TranslateModule
   ],
   templateUrl: './boards.html',
   styleUrls: ['./boards.css']

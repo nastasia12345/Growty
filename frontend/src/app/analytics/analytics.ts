@@ -12,6 +12,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { TranslateModule } from '@ngx-translate/core';
 import { BoardService } from '../services/board';
 import { TaskService } from '../services/task';
 import {
@@ -33,7 +34,7 @@ const PRIORITY_ORDER: Record<string, number> = { Critical: 4, High: 3, Medium: 2
     CommonModule, FormsModule, RouterModule,
     MatIconModule, MatButtonModule, MatSelectModule,
     MatFormFieldModule, MatInputModule, MatTooltipModule,
-    MatProgressBarModule, MatChipsModule
+    MatProgressBarModule, MatChipsModule, TranslateModule
   ],
   templateUrl: './analytics.html',
   styleUrls: ['./analytics.css']
@@ -55,9 +56,9 @@ export class AnalyticsComponent implements OnInit {
   activeTab = 'overview';
 
   tabs = [
-    { id: 'overview',  label: 'Overview',  icon: 'dashboard' },
-    { id: 'insights',  label: 'Insights',  icon: 'psychology' },
-    { id: 'tasks',     label: 'Tasks',     icon: 'task_alt' }
+    { id: 'overview',  labelKey: 'analytics.overview',  icon: 'dashboard' },
+    { id: 'insights',  labelKey: 'analytics.activity',  icon: 'psychology' },
+    { id: 'tasks',     labelKey: 'analytics.tasks',     icon: 'task_alt' }
   ];
 
   // в”Ђв”Ђ Completion trend chart в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ

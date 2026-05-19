@@ -1,0 +1,79 @@
+<div class="ar-page">
+
+  <!-- Floating decorative leaves -->
+  <span class="deco deco-1">🍃</span>
+  <span class="deco deco-2">🌿</span>
+  <span class="deco deco-3">🍃</span>
+  <span class="deco deco-4">🌱</span>
+  <span class="deco deco-5">🌿</span>
+
+  <div class="ar-card">
+
+    <!-- Plant illustration -->
+    <div class="ar-plant">
+      <svg class="ar-pot" viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Pot -->
+        <path d="M35 85 L25 115 Q25 120 30 120 L90 120 Q95 120 95 115 L85 85 Z" fill="#b45309"/>
+        <rect x="28" y="80" width="64" height="10" rx="5" fill="#d97706"/>
+        <!-- Soil -->
+        <ellipse cx="60" cy="83" rx="30" ry="6" fill="#7c4a03"/>
+        <!-- Stem -->
+        <line x1="60" y1="80" x2="60" y2="40" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+        <!-- Leaves -->
+        <ellipse cx="42" cy="55" rx="16" ry="8" fill="#22c55e" transform="rotate(-30 42 55)"/>
+        <ellipse cx="78" cy="50" rx="16" ry="8" fill="#16a34a" transform="rotate(30 78 50)"/>
+        <ellipse cx="46" cy="38" rx="12" ry="6" fill="#4ade80" transform="rotate(-20 46 38)"/>
+        <ellipse cx="74" cy="34" rx="12" ry="6" fill="#22c55e" transform="rotate(20 74 34)"/>
+        <!-- Flower -->
+        <circle cx="60" cy="28" r="9" fill="#fbbf24"/>
+        <circle cx="60" cy="28" r="5" fill="#f59e0b"/>
+        <!-- Petals -->
+        <ellipse cx="60" cy="16" rx="4" ry="7" fill="#fde68a" opacity=".9"/>
+        <ellipse cx="60" cy="40" rx="4" ry="7" fill="#fde68a" opacity=".9"/>
+        <ellipse cx="48" cy="28" rx="7" ry="4" fill="#fde68a" opacity=".9"/>
+        <ellipse cx="72" cy="28" rx="7" ry="4" fill="#fde68a" opacity=".9"/>
+        <ellipse cx="52" cy="20" rx="4" ry="6" fill="#fde68a" opacity=".85" transform="rotate(-45 52 20)"/>
+        <ellipse cx="68" cy="20" rx="4" ry="6" fill="#fde68a" opacity=".85" transform="rotate(45 68 20)"/>
+        <ellipse cx="52" cy="36" rx="4" ry="6" fill="#fde68a" opacity=".85" transform="rotate(45 52 36)"/>
+        <ellipse cx="68" cy="36" rx="4" ry="6" fill="#fde68a" opacity=".85" transform="rotate(-45 68 36)"/>
+        <!-- Happy face -->
+        <circle cx="57" cy="27" r="1.5" fill="#78350f"/>
+        <circle cx="63" cy="27" r="1.5" fill="#78350f"/>
+        <path d="M56 31 Q60 34 64 31" stroke="#78350f" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- Badge -->
+    <div class="ar-badge">🌱 Growty</div>
+
+    <!-- Heading -->
+    <h1 class="ar-title">{{ 'authRequired.title' | translate }}</h1>
+    <p class="ar-subtitle">{{ 'authRequired.subtitle' | translate }}</p>
+
+    <!-- Action buttons -->
+    <div class="ar-actions">
+      <button class="ar-btn ar-btn-primary" (click)="openLogin()">
+        <mat-icon>login</mat-icon>
+        {{ 'authRequired.signIn' | translate }}
+      </button>
+      <button class="ar-btn ar-btn-secondary" (click)="openRegister()">
+        <mat-icon>person_add</mat-icon>
+        {{ 'authRequired.register' | translate }}
+      </button>
+    </div>
+
+    <p class="ar-home-link">
+      {{ 'authRequired.orGoBack' | translate }}
+      <button class="ar-link-btn" (click)="goHome()">{{ 'authRequired.home' | translate }}</button>
+    </p>
+
+  </div>
+
+</div>
+
+<!-- Auth modal — opens when sign in or register is clicked -->
+<app-auth-modal
+  *ngIf="showModal"
+  [initialTab]="activeTab"
+  (closed)="closeModal()"
+></app-auth-modal>

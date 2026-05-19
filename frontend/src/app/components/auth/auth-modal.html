@@ -14,8 +14,8 @@
 
   <!-- Tabs -->
   <div class="auth-tabs">
-    <button [class.active]="tab === 'login'"    (click)="switchTab('login')">Sign in</button>
-    <button [class.active]="tab === 'register'" (click)="switchTab('register')">Create account</button>
+    <button [class.active]="tab === 'login'"    (click)="switchTab('login')">{{ 'auth.signIn' | translate }}</button>
+    <button [class.active]="tab === 'register'" (click)="switchTab('register')">{{ 'auth.createAccount' | translate }}</button>
   </div>
 
   <!-- Success -->
@@ -31,21 +31,21 @@
   <!-- ── LOGIN FORM ── -->
   <form *ngIf="tab === 'login'" (ngSubmit)="submitLogin()" class="auth-form" autocomplete="on">
     <div class="field">
-      <label>Email address</label>
+      <label>{{ 'auth.emailLabel' | translate }}</label>
       <div class="input-wrap">
         <mat-icon>email</mat-icon>
         <input type="email" [(ngModel)]="loginEmail" name="email"
-               placeholder="you@example.com" autocomplete="email" required/>
+               [placeholder]="'auth.emailPlaceholder' | translate" autocomplete="email" required/>
       </div>
     </div>
 
     <div class="field">
-      <label>Password</label>
+      <label>{{ 'auth.passwordLabel' | translate }}</label>
       <div class="input-wrap">
         <mat-icon>lock</mat-icon>
         <input [type]="showLoginPwd ? 'text' : 'password'"
                [(ngModel)]="loginPassword" name="password"
-               placeholder="••••••••" autocomplete="current-password" required/>
+               [placeholder]="'auth.passwordHint' | translate" autocomplete="current-password" required/>
         <button type="button" class="eye-btn" (click)="showLoginPwd = !showLoginPwd" tabindex="-1">
           <mat-icon>{{ showLoginPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
@@ -55,37 +55,37 @@
     <button type="submit" class="submit-btn" [disabled]="loading">
       <mat-icon *ngIf="loading" class="spin">autorenew</mat-icon>
       <mat-icon *ngIf="!loading">login</mat-icon>
-      {{ loading ? 'Signing in…' : 'Sign in' }}
+      {{ loading ? ('auth.signingIn' | translate) : ('auth.signIn' | translate) }}
     </button>
 
     <p class="switch-hint">
-      Don't have an account?
-      <button type="button" class="link-btn" (click)="switchTab('register')">Create one</button>
+      {{ 'auth.noAccount' | translate }}
+      <button type="button" class="link-btn" (click)="switchTab('register')">{{ 'auth.createOne' | translate }}</button>
     </p>
   </form>
 
   <!-- ── REGISTER FORM ── -->
   <form *ngIf="tab === 'register'" (ngSubmit)="submitRegister()" class="auth-form" autocomplete="on">
     <div class="field">
-      <label>Display name</label>
+      <label>{{ 'auth.displayNameLabel' | translate }}</label>
       <div class="input-wrap">
         <mat-icon>person</mat-icon>
         <input type="text" [(ngModel)]="regName" name="displayName"
-               placeholder="Your name" autocomplete="name" required/>
+               [placeholder]="'auth.displayNamePlaceholder' | translate" autocomplete="name" required/>
       </div>
     </div>
 
     <div class="field">
-      <label>Email address</label>
+      <label>{{ 'auth.emailLabel' | translate }}</label>
       <div class="input-wrap">
         <mat-icon>email</mat-icon>
         <input type="email" [(ngModel)]="regEmail" name="email"
-               placeholder="you@example.com" autocomplete="email" required/>
+               [placeholder]="'auth.emailPlaceholder' | translate" autocomplete="email" required/>
       </div>
     </div>
 
     <div class="field">
-      <label>Password <span class="hint">(min. 6 characters)</span></label>
+      <label>{{ 'auth.passwordLabel' | translate }} <span class="hint">({{ 'auth.passwordHint' | translate }})</span></label>
       <div class="input-wrap">
         <mat-icon>lock</mat-icon>
         <input [type]="showRegPwd ? 'text' : 'password'"
@@ -98,7 +98,7 @@
     </div>
 
     <div class="field">
-      <label>Confirm password</label>
+      <label>{{ 'auth.confirmPasswordLabel' | translate }}</label>
       <div class="input-wrap">
         <mat-icon>lock_outline</mat-icon>
         <input [type]="showRegConfirm ? 'text' : 'password'"
@@ -113,12 +113,12 @@
     <button type="submit" class="submit-btn" [disabled]="loading">
       <mat-icon *ngIf="loading" class="spin">autorenew</mat-icon>
       <mat-icon *ngIf="!loading">person_add</mat-icon>
-      {{ loading ? 'Creating account…' : 'Create account' }}
+      {{ loading ? ('auth.creatingAccount' | translate) : ('auth.createAccount' | translate) }}
     </button>
 
     <p class="switch-hint">
-      Already have an account?
-      <button type="button" class="link-btn" (click)="switchTab('login')">Sign in</button>
+      {{ 'auth.hasAccount' | translate }}
+      <button type="button" class="link-btn" (click)="switchTab('login')">{{ 'auth.signIn' | translate }}</button>
     </p>
   </form>
 

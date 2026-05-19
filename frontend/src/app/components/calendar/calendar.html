@@ -32,14 +32,33 @@
   <!-- ══════════ HEADER ══════════ -->
   <div class="page-header">
     <div class="header-left">
-      <button mat-icon-button class="back-btn" routerLink="/boards" matTooltip="Back to boards">
+      <button mat-icon-button class="back-btn" routerLink="/boards" [matTooltip]="'calendar.backToBoards' | translate">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div>
-        <h1>Calendar</h1>
-        <p>Track your productivity day by day</p>
+        <h1>{{ 'calendar.title' | translate }}</h1>
+        <p>{{ 'calendar.subtitle' | translate }}</p>
       </div>
     </div>
+  </div>
+
+  <!-- ══════════ NOTIFICATION PERMISSION BANNER ══════════ -->
+  <div class="notif-banner" *ngIf="notifPermission !== 'granted' && notifPermission !== 'denied'">
+    <div class="notif-banner-left">
+      <img src="/icons/growty-notify.svg" class="notif-banner-icon" alt="Growty"/>
+      <div>
+        <div class="notif-banner-title">{{ 'calendar.enableReminders' | translate }}</div>
+        <div class="notif-banner-sub">{{ 'calendar.remindersSub' | translate }}</div>
+      </div>
+    </div>
+    <button class="notif-enable-btn" (click)="requestNotifPermission()" [disabled]="notifRequesting">
+      <mat-icon>notifications_active</mat-icon>
+      {{ notifRequesting ? ('calendar.requesting' | translate) : ('calendar.enableNotifications' | translate) }}
+    </button>
+  </div>
+  <div class="notif-banner notif-banner-granted" *ngIf="notifPermission === 'granted'">
+    <mat-icon class="notif-check-icon">check_circle</mat-icon>
+    <span>{{ 'calendar.remindersActive' | translate }}</span>
   </div>
 
   <!-- ══════════ GOOGLE CALENDAR CARD ══════════ -->
@@ -55,11 +74,11 @@
         </svg>
       </div>
       <div>
-        <div class="gcal-title">Google Calendar</div>
-        <div class="gcal-sub" *ngIf="!googleConnected">Sync your tasks and events — works both ways</div>
+        <div class="gcal-title">{{ 'calendar.googleCalendar' | translate }}</div>
+        <div class="gcal-sub" *ngIf="!googleConnected">{{ 'calendar.gcalSub' | translate }}</div>
         <div class="gcal-sub connected-sub" *ngIf="googleConnected">
           <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">check_circle</mat-icon>
-          Connected · {{ allGoogleEvents.length }} event{{ allGoogleEvents.length !== 1 ? 's' : '' }} loaded
+          {{ 'calendar.connected' | translate }} · {{ allGoogleEvents.length }} event{{ allGoogleEvents.length !== 1 ? 's' : '' }} loaded
         </div>
       </div>
     </div>
@@ -78,25 +97,25 @@
             </svg>
           </span>
           <mat-icon *ngIf="googleConnecting" class="spin">autorenew</mat-icon>
-          {{ googleConnecting ? 'Connecting…' : 'Connect to Google Calendar' }}
+          {{ googleConnecting ? ('calendar.connecting' | translate) : ('calendar.connect' | translate) }}
         </button>
       </ng-container>
 
       <!-- Connected -->
       <ng-container *ngIf="googleConnected">
-        <button class="gcal-btn sync-btn" (click)="syncNow()" [disabled]="googleSyncing" matTooltip="Push your Growty tasks to Google Calendar">
+        <button class="gcal-btn sync-btn" (click)="syncNow()" [disabled]="googleSyncing" [matTooltip]="'calendar.syncTasks' | translate">
           <mat-icon *ngIf="!googleSyncing">sync</mat-icon>
           <mat-icon *ngIf="googleSyncing" class="spin">autorenew</mat-icon>
-          {{ googleSyncing ? 'Syncing…' : 'Sync tasks → Google' }}
+          {{ googleSyncing ? ('calendar.syncing' | translate) : ('calendar.syncTasks' | translate) }}
         </button>
-        <button class="gcal-btn import-btn" (click)="importFromGoogle()" [disabled]="googleImporting" matTooltip="Import Google Calendar events as tasks in Growty">
+        <button class="gcal-btn import-btn" (click)="importFromGoogle()" [disabled]="googleImporting" [matTooltip]="'calendar.importFromGoogle' | translate">
           <mat-icon *ngIf="!googleImporting">download</mat-icon>
           <mat-icon *ngIf="googleImporting" class="spin">autorenew</mat-icon>
-          {{ googleImporting ? 'Importing…' : 'Import from Google' }}
+          {{ googleImporting ? ('calendar.importing' | translate) : ('calendar.importFromGoogle' | translate) }}
         </button>
-        <button class="gcal-btn disconnect-btn" (click)="disconnectGoogle()" matTooltip="Disconnect Google Calendar">
+        <button class="gcal-btn disconnect-btn" (click)="disconnectGoogle()" [matTooltip]="'calendar.disconnect' | translate">
           <mat-icon>link_off</mat-icon>
-          Disconnect
+          {{ 'calendar.disconnect' | translate }}
         </button>
       </ng-container>
     </div>
@@ -136,13 +155,13 @@
   <!-- ══════════ LOADING ══════════ -->
   <div class="loading-state" *ngIf="isLoading">
     <mat-icon class="spin">autorenew</mat-icon>
-    <p>Loading…</p>
+    <p>{{ 'calendar.loading' | translate }}</p>
   </div>
 
   <!-- Error banner -->
   <div class="error-banner" *ngIf="hasError && !isLoading">
     <mat-icon>warning_amber</mat-icon>
-    Could not reach the server — showing calendar without task data.
+    {{ 'calendar.serverError' | translate }}
   </div>
 
   <ng-container *ngIf="!isLoading">
@@ -160,7 +179,7 @@
       </div>
 
       <div class="grid-header">
-        <div class="wday" *ngFor="let w of weekDays">{{ w }}</div>
+        <div class="wday" *ngFor="let w of weekDays">{{ w | translate }}</div>
       </div>
 
       <div class="grid-body">
@@ -186,13 +205,13 @@
 
       <!-- Legend -->
       <div class="legend">
-        <span class="legend-dot" data-level="none"></span><span>No data</span>
-        <span class="legend-dot" data-level="low"></span><span>Low</span>
-        <span class="legend-dot" data-level="mid"></span><span>Medium</span>
-        <span class="legend-dot" data-level="high"></span><span>High</span>
+        <span class="legend-dot" data-level="none"></span><span>{{ 'calendar.legendNone' | translate }}</span>
+        <span class="legend-dot" data-level="low"></span><span>{{ 'calendar.legendLow' | translate }}</span>
+        <span class="legend-dot" data-level="mid"></span><span>{{ 'calendar.legendMid' | translate }}</span>
+        <span class="legend-dot" data-level="high"></span><span>{{ 'calendar.legendHigh' | translate }}</span>
         <span class="legend-sep" *ngIf="googleConnected"></span>
         <span class="gevent-dot legend-gevent" *ngIf="googleConnected"></span>
-        <span *ngIf="googleConnected">Google event</span>
+        <span *ngIf="googleConnected">{{ 'calendar.googleEvent' | translate }}</span>
       </div>
     </div>
 
@@ -200,7 +219,7 @@
     <div class="upcoming-card" *ngIf="googleConnected && upcomingEvents.length > 0">
       <div class="upcoming-header">
         <mat-icon>event</mat-icon>
-        <span>Upcoming Google Calendar Events</span>
+        <span>{{ 'calendar.upcomingEvents' | translate }}</span>
       </div>
       <div class="upcoming-list">
         <a
@@ -236,33 +255,33 @@
 >
   <div class="tt-date">
     {{ hoveredDay.date | date:'MMMM d, yyyy' }}
-    <span class="tt-today" *ngIf="hoveredDay.isToday">Today</span>
+    <span class="tt-today" *ngIf="hoveredDay.isToday">{{ 'calendar.today' | translate }}</span>
   </div>
 
   <!-- Task stats -->
   <ng-container *ngIf="hoveredDay.stats; else noStats">
     <div class="tt-row">
-      <span class="tt-dot created"></span><span>Created</span>
+      <span class="tt-dot created"></span><span>{{ 'calendar.created' | translate }}</span>
       <strong>{{ hoveredDay.stats.tasksCreated }}</strong>
     </div>
     <div class="tt-row">
-      <span class="tt-dot completed"></span><span>Completed</span>
+      <span class="tt-dot completed"></span><span>{{ 'calendar.completed' | translate }}</span>
       <strong>{{ hoveredDay.stats.tasksCompleted }}</strong>
     </div>
     <div class="tt-row" *ngIf="hoveredDay.stats.tasksOverdue > 0">
-      <span class="tt-dot overdue"></span><span>Overdue</span>
+      <span class="tt-dot overdue"></span><span>{{ 'calendar.overdue' | translate }}</span>
       <strong class="overdue-val">{{ hoveredDay.stats.tasksOverdue }}</strong>
     </div>
-    <div class="tt-score">Activity score: <strong>{{ hoveredDay.stats.activityScore }}</strong>/10</div>
+    <div class="tt-score">{{ 'calendar.activityScore' | translate }}: <strong>{{ hoveredDay.stats.activityScore }}</strong>/10</div>
   </ng-container>
   <ng-template #noStats>
-    <div class="tt-empty">No task activity recorded</div>
+    <div class="tt-empty">{{ 'calendar.noActivity' | translate }}</div>
   </ng-template>
 
   <!-- Google events for this day -->
   <ng-container *ngIf="hoveredDay.googleEvents.length > 0">
     <div class="tt-divider"></div>
-    <div class="tt-gevents-label">Google Calendar</div>
+    <div class="tt-gevents-label">{{ 'calendar.googleCalendar' | translate }}</div>
     <div class="tt-gevent" *ngFor="let ev of hoveredDay.googleEvents">
       <span class="gevent-dot-sm"></span>
       <span class="tt-gevent-time">{{ formatEventTime(ev.start) }}</span>

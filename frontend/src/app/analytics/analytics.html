@@ -3,16 +3,16 @@
   <!-- ══════════ HEADER ══════════ -->
   <div class="page-header">
     <div class="header-left">
-      <button mat-icon-button class="back-btn" routerLink="/boards" matTooltip="Back to boards">
+      <button mat-icon-button class="back-btn" routerLink="/boards" [matTooltip]="'analytics.backToBoards' | translate">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div>
-        <h1>Analytics</h1>
-        <p>{{ isLoading ? 'Loading…' : total + ' tasks · ' + boards.length + ' boards' }}</p>
+        <h1>{{ 'analytics.title' | translate }}</h1>
+        <p>{{ isLoading ? ('analytics.loading' | translate) : total + ' tasks · ' + boards.length + ' boards' }}</p>
       </div>
     </div>
     <div class="header-actions">
-      <button mat-icon-button class="back-btn" (click)="loadAll()" matTooltip="Refresh">
+      <button mat-icon-button class="back-btn" (click)="loadAll()" [matTooltip]="'analytics.refresh' | translate">
         <mat-icon>refresh</mat-icon>
       </button>
 
@@ -30,7 +30,7 @@
 
       <button mat-stroked-button class="excel-btn" (click)="generateExcelReport()" [disabled]="isExporting">
         <mat-icon>table_view</mat-icon>
-        {{ isExporting ? 'Generating…' : 'Export Excel' }}
+        {{ isExporting ? ('analytics.generating' | translate) : ('analytics.exportExcel' | translate) }}
       </button>
     </div>
   </div>
@@ -38,13 +38,13 @@
   <!-- ══════════ TAB BAR ══════════ -->
   <div class="tab-bar">
     <button *ngFor="let t of tabs" class="tab-btn" [class.active]="activeTab === t.id" (click)="activeTab = t.id">
-      <mat-icon>{{ t.icon }}</mat-icon>{{ t.label }}
+      <mat-icon>{{ t.icon }}</mat-icon>{{ t.labelKey | translate }}
     </button>
   </div>
 
   <div class="loading-state" *ngIf="isLoading">
     <mat-icon class="spin">autorenew</mat-icon>
-    <p>Loading…</p>
+    <p>{{ 'analytics.loading' | translate }}</p>
   </div>
 
   <ng-container *ngIf="!isLoading">
@@ -58,7 +58,7 @@
 
         <!-- ① At a glance ─────────────────────────── -->
         <div class="bento-card glance-card">
-          <div class="bc-label">At a glance</div>
+          <div class="bc-label">{{ 'analytics.atAGlance' | translate }}</div>
           <div class="glance-ring-row">
             <svg class="glance-donut" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="30" fill="none" stroke="#f1f5f9" stroke-width="8"/>
@@ -72,19 +72,19 @@
             </svg>
             <div class="glance-stats">
               <div class="gs-row clickable" (click)="activeTab='tasks'; tableStatus='Done'">
-                <span class="gs-dot g-green"></span><span class="gs-lbl">Done</span>
+                <span class="gs-dot g-green"></span><span class="gs-lbl">{{ 'analytics.done' | translate }}</span>
                 <span class="gs-val g-green">{{ totalDone }}</span>
               </div>
               <div class="gs-row clickable" (click)="activeTab='tasks'; tableStatus='InProgress'">
-                <span class="gs-dot g-amber"></span><span class="gs-lbl">In Progress</span>
+                <span class="gs-dot g-amber"></span><span class="gs-lbl">{{ 'analytics.inProgress' | translate }}</span>
                 <span class="gs-val">{{ totalInProg }}</span>
               </div>
               <div class="gs-row clickable" (click)="activeTab='tasks'; tableStatus='ToDo'">
-                <span class="gs-dot g-slate"></span><span class="gs-lbl">To Do</span>
+                <span class="gs-dot g-slate"></span><span class="gs-lbl">{{ 'analytics.todo' | translate }}</span>
                 <span class="gs-val">{{ totalTodo }}</span>
               </div>
               <div class="gs-row" *ngIf="totalOverdue > 0">
-                <span class="gs-dot g-red"></span><span class="gs-lbl">Overdue</span>
+                <span class="gs-dot g-red"></span><span class="gs-lbl">{{ 'analytics.overdue' | translate }}</span>
                 <span class="gs-val g-red">{{ totalOverdue }}</span>
               </div>
             </div>
@@ -94,12 +94,12 @@
 
         <!-- ② Priority breakdown ───────────────────── -->
         <div class="bento-card">
-          <div class="bc-label">By priority</div>
+          <div class="bc-label">{{ 'analytics.byPriority' | translate }}</div>
           <div class="bento-priority-list">
             <div class="bpl-row">
               <div class="bpl-head">
                 <span class="bpl-dot bpl-high"></span>
-                <span class="bpl-name">High</span>
+                <span class="bpl-name">{{ 'analytics.high' | translate }}</span>
                 <span class="bpl-num">{{ priorityCount('High') }}</span>
               </div>
               <div class="bpl-track"><div class="bpl-fill bpl-fill-high" [style.width.%]="total>0?priorityCount('High')/total*100:0"></div></div>
@@ -107,7 +107,7 @@
             <div class="bpl-row">
               <div class="bpl-head">
                 <span class="bpl-dot bpl-med"></span>
-                <span class="bpl-name">Medium</span>
+                <span class="bpl-name">{{ 'analytics.medium' | translate }}</span>
                 <span class="bpl-num">{{ priorityCount('Medium') }}</span>
               </div>
               <div class="bpl-track"><div class="bpl-fill bpl-fill-med" [style.width.%]="total>0?priorityCount('Medium')/total*100:0"></div></div>
@@ -115,7 +115,7 @@
             <div class="bpl-row">
               <div class="bpl-head">
                 <span class="bpl-dot bpl-low"></span>
-                <span class="bpl-name">Low</span>
+                <span class="bpl-name">{{ 'analytics.low' | translate }}</span>
                 <span class="bpl-num">{{ priorityCount('Low') }}</span>
               </div>
               <div class="bpl-track"><div class="bpl-fill bpl-fill-low" [style.width.%]="total>0?priorityCount('Low')/total*100:0"></div></div>
@@ -126,40 +126,40 @@
                   [class.bt-up]="trendCompleted.dir==='up'"
                   [class.bt-down]="trendCompleted.dir==='down'"
                   [class.bt-flat]="trendCompleted.dir==='flat'"
-                  matTooltip="Completed tasks vs prev 30 days">
+                  [matTooltip]="'analytics.thisMonth' | translate">
               <mat-icon>{{ trendCompleted.dir==='up'?'trending_up':trendCompleted.dir==='down'?'trending_down':'trending_flat' }}</mat-icon>
-              {{ trendCompleted.value }} this month
+              {{ trendCompleted.value }} {{ 'analytics.thisMonth' | translate }}
             </span>
           </div>
         </div>
 
         <!-- ③ Activity snapshot ─────────────────────── -->
         <div class="bento-card activity-card">
-          <div class="bc-label">Activity</div>
+          <div class="bc-label">{{ 'analytics.activity' | translate }}</div>
           <div class="activity-metrics">
             <div class="am-item">
               <div class="am-val">{{ streaks.current }}<span class="am-unit">d</span></div>
-              <div class="am-lbl">Current streak</div>
+              <div class="am-lbl">{{ 'analytics.currentStreak' | translate }}</div>
             </div>
             <div class="am-sep"></div>
             <div class="am-item">
               <div class="am-val">{{ onTimeRate }}<span class="am-unit">%</span></div>
-              <div class="am-lbl">On time</div>
+              <div class="am-lbl">{{ 'analytics.onTime' | translate }}</div>
             </div>
             <div class="am-sep"></div>
             <div class="am-item">
               <div class="am-val">{{ heatmapActiveDays }}</div>
-              <div class="am-lbl">Active days</div>
+              <div class="am-lbl">{{ 'analytics.activeDays' | translate }}</div>
             </div>
           </div>
           <div class="activity-ww">
-            <span class="ww-label">Weekday</span>
+            <span class="ww-label">{{ 'analytics.weekday' | translate }}</span>
             <div class="ww-bar-track">
               <div class="ww-bar ww-weekday"
                    [style.width.%]="(weekdayVsWeekend.weekday+weekdayVsWeekend.weekend)>0 ? weekdayVsWeekend.weekday/(weekdayVsWeekend.weekday+weekdayVsWeekend.weekend)*100 : 50">
               </div>
             </div>
-            <span class="ww-label">Weekend</span>
+            <span class="ww-label">{{ 'analytics.weekend' | translate }}</span>
           </div>
           <div class="activity-ww-nums">
             <span>{{ weekdayVsWeekend.weekday }}</span>
@@ -172,8 +172,8 @@
         <div class="bento-card bento-full">
           <div class="bento-row-header">
             <div class="bc-label">
-              Completion trend
-              <span class="bc-sub">tasks done per day</span>
+              {{ 'analytics.completionTrend' | translate }}
+              <span class="bc-sub">{{ 'analytics.tasksPerDay' | translate }}</span>
             </div>
             <div class="heatmap-view-toggle">
               <button *ngFor="let opt of lineChartWindowOptions" class="view-btn"
@@ -456,7 +456,7 @@
               <h3 class="timeline-title"><mat-icon>assignment_late</mat-icon> Upcoming in window</h3>
               <div class="upcoming-list">
                 <div *ngFor="let t of capacityForecast.upcomingTasks" class="upcoming-row">
-                  <span class="up-priority" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
+                  <span class="up-priority" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span>
                   <span class="up-title">{{ t.title }}</span>
                   <span class="up-board">{{ t.boardTitle }}</span>
                   <span class="up-deadline" [class.up-urgent]="isDueToday(t.deadline)||isOverdue(t.deadline)">
@@ -514,37 +514,37 @@
       <!-- All tasks table -->
       <section class="section">
         <div class="section-header">
-          <h2 class="section-title"><mat-icon>table_rows</mat-icon> All tasks</h2>
+          <h2 class="section-title"><mat-icon>table_rows</mat-icon> {{ 'analytics.tasks' | translate }}</h2>
           <span class="tasks-count">{{ filteredTasks.length }} of {{ total }}</span>
         </div>
         <div class="table-filters">
           <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Search…</mat-label>
+            <mat-label>{{ 'analytics.searchTasks' | translate }}</mat-label>
             <mat-icon matPrefix>search</mat-icon>
             <input matInput [(ngModel)]="tableSearch">
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-select">
-            <mat-label>Status</mat-label>
+            <mat-label>{{ 'analytics.status' | translate }}</mat-label>
             <mat-select [(ngModel)]="tableStatus">
-              <mat-option value="all">All</mat-option>
-              <mat-option value="ToDo">To Do</mat-option>
-              <mat-option value="InProgress">In Progress</mat-option>
-              <mat-option value="Done">Done</mat-option>
+              <mat-option value="all">{{ 'analytics.allStatuses' | translate }}</mat-option>
+              <mat-option value="ToDo">{{ 'analytics.todo' | translate }}</mat-option>
+              <mat-option value="InProgress">{{ 'analytics.inProgress' | translate }}</mat-option>
+              <mat-option value="Done">{{ 'analytics.done' | translate }}</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-select">
-            <mat-label>Priority</mat-label>
+            <mat-label>{{ 'analytics.priority' | translate }}</mat-label>
             <mat-select [(ngModel)]="tablePriority">
-              <mat-option value="all">All</mat-option>
-              <mat-option value="High">High</mat-option>
-              <mat-option value="Medium">Medium</mat-option>
-              <mat-option value="Low">Low</mat-option>
+              <mat-option value="all">{{ 'analytics.allPriorities' | translate }}</mat-option>
+              <mat-option value="High">{{ 'analytics.high' | translate }}</mat-option>
+              <mat-option value="Medium">{{ 'analytics.medium' | translate }}</mat-option>
+              <mat-option value="Low">{{ 'analytics.low' | translate }}</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-select">
-            <mat-label>Board</mat-label>
+            <mat-label>{{ 'analytics.boards' | translate }}</mat-label>
             <mat-select [(ngModel)]="tableBoard">
-              <mat-option value="all">All boards</mat-option>
+              <mat-option value="all">{{ 'analytics.allBoards' | translate }}</mat-option>
               <mat-option *ngFor="let b of boards" [value]="b.id.toString()">{{ b.title }}</mat-option>
             </mat-select>
           </mat-form-field>
@@ -558,7 +558,7 @@
         <div class="table-wrap">
           <table class="tasks-table" *ngIf="filteredTasks.length > 0">
             <thead><tr>
-              <th>Task</th><th>Board</th><th>Status</th><th>Priority</th><th>Deadline</th><th>Completed</th>
+              <th>{{ 'analytics.tasks' | translate }}</th><th>{{ 'analytics.board' | translate }}</th><th>{{ 'analytics.status' | translate }}</th><th>{{ 'analytics.priority' | translate }}</th><th>{{ 'analytics.deadline' | translate }}</th><th>{{ 'analytics.done' | translate }}</th>
             </tr></thead>
             <tbody>
               <tr *ngFor="let t of filteredTasks"
@@ -570,14 +570,14 @@
                 </td>
                 <td><a class="board-link" [routerLink]="['/board', t.boardId]">{{ t.boardTitle }}</a></td>
                 <td><span class="status-badge" [ngClass]="t.status.toLowerCase()">{{ statusLabel(t.status) }}</span></td>
-                <td><span class="priority-badge" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span></td>
+                <td><span class="priority-badge" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span></td>
                 <td>
                   <span *ngIf="t.deadline" class="deadline-cell"
                         [class.overdue-text]="t.status!=='Done'&&isOverdue(t.deadline)"
                         [class.today-text]="isDueToday(t.deadline)">
                     {{ t.deadline | date:'dd MMM yyyy' }}
-                    <span class="overdue-tag" *ngIf="t.status!=='Done'&&isOverdue(t.deadline)">overdue</span>
-                    <span class="today-tag" *ngIf="isDueToday(t.deadline)&&t.status!=='Done'">today</span>
+                    <span class="overdue-tag" *ngIf="t.status!=='Done'&&isOverdue(t.deadline)">{{ 'analytics.overdue' | translate }}</span>
+                    <span class="today-tag" *ngIf="isDueToday(t.deadline)&&t.status!=='Done'">{{ 'calendar.today' | translate }}</span>
                   </span>
                   <span *ngIf="!t.deadline" class="no-deadline">—</span>
                 </td>
@@ -590,7 +590,7 @@
           </table>
           <div class="empty-state" *ngIf="filteredTasks.length === 0">
             <mat-icon>search_off</mat-icon>
-            <p>No tasks match your filters</p>
+            <p>{{ 'analytics.noTasks' | translate }}</p>
             <button mat-stroked-button (click)="tableSearch='';tableStatus='all';tablePriority='all';tableBoard='all'">Clear filters</button>
           </div>
         </div>
@@ -624,7 +624,7 @@
               <div class="cr-meta">
                 <span class="cr-board">{{ t.boardTitle }}</span>
                 <span class="cr-dot">·</span>
-                <span class="priority-badge" [ngClass]="t.priority?.toLowerCase()">{{ t.priority }}</span>
+                <span class="priority-badge" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span>
                 <span class="cr-dot">·</span>
                 <span class="cr-date">{{ t.completedAt | date:'dd MMM yyyy, HH:mm' }}</span>
                 <ng-container *ngIf="t.deadline">

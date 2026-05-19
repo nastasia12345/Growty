@@ -19,6 +19,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { BoardService } from '../../services/board';
 import { TaskService } from '../../services/task';
 import { AIService, AISuggestion } from '../../services/ai';
@@ -37,7 +38,7 @@ const PRIORITY_ORDER: Record<string, number> = {
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatDatepickerModule, MatNativeDateModule, MatSidenavModule,
     MatTooltipModule, MatMenuModule, MatChipsModule,
-    MatProgressBarModule, DragDropModule
+    MatProgressBarModule, DragDropModule, TranslateModule
   ],
   templateUrl: './board-detail.html',
   styleUrls: ['./board-detail.css']
