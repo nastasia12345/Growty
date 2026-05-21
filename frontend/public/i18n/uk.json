@@ -80,7 +80,8 @@
     "titleTooLong": "Назва не може перевищувати 100 символів",
     "createFailed": "Не вдалося створити дошку. Спробуйте ще раз.",
     "updateFailed": "Не вдалося оновити дошку. Спробуйте ще раз.",
-    "ganttHint": "Перетягніть правий край бару, щоб змінити дедлайн"
+    "ganttHint": "Перетягніть правий край бару, щоб змінити дедлайн",
+    "noDeadline": "Без дедлайну"
   },
   "board": {
     "backToBoards": "До дошок",
@@ -155,7 +156,22 @@
     "status": "Статус",
     "priority": "Пріоритет",
     "deadline": "Дедлайн",
-    "noBoardData": "Немає даних дошки"
+    "noBoardData": "Немає даних дошки",
+    "periodAllTime": "Весь час",
+    "periodThisWeek": "Цей тиждень",
+    "periodThisMonth": "Цей місяць",
+    "period3months": "3 місяці",
+    "period6months": "6 місяців",
+    "periodLastMonth": "Минулий місяць",
+    "periodCustom": "Довільно",
+    "periodCustomRange": "Довільний діапазон",
+    "period3monthsLong": "Останні 3 місяці",
+    "period6monthsLong": "Останні 6 місяців",
+    "periodLabel": "Період:",
+    "windowLabel": "Вікно:",
+    "forecastDays": "наступні {{count}} днів",
+    "tasksAnalysed": "{{count}} виконаних завдань проаналізовано",
+    "totalSummary": "{{tasks}} завдань на {{boards}} дошках"
   },
   "calendar": {
     "title": "Календар",
@@ -257,21 +273,4 @@
     "healthWilting": "В'яне",
     "healthStressed": "Стрес"
   },
-  "analytics": {
-    "periodAllTime": "Весь час",
-    "periodThisWeek": "Цей тиждень",
-    "periodThisMonth": "Цей місяць",
-    "period3months": "3 місяці",
-    "period6months": "6 місяців",
-    "periodLastMonth": "Минулий місяць",
-    "periodCustom": "Довільно",
-    "periodCustomRange": "Довільний діапазон",
-    "period3monthsLong": "Останні 3 місяці",
-    "period6monthsLong": "Останні 6 місяців",
-    "periodLabel": "Період:",
-    "windowLabel": "Вікно:",
-    "forecastDays": "наступні {{count}} днів",
-    "tasksAnalysed": "{{count}} виконаних завдань проаналізовано",
-    "totalSummary": "{{tasks}} завдань на {{boards}} дошках"
-  }
 }

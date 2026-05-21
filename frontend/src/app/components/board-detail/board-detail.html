@@ -174,10 +174,6 @@
                 (click)="setViewMode('kanban')" matTooltip="Kanban view">
           <mat-icon>view_kanban</mat-icon>
         </button>
-        <button class="view-btn" [class.active]="viewMode === 'pipeline'"
-                (click)="setViewMode('pipeline')" matTooltip="Pipeline view">
-          <mat-icon>view_timeline</mat-icon>
-        </button>
       </div>
 
       <button mat-raised-button color="primary" class="new-task-btn"
@@ -228,7 +224,7 @@
 
       <!-- No-deadline strip -->
       <div class="pipeline-no-dl" *ngIf="pipelineNoDeadlineTasks.length > 0">
-        <span class="pipeline-no-dl-label">No deadline</span>
+        <span class="pipeline-no-dl-label">{{ 'boards.noDeadline' | translate }}</span>
         <div class="pipeline-no-dl-tasks">
           <span *ngFor="let t of pipelineNoDeadlineTasks"
                 class="no-dl-task" [class]="'ndl-' + t.priority?.toLowerCase()">
@@ -419,7 +415,7 @@
 
             <div class="task-meta">
               <span class="priority" [ngClass]="task.priority?.toLowerCase()">
-                {{ task.priority }}
+                {{ priorityLabel(task.priority) }}
               </span>
               <span *ngIf="task.deadline" class="deadline"
                     [class.overdue]="isOverdue(task.deadline) && task.status !== 'Done'"

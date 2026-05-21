@@ -19,7 +19,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BoardService } from '../../services/board';
 import { TaskService } from '../../services/task';
 import { AIService, AISuggestion } from '../../services/ai';
@@ -130,10 +130,19 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked, OnDestroy
     private aiService: AIService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
-    public  langService: LanguageService
+    public  langService: LanguageService,
+    private translate: TranslateService
   ) {}
 
   get locale(): string { return this.langService.current; }
+
+  priorityLabel(p: string | undefined | null): string {
+    if (!p) return '';
+    if (p === 'High')   return this.translate.instant('board.high');
+    if (p === 'Medium') return this.translate.instant('board.medium');
+    if (p === 'Low')    return this.translate.instant('board.low');
+    return p;
+  }
 
   ngOnInit() {
     this.boardId = Number(this.route.snapshot.paramMap.get('id'));

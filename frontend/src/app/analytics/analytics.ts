@@ -59,7 +59,8 @@ export class AnalyticsComponent implements OnInit {
   tabs = [
     { id: 'overview',  labelKey: 'analytics.overview',  icon: 'dashboard' },
     { id: 'insights',  labelKey: 'analytics.activity',  icon: 'psychology' },
-    { id: 'tasks',     labelKey: 'analytics.tasks',     icon: 'task_alt' }
+    { id: 'tasks',     labelKey: 'analytics.tasks',     icon: 'task_alt' },
+    { id: 'heatmap',   labelKey: 'analytics.heatmap',   icon: 'grid_view' }
   ];
 
   // в"Ђв"Ђ Completion trend chart в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
@@ -739,6 +740,13 @@ export class AnalyticsComponent implements OnInit {
     if (s === 'InProgress') return this.translate.instant('board.inProgress');
     if (s === 'Done')       return this.translate.instant('board.done');
     return s;
+  }
+
+  priorityLabel(p: string): string {
+    if (p === 'High')   return this.translate.instant('board.high');
+    if (p === 'Medium') return this.translate.instant('board.medium');
+    if (p === 'Low')    return this.translate.instant('board.low');
+    return p;
   }
 
   // в"Ђв"Ђ Excel export period в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ

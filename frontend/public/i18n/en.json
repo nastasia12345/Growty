@@ -80,7 +80,8 @@
     "titleTooLong": "Title must be under 100 characters",
     "createFailed": "Failed to create board. Please try again.",
     "updateFailed": "Failed to update board. Please try again.",
-    "ganttHint": "Drag right edge of a bar to extend its deadline"
+    "ganttHint": "Drag right edge of a bar to extend its deadline",
+    "noDeadline": "No deadline"
   },
   "board": {
     "backToBoards": "Back to boards",
@@ -155,7 +156,22 @@
     "status": "Status",
     "priority": "Priority",
     "deadline": "Deadline",
-    "noBoardData": "No board data"
+    "noBoardData": "No board data",
+    "periodAllTime": "All time",
+    "periodThisWeek": "This week",
+    "periodThisMonth": "This month",
+    "period3months": "3 months",
+    "period6months": "6 months",
+    "periodLastMonth": "Last month",
+    "periodCustom": "Custom",
+    "periodCustomRange": "Custom range",
+    "period3monthsLong": "Last 3 months",
+    "period6monthsLong": "Last 6 months",
+    "periodLabel": "Period:",
+    "windowLabel": "Window:",
+    "forecastDays": "next {{count}} days",
+    "tasksAnalysed": "{{count}} completed tasks analysed",
+    "totalSummary": "{{tasks}} tasks total across {{boards}} boards"
   },
   "calendar": {
     "title": "Calendar",
@@ -257,21 +273,4 @@
     "healthWilting": "Wilting",
     "healthStressed": "Stressed"
   },
-  "analytics": {
-    "periodAllTime": "All time",
-    "periodThisWeek": "This week",
-    "periodThisMonth": "This month",
-    "period3months": "3 months",
-    "period6months": "6 months",
-    "periodLastMonth": "Last month",
-    "periodCustom": "Custom",
-    "periodCustomRange": "Custom range",
-    "period3monthsLong": "Last 3 months",
-    "period6monthsLong": "Last 6 months",
-    "periodLabel": "Period:",
-    "windowLabel": "Window:",
-    "forecastDays": "next {{count}} days",
-    "tasksAnalysed": "{{count}} completed tasks analysed",
-    "totalSummary": "{{tasks}} tasks total across {{boards}} boards"
-  }
 }

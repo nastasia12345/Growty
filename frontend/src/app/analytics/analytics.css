@@ -2038,3 +2038,110 @@
   .streak-grid { grid-template-columns: 1fr 1fr; }
   .export-bar-inner { flex-direction: column; align-items: flex-start; }
 }
+
+/* ─── Heatmap tab ────────────────────────────────────── */
+.heatmap-section { padding: 28px 32px; }
+
+.heatmap-stats {
+  display: flex;
+  gap: 16px;
+}
+.hstat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+.hstat mat-icon { font-size: 15px; width: 15px; height: 15px; color: #10b981; }
+
+.heatmap-wrap {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-top: 20px;
+}
+
+.heatmap-day-labels {
+  display: grid;
+  grid-template-rows: repeat(7, 14px);
+  gap: 2px;
+  padding-top: 22px;
+  min-width: 26px;
+}
+.heatmap-day-labels span {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 500;
+  text-align: right;
+  padding-right: 4px;
+  line-height: 14px;
+}
+
+.heatmap-grid-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heatmap-months {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 2px;
+  margin-bottom: 2px;
+  height: 18px;
+}
+.heatmap-month-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.heatmap-grid {
+  display: flex;
+  gap: 2px;
+}
+.heatmap-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.heatmap-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  cursor: default;
+  transition: opacity 0.1s;
+}
+.heatmap-cell:hover { opacity: 0.75; }
+
+.heatmap-cell.level-0     { background: #f1f5f9; }
+.heatmap-cell.level-1     { background: #bbf7d0; }
+.heatmap-cell.level-2     { background: #4ade80; }
+.heatmap-cell.level-3     { background: #16a34a; }
+.heatmap-cell.level-4     { background: #14532d; }
+.heatmap-cell.level-future { background: transparent; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+.legend-label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.legend-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+.legend-cell.level-0 { background: #f1f5f9; }
+.legend-cell.level-1 { background: #bbf7d0; }
+.legend-cell.level-2 { background: #4ade80; }
+.legend-cell.level-3 { background: #16a34a; }
+.legend-cell.level-4 { background: #14532d; }
