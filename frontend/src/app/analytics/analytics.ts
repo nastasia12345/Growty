@@ -339,7 +339,7 @@ export class AnalyticsComponent implements OnInit {
   get bestDay(): string {
     const data = this.dayOfWeekActivity;
     const top  = data.reduce((a, b) => b.count > a.count ? b : a, data[0]);
-    return top.count > 0 ? top.day : '';
+    return top.count > 0 ? top.dayKey : '';
   }
 
   get timeOfDayActivity() { return this.timeOfDayStrategy.compute(this.insightTasks); }
@@ -347,7 +347,9 @@ export class AnalyticsComponent implements OnInit {
   get bestTimeSlot(): string {
     const data = this.timeOfDayActivity;
     const top  = data.reduce((a, b) => b.count > a.count ? b : a, data[0]);
-    return top.count > 0 ? `${top.label} (${top.range})` : '';
+    return top.count > 0
+      ? `${this.translate.instant(top.labelKey)} (${this.translate.instant(top.rangeKey)})`
+      : '';
   }
 
   get streaks()         { return this.streakStrategy.compute(this.insightTasks); }
@@ -360,37 +362,39 @@ export class AnalyticsComponent implements OnInit {
 
     if (done.length < 3) {
       return { icon: 'tips_and_updates',
-        text: 'Complete a few more tasks to unlock personalised productivity insights!' };
+        text: this.translate.instant('analytics.recNoData') };
     }
 
     const topDay  = this.dayOfWeekActivity.reduce((a, b) => b.count > a.count ? b : a);
     const topSlot = this.timeOfDayActivity.reduce((a, b)  => b.count > a.count ? b : a);
+    const day     = this.translate.instant(topDay.dayKey);
+    const slot    = this.translate.instant(topSlot.labelKey).toLowerCase();
     const { current, best } = this.streaks;
     const overduePct = this.total > 0 ? Math.round(this.totalOverdue / this.total * 100) : 0;
     const ww = this.weekdayVsWeekend;
 
     if (current >= 5)
       return { icon: 'local_fire_department',
-        text: `рџ"Ґ ${current}-day streak! Outstanding consistency. Your peak window is ${topDay.day} ${topSlot.label.toLowerCase()}s вЂ" protect that time.` };
+        text: this.translate.instant('analytics.recStreak', { n: current, day, slot }) };
 
     if (overduePct >= 30)
       return { icon: 'alarm',
-        text: `${overduePct}% of your open tasks are overdue. Tackle them on ${topDay.day} ${topSlot.label.toLowerCase()}s вЂ" that's when you get the most done.` };
+        text: this.translate.instant('analytics.recOverdue', { pct: overduePct, day, slot }) };
 
     if (ww.weekend > ww.weekday && ww.weekend > 0)
       return { icon: 'weekend',
-        text: `You're a weekend warrior! ${ww.weekend} tasks completed on weekends vs ${ww.weekday} on weekdays. Consider planning hard tasks for Saturdays.` };
+        text: this.translate.instant('analytics.recWeekend', { wknd: ww.weekend, wkdy: ww.weekday }) };
 
     if (this.onTimeRate >= 80)
       return { icon: 'verified',
-        text: `You deliver ${this.onTimeRate}% of tasks on time вЂ" excellent discipline! Keep scheduling your heaviest work on ${topDay.day}s.` };
+        text: this.translate.instant('analytics.recOnTime', { rate: this.onTimeRate, day }) };
 
     if (best >= 3 && current === 0)
       return { icon: 'restart_alt',
-        text: `You hit a ${best}-day streak before. ${topDay.day} ${topSlot.label.toLowerCase()}s are your sweet spot вЂ" try restarting your streak then!` };
+        text: this.translate.instant('analytics.recRestart', { best, day, slot }) };
 
     return { icon: 'psychology',
-      text: `Your most productive time is ${topDay.day} ${topSlot.label.toLowerCase()}s. Schedule your Critical and High-priority tasks in that window!` };
+      text: this.translate.instant('analytics.recDefault', { day, slot }) };
   }
 
   // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ CAPACITY FORECAST ALGORITHM в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
@@ -460,22 +464,24 @@ export class AnalyticsComponent implements OnInit {
     let prediction   = '';
     let suggestion   = '';
 
+    const tr = (key: string, params?: object): string => this.translate.instant(key, params);
+
     if (isHigh) {
-      warning    = `вљ пёЏ Overload detected вЂ" your planned workload is ${Math.round((riskCoefficient - 1) * 100)}% above your capacity.`;
-      prediction = `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${FORECAST_DAYS} days. Based on your history you typically complete ~${avgCountPeriod} tasks in this period.`;
-      suggestion = `Consider rescheduling low-priority tasks or splitting large ones. Focus Critical and High items first.`;
+      warning    = tr('analytics.fcOverloadWarning', { pct: Math.round((riskCoefficient - 1) * 100) });
+      prediction = tr('analytics.fcPredHigh', { count: upcomingCount, n: FORECAST_DAYS, avg: avgCountPeriod });
+      suggestion = tr('analytics.fcSuggestHigh');
     } else if (isMedium) {
-      warning    = `рџ"‹ Slightly above capacity вЂ" manageable with good prioritisation.`;
-      prediction = `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${FORECAST_DAYS} days, slightly above your average of ~${avgCountPeriod}.`;
-      suggestion = `Try to complete Medium and High tasks early in the week to avoid a last-minute crunch.`;
+      warning    = tr('analytics.fcSlightlyAbove');
+      prediction = tr('analytics.fcPredMed', { count: upcomingCount, n: FORECAST_DAYS, avg: avgCountPeriod });
+      suggestion = tr('analytics.fcSuggestMed');
     } else {
       warning    = upcomingCount > 0
-        ? `вњ… Workload is within your capacity вЂ" you're on track.`
-        : `вњ… No tasks due in the next ${FORECAST_DAYS} days вЂ" great time to plan ahead.`;
+        ? tr('analytics.fcOnTrack')
+        : tr('analytics.fcNoDue', { n: FORECAST_DAYS });
       prediction = upcomingCount > 0
-        ? `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${FORECAST_DAYS} days, well within your average capacity of ~${avgCountPeriod}.`
-        : `Your upcoming schedule is clear. Your average capacity is ~${avgCountPeriod} tasks per ${FORECAST_DAYS} days.`;
-      suggestion = `Keep your current rhythm. You could take on ${Math.max(0, Math.round(avgCountPeriod - upcomingCount))} more tasks comfortably.`;
+        ? tr('analytics.fcPredLow', { count: upcomingCount, n: FORECAST_DAYS, avg: avgCountPeriod })
+        : tr('analytics.fcPredNone', { avg: avgCountPeriod, n: FORECAST_DAYS });
+      suggestion = tr('analytics.fcSuggestLow', { extra: Math.max(0, Math.round(avgCountPeriod - upcomingCount)) });
     }
 
     // Daily breakdown for the forecast chart
@@ -938,8 +944,8 @@ export class AnalyticsComponent implements OnInit {
         ['Best streak',       `${st.best} days`,      ''],
         ['On-time rate',      `${this.onTimeRate}%`,  this.onTimeRate >= 80 ? 'Excellent' : this.onTimeRate >= 60 ? 'Good' : 'Improve'],
         ['Active days',       `${this.heatmapActiveDays}`, 'last 12 weeks'],
-        ['Most active day',   td.count > 0 ? td.day  : 'вЂ"', td.count > 0 ? `${td.count} tasks` : ''],
-        ['Best time slot',    ts.count > 0 ? `${ts.label} (${ts.range})` : 'вЂ"', ''],
+        [this.translate.instant('analytics.mostActiveDay'),   td.count > 0 ? this.translate.instant(td.dayKey) : '—', td.count > 0 ? `${td.count}` : ''],
+        [this.translate.instant('analytics.bestTimeOfDay'),   ts.count > 0 ? `${this.translate.instant(ts.labelKey)} (${this.translate.instant(ts.rangeKey)})` : '—', ''],
         ['Weekday / Weekend', `${ww.weekday} / ${ww.weekend}`, 'completions'],
       ];
       acts.forEach(([m, v, n], i) => {
@@ -1119,7 +1125,7 @@ export class AnalyticsComponent implements OnInit {
         hdr(pd4Hdr, C.amber);
 
         pds.forEach((pd: any, idx: number) => {
-          const r = ws4.addRow([pd.rank, pd.day, pd.slot, pd.count]);
+          const r = ws4.addRow([pd.rank, this.translate.instant(pd.dayKey), this.translate.instant(pd.slotKey), pd.count]);
           r.height = 22;
           r.eachCell((cell: any, col: number) => {
             cell.alignment = { vertical: 'middle', horizontal: col === 1 || col === 4 ? 'center' : 'left' };

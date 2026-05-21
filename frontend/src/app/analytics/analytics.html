@@ -229,7 +229,7 @@
 
       <div class="empty-state" *ngIf="totalDone === 0">
         <mat-icon>bar_chart</mat-icon>
-        <p>Complete some tasks to unlock productivity insights</p>
+        <p>{{ 'analytics.completeForInsights' | translate }}</p>
       </div>
 
       <ng-container *ngIf="totalDone > 0">
@@ -249,16 +249,16 @@
         </div>
 
         <!-- Patterns grid (4 equal cards) -->
-        <div class="insight-section-label"><mat-icon>psychology</mat-icon> Your Patterns</div>
+        <div class="insight-section-label"><mat-icon>psychology</mat-icon> {{ 'analytics.yourPatterns' | translate }}</div>
         <div class="insights-grid">
 
           <div class="insight-card">
-            <div class="insight-header"><mat-icon>calendar_today</mat-icon><span>Most active day</span>
-              <span class="insight-badge" *ngIf="bestDay">🏆 {{ bestDay }}</span>
+            <div class="insight-header"><mat-icon>calendar_today</mat-icon><span>{{ 'analytics.mostActiveDay' | translate }}</span>
+              <span class="insight-badge" *ngIf="bestDay">🏆 {{ bestDay | translate }}</span>
             </div>
             <div class="dow-chart">
               <div *ngFor="let d of dayOfWeekActivity" class="dow-row" [class.top-row]="d.isTop">
-                <span class="dow-label">{{ d.short }}</span>
+                <span class="dow-label">{{ d.shortKey | translate }}</span>
                 <div class="dow-bar-track"><div class="dow-bar" [style.width.%]="d.pct" [class.top-bar]="d.isTop"></div></div>
                 <span class="dow-count">{{ d.count }}</span>
               </div>
@@ -266,14 +266,14 @@
           </div>
 
           <div class="insight-card">
-            <div class="insight-header"><mat-icon>schedule</mat-icon><span>Best time of day</span></div>
+            <div class="insight-header"><mat-icon>schedule</mat-icon><span>{{ 'analytics.bestTimeOfDay' | translate }}</span></div>
             <div class="tod-chart">
               <div *ngFor="let s of timeOfDayActivity" class="tod-row" [class.top-row]="s.isTop">
                 <div class="tod-meta">
                   <mat-icon class="tod-icon">{{ s.icon }}</mat-icon>
                   <div class="tod-labels">
-                    <span class="tod-label">{{ s.label }}</span>
-                    <span class="tod-range">{{ s.range }}</span>
+                    <span class="tod-label">{{ s.labelKey | translate }}</span>
+                    <span class="tod-range">{{ s.rangeKey | translate }}</span>
                   </div>
                   <span class="tod-count">{{ s.count }}</span>
                 </div>
@@ -283,48 +283,48 @@
           </div>
 
           <div class="insight-card power-days-card" *ngIf="powerDays.length > 0">
-            <div class="insight-header"><mat-icon>bolt</mat-icon><span>Power Days</span>
+            <div class="insight-header"><mat-icon>bolt</mat-icon><span>{{ 'analytics.powerDays' | translate }}</span>
               <span class="insight-badge">🔥 Top {{ powerDays.length }}</span>
             </div>
-            <p class="power-days-desc">Day + time combinations where you finish the most</p>
+            <p class="power-days-desc">{{ 'analytics.powerDaysDesc' | translate }}</p>
             <div class="power-days-list">
               <div *ngFor="let pd of powerDays" class="power-day-row" [class.peak-row]="pd.isPeak">
                 <div class="pd-rank">{{ pd.rank===1?'🥇':pd.rank===2?'🥈':'🥉' }}</div>
                 <div class="pd-info">
-                  <span class="pd-day">{{ pd.day }}</span>
-                  <span class="pd-slot"><mat-icon class="pd-icon">{{ pd.icon }}</mat-icon>{{ pd.slot }}</span>
+                  <span class="pd-day">{{ pd.dayKey | translate }}</span>
+                  <span class="pd-slot"><mat-icon class="pd-icon">{{ pd.icon }}</mat-icon>{{ pd.slotKey | translate }}</span>
                 </div>
-                <div class="pd-count"><span class="pd-num">{{ pd.count }}</span><span class="pd-unit">tasks</span></div>
+                <div class="pd-count"><span class="pd-num">{{ pd.count }}</span><span class="pd-unit">{{ 'analytics.tasksTotal' | translate }}</span></div>
               </div>
             </div>
             <div class="power-tip" *ngIf="powerDays.length > 0">
               <mat-icon>tips_and_updates</mat-icon>
-              Best window: <strong>{{ powerDays[0].day }} {{ powerDays[0].slot }}</strong>
+              {{ 'analytics.bestWindow' | translate }}: <strong>{{ powerDays[0].dayKey | translate }} {{ powerDays[0].slotKey | translate }}</strong>
             </div>
           </div>
 
           <div class="insight-card insight-summary">
-            <div class="insight-header"><mat-icon>emoji_events</mat-icon><span>Performance</span></div>
+            <div class="insight-header"><mat-icon>emoji_events</mat-icon><span>{{ 'analytics.performance' | translate }}</span></div>
             <div class="streak-grid">
               <div class="streak-item" [class.streak-alive]="streaks.current>0">
                 <div class="streak-num">{{ streaks.current }}</div>
-                <div class="streak-lbl">Current streak</div>
-                <div class="streak-unit">days</div>
+                <div class="streak-lbl">{{ 'analytics.currentStreak' | translate }}</div>
+                <div class="streak-unit">{{ 'analytics.days' | translate }}</div>
               </div>
               <div class="streak-item best-streak">
                 <div class="streak-num">{{ streaks.best }}</div>
-                <div class="streak-lbl">Best streak</div>
-                <div class="streak-unit">days</div>
+                <div class="streak-lbl">{{ 'analytics.bestStreak' | translate }}</div>
+                <div class="streak-unit">{{ 'analytics.days' | translate }}</div>
               </div>
               <div class="streak-item">
                 <div class="streak-num">{{ onTimeRate }}%</div>
-                <div class="streak-lbl">On-time rate</div>
-                <div class="streak-unit">of done tasks</div>
+                <div class="streak-lbl">{{ 'analytics.onTime' | translate }}</div>
+                <div class="streak-unit">{{ 'analytics.ofDoneTasks' | translate }}</div>
               </div>
               <div class="streak-item">
                 <div class="streak-num ww">{{ weekdayVsWeekend.weekday }}<span class="ww-sep">/</span>{{ weekdayVsWeekend.weekend }}</div>
-                <div class="streak-lbl">Weekday / Weekend</div>
-                <div class="streak-unit">completions</div>
+                <div class="streak-lbl">{{ 'analytics.weekday' | translate }} / {{ 'analytics.weekend' | translate }}</div>
+                <div class="streak-unit">{{ 'analytics.completions' | translate }}</div>
               </div>
             </div>
             <div class="recommendation">
@@ -336,7 +336,7 @@
         </div>
 
         <!-- Capacity Forecast -->
-        <div class="insight-section-label forecast-label"><mat-icon>speed</mat-icon> Capacity Forecast</div>
+        <div class="insight-section-label forecast-label"><mat-icon>speed</mat-icon> {{ 'analytics.capacityForecastTitle' | translate }}</div>
 
         <div class="forecast-panel">
           <div class="forecast-header">
@@ -352,7 +352,7 @@
 
           <div class="forecast-no-data" *ngIf="capacityForecast.noHistory">
             <mat-icon>history</mat-icon>
-            <p>Complete some tasks to enable capacity forecasting.</p>
+            <p>{{ 'analytics.noHistoryMsg' | translate }}</p>
           </div>
 
           <ng-container *ngIf="!capacityForecast.noHistory">
@@ -369,23 +369,23 @@
                    [class.badge-high]="capacityForecast.isHigh"
                    [class.badge-medium]="capacityForecast.isMedium"
                    [class.badge-low]="!capacityForecast.isHigh && !capacityForecast.isMedium">
-                {{ capacityForecast.isHigh?'HIGH RISK':capacityForecast.isMedium?'MEDIUM':'LOW RISK' }}
+                {{ capacityForecast.isHigh ? ('analytics.riskHigh' | translate) : capacityForecast.isMedium ? ('analytics.riskMedium' | translate) : ('analytics.riskLow' | translate) }}
               </div>
             </div>
 
             <div class="forecast-metrics">
               <div class="fmetric">
                 <div class="fmetric-value">{{ capacityForecast.avgCountPeriod }}</div>
-                <div class="fmetric-label">Avg capacity</div>
-                <div class="fmetric-sub">tasks / {{ capacityForecast.forecastDays }} days</div>
+                <div class="fmetric-label">{{ 'analytics.avgCapacity' | translate }}</div>
+                <div class="fmetric-sub">{{ 'analytics.tasksTotal' | translate }} / {{ capacityForecast.forecastDays }} {{ 'analytics.days' | translate }}</div>
               </div>
               <div class="fmetric-arrow"><mat-icon>arrow_forward</mat-icon></div>
               <div class="fmetric">
                 <div class="fmetric-value" [class.value-high]="capacityForecast.isHigh" [class.value-medium]="capacityForecast.isMedium">
                   {{ capacityForecast.upcomingCount }}
                 </div>
-                <div class="fmetric-label">Planned tasks</div>
-                <div class="fmetric-sub">with deadline ahead</div>
+                <div class="fmetric-label">{{ 'analytics.plannedTasks' | translate }}</div>
+                <div class="fmetric-sub">{{ 'analytics.withDeadlineAhead' | translate }}</div>
               </div>
               <div class="fmetric-arrow"><mat-icon>drag_handle</mat-icon></div>
               <div class="fmetric gauge-metric">
@@ -405,7 +405,7 @@
                   </svg>
                   <div class="gauge-labels"><span>0</span><span>1.1</span><span>1.3+</span></div>
                 </div>
-                <div class="fmetric-label">Risk coefficient</div>
+                <div class="fmetric-label">{{ 'analytics.riskCoefficientLabel' | translate }}</div>
                 <div class="fmetric-sub">PlannedLoad / AvgCapacity</div>
               </div>
             </div>
