@@ -254,7 +254,7 @@
   [style.top.px]="tooltipY"
 >
   <div class="tt-date">
-    {{ hoveredDay.date | date:'MMMM d, yyyy' }}
+    {{ hoveredDay.date | date:'MMMM d, yyyy':'':langService.current }}
     <span class="tt-today" *ngIf="hoveredDay.isToday">{{ 'calendar.today' | translate }}</span>
   </div>
 

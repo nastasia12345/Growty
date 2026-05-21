@@ -1,57 +1,164 @@
 <div class="boards-container">
 
+  <!-- ══════════ HEADER ══════════ -->
   <div class="boards-header">
     <div>
       <h1>{{ 'boards.title' | translate }}</h1>
       <p>{{ 'boards.subtitle' | translate }}</p>
     </div>
-    <button mat-raised-button color="primary" class="create-btn" (click)="createBoard()">
+    <button class="create-btn" (click)="openCreate()">
       <mat-icon>add</mat-icon>
       {{ 'boards.newBoard' | translate }}
     </button>
   </div>
 
-  <!-- Empty state -->
+  <!-- ══════════ EMPTY STATE ══════════ -->
   <div *ngIf="boards.length === 0" class="empty-state">
     <mat-icon>dashboard_customize</mat-icon>
     <h3>{{ 'boards.emptyTitle' | translate }}</h3>
     <p>{{ 'boards.emptySubtitle' | translate }}</p>
-    <button mat-raised-button color="primary" class="create-btn" (click)="createBoard()">
+    <button class="create-btn" (click)="openCreate()">
       <mat-icon>add</mat-icon>
       {{ 'boards.createBoard' | translate }}
     </button>
   </div>
 
-  <!-- Boards grid -->
+  <!-- ══════════ BOARDS GRID ══════════ -->
   <div class="boards-grid" *ngIf="boards.length > 0">
-    <mat-card *ngFor="let board of boards"
-              class="board-card"
-              [routerLink]="['/board', board.id]">
 
-      <div class="board-card-top">
-        <div class="board-icon">🌱</div>
-        <div class="board-menu">
-          <button mat-icon-button (click)="editBoard(board); $event.stopPropagation()" [matTooltip]="'boards.editTooltip' | translate">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteBoard(board.id); $event.stopPropagation()" [matTooltip]="'boards.deleteTooltip' | translate">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
+    <div class="board-card" *ngFor="let board of boards"
+         [routerLink]="['/board', board.id]">
 
-      <mat-card-content>
-        <h2>{{ board.title }}</h2>
-        <p>{{ board.description || ('boards.noDescription' | translate) }}</p>
-        <div class="board-footer">
-          <span>{{ board.createdAt | date:'dd.MM.yyyy' }}</span>
-          <div class="open-board">
-            {{ 'boards.open' | translate }} <mat-icon>arrow_forward</mat-icon>
+      <!-- Colored accent bar -->
+      <div class="board-accent" [style.background]="getBoardColor(board.id)"></div>
+
+      <!-- Card body -->
+      <div class="board-card-body">
+
+        <!-- Icon + actions row -->
+        <div class="board-card-top">
+          <div class="board-icon" [style.background]="getBoardColor(board.id)">
+            <mat-icon>dashboard</mat-icon>
+          </div>
+          <div class="board-actions">
+            <button class="board-action-btn"
+                    (click)="openEdit(board, $event)"
+                    [matTooltip]="'boards.editTooltip' | translate">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="board-action-btn board-action-delete"
+                    (click)="openDelete(board, $event)"
+                    [matTooltip]="'boards.deleteTooltip' | translate">
+              <mat-icon>delete</mat-icon>
+            </button>
           </div>
         </div>
-      </mat-card-content>
 
-    </mat-card>
+        <!-- Text -->
+        <h2 class="board-title">{{ board.title }}</h2>
+        <p class="board-desc">{{ board.description || ('boards.noDescription' | translate) }}</p>
+
+        <!-- Footer -->
+        <div class="board-footer">
+          <span class="board-date">{{ board.createdAt | date:'dd.MM.yyyy' }}</span>
+          <span class="board-open">
+            {{ 'boards.open' | translate }}
+            <mat-icon>arrow_forward</mat-icon>
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SLIDING PANEL BACKDROP ══════════ -->
+  <div class="panel-backdrop" [class.panel-backdrop-visible]="panelOpen" (click)="closePanel()"></div>
+
+  <!-- ══════════ SLIDING PANEL ══════════ -->
+  <div class="panel-drawer" [class.panel-drawer-open]="panelOpen">
+
+    <div class="panel-header">
+      <h2>{{ panelMode === 'create' ? ('boards.createBoardTitle' | translate) : ('boards.editBoardTitle' | translate) }}</h2>
+      <button class="panel-close-btn" (click)="closePanel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Color picker -->
+    <div class="panel-section">
+      <label class="panel-label">{{ 'boards.boardColor' | translate }}</label>
+      <div class="color-swatches">
+        <button *ngFor="let color of colors"
+                class="color-swatch"
+                [class.swatch-active]="selectedColor === color"
+                [style.background]="color"
+                (click)="selectedColor = color">
+        </button>
+      </div>
+      <!-- Preview bar -->
+      <div class="color-preview-bar" [style.background]="selectedColor"></div>
+    </div>
+
+    <!-- Form -->
+    <div class="panel-section">
+      <label class="panel-label" for="board-title">{{ 'boards.boardName' | translate }} <span class="required">*</span></label>
+      <input id="board-title"
+             class="panel-input"
+             [class.input-error]="formError && !form.title.trim()"
+             [(ngModel)]="form.title"
+             placeholder="e.g. Product Roadmap"
+             maxlength="100"
+             (keydown.enter)="save()" />
+    </div>
+
+    <div class="panel-section">
+      <label class="panel-label" for="board-desc">{{ 'boards.boardDescription' | translate }} <span class="optional">(optional)</span></label>
+      <textarea id="board-desc"
+                class="panel-textarea"
+                [(ngModel)]="form.description"
+                placeholder="What is this board for?"
+                rows="3"
+                maxlength="300"></textarea>
+    </div>
+
+    <!-- Error -->
+    <div class="panel-error" *ngIf="formError">
+      <mat-icon>error_outline</mat-icon>
+      {{ formError }}
+    </div>
+
+    <!-- Actions -->
+    <div class="panel-actions">
+      <button class="panel-btn-cancel" (click)="closePanel()" [disabled]="saving">
+        {{ 'boards.cancel' | translate }}
+      </button>
+      <button class="panel-btn-save" (click)="save()" [disabled]="saving">
+        <mat-spinner *ngIf="saving" diameter="16"></mat-spinner>
+        <mat-icon *ngIf="!saving">{{ panelMode === 'create' ? 'add' : 'save' }}</mat-icon>
+        {{ (panelMode === 'create' ? 'boards.createBoard' : 'boards.saveChanges') | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ DELETE OVERLAY ══════════ -->
+  <div class="delete-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+    <div class="delete-card" (click)="$event.stopPropagation()">
+      <div class="delete-icon-wrap">
+        <mat-icon>delete_forever</mat-icon>
+      </div>
+      <h3>{{ 'boards.deleteBoard' | translate }}</h3>
+      <p>
+        <strong>{{ deleteTarget.title }}</strong> {{ 'boards.deleteBoardDesc' | translate }}
+      </p>
+      <div class="delete-actions">
+        <button class="delete-cancel-btn" (click)="cancelDelete()" [disabled]="deleting">{{ 'boards.keepBoard' | translate }}</button>
+        <button class="delete-confirm-btn" (click)="confirmDelete()" [disabled]="deleting">
+          <mat-spinner *ngIf="deleting" diameter="16"></mat-spinner>
+          <mat-icon *ngIf="!deleting">delete</mat-icon>
+          {{ 'boards.deleteTooltip' | translate }}
+        </button>
+      </div>
+    </div>
   </div>
 
 </div>

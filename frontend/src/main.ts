@@ -1,4 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { registerLocaleData } from '@angular/common';
+import localeUk from '@angular/common/locales/uk';
+registerLocaleData(localeUk, 'uk');
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';

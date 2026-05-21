@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AnalyticsService } from '../../services/analytics';
 import { GamificationService, GamificationState } from '../../services/gamification';
 import { PlantViewerComponent } from './plant-viewer/plant-viewer';
@@ -31,7 +32,7 @@ const ALL_COLLECTIBLES: Collectible[] = [
 @Component({
   selector: 'app-plant',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule, PlantViewerComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule, PlantViewerComponent, TranslateModule],
   templateUrl: './plant.html',
   styleUrls: ['./plant.css']
 })
@@ -48,7 +49,8 @@ export class PlantComponent implements OnInit {
   constructor(
     private analyticsService: AnalyticsService,
     private gamificationService: GamificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -106,14 +108,14 @@ export class PlantComponent implements OnInit {
   get healthLabel(): string {
     const hp = this.healthPercent;
     const wilt = this.wiltingLevel;
-    if (wilt === 'critical') return 'Critical — Wilting!';
-    if (wilt === 'moderate') return 'Wilting';
-    if (wilt === 'mild')     return 'Stressed';
-    if (hp >= 80) return 'Excellent';
-    if (hp >= 60) return 'Good';
-    if (hp >= 40) return 'Fair';
-    if (hp >= 20) return 'Weak';
-    return 'Critical';
+    if (wilt === 'critical') return this.translate.instant('plant.healthCriticalWilting');
+    if (wilt === 'moderate') return this.translate.instant('plant.healthWilting');
+    if (wilt === 'mild')     return this.translate.instant('plant.healthStressed');
+    if (hp >= 80) return this.translate.instant('plant.healthExcellent');
+    if (hp >= 60) return this.translate.instant('plant.healthGood');
+    if (hp >= 40) return this.translate.instant('plant.healthFair');
+    if (hp >= 20) return this.translate.instant('plant.healthWeak');
+    return this.translate.instant('plant.healthCritical');
   }
 
   get healthColor(): string {
@@ -134,20 +136,29 @@ export class PlantComponent implements OnInit {
   }
 
   get wiltingMessage(): string | null {
+    const t = (k: string, p?: object) => this.translate.instant(k, p);
     if (this.wiltingLevel === 'critical') {
       return this.inactiveDays >= 7
-        ? `Your plant hasn't been cared for in ${this.inactiveDays} days! Complete tasks to revive it.`
-        : `${this.overdueCount} overdue tasks are draining your plant's health!`;
+        ? t('plant.wiltCriticalDays',    { count: this.inactiveDays })
+        : t('plant.wiltCriticalOverdue', { count: this.overdueCount });
     }
     if (this.wiltingLevel === 'moderate') {
       return this.inactiveDays >= 3
-        ? `${this.inactiveDays} days without activity. Complete a task to restore health!`
-        : `${this.overdueCount} overdue tasks need attention.`;
+        ? t('plant.wiltModerateDays',    { count: this.inactiveDays })
+        : t('plant.wiltModerateOverdue', { count: this.overdueCount });
     }
     if (this.wiltingLevel === 'mild') {
-      return 'Your plant is a little stressed. Keep completing tasks!';
+      return t('plant.wiltMild');
     }
     return null;
+  }
+
+  get daysInactiveLabel(): string {
+    return this.translate.instant('plant.daysInactive', { count: this.inactiveDays });
+  }
+
+  get overdueTasksLabel(): string {
+    return this.translate.instant('plant.overdueTasks', { count: this.overdueCount });
   }
 
   get collectibles(): (Collectible & { unlocked: boolean })[] {

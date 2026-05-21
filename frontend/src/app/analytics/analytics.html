@@ -19,7 +19,7 @@
       <!-- Period selector -->
       <div class="export-period-wrap">
         <select class="export-period-select" [(ngModel)]="xlsExportPeriod">
-          <option *ngFor="let o of xlsPeriodOptions" [value]="o.value">{{ o.label }}</option>
+          <option *ngFor="let o of xlsPeriodOptions" [value]="o.value">{{ o.labelKey | translate }}</option>
         </select>
         <div *ngIf="xlsExportPeriod === 'custom'" class="export-custom-dates">
           <input type="date" class="date-input" [(ngModel)]="xlsExportFrom" placeholder="From">
@@ -89,7 +89,7 @@
               </div>
             </div>
           </div>
-          <div class="glance-total">{{ total }} tasks total across {{ boards.length }} boards</div>
+          <div class="glance-total">{{ 'analytics.totalSummary' | translate:{ tasks: total, boards: boards.length } }}</div>
         </div>
 
         <!-- ② Priority breakdown ───────────────────── -->
@@ -236,13 +236,13 @@
 
         <!-- Controls -->
         <div class="insights-controls">
-          <p class="tab-desc">{{ totalDone }} completed tasks analysed</p>
+          <p class="tab-desc">{{ 'analytics.tasksAnalysed' | translate:{ count: totalDone } }}</p>
           <div class="insights-period-selector">
-            <span class="insights-period-label">Period:</span>
+            <span class="insights-period-label">{{ 'analytics.periodLabel' | translate }}</span>
             <div class="insights-period-chips">
               <button *ngFor="let opt of insightsPeriodOptions" class="pchip"
                       [class.active]="insightsPeriodDays===opt.days" (click)="insightsPeriodDays=opt.days">
-                {{ opt.label }}
+                {{ opt.labelKey | translate }}
               </button>
             </div>
           </div>
@@ -341,13 +341,13 @@
         <div class="forecast-panel">
           <div class="forecast-header">
             <div class="forecast-window-selector">
-              <span class="fw-label">Window:</span>
+              <span class="fw-label">{{ 'analytics.windowLabel' | translate }}</span>
               <button *ngFor="let opt of forecastWindowOptions" class="pchip"
                       [class.active]="forecastWindowDays===opt.days" (click)="forecastWindowDays=opt.days">
                 {{ opt.label }}
               </button>
             </div>
-            <span class="forecast-window-badge">next {{ capacityForecast.forecastDays }} days</span>
+            <span class="forecast-window-badge">{{ 'analytics.forecastDays' | translate:{ count: capacityForecast.forecastDays } }}</span>
           </div>
 
           <div class="forecast-no-data" *ngIf="capacityForecast.noHistory">
@@ -460,7 +460,7 @@
                   <span class="up-title">{{ t.title }}</span>
                   <span class="up-board">{{ t.boardTitle }}</span>
                   <span class="up-deadline" [class.up-urgent]="isDueToday(t.deadline)||isOverdue(t.deadline)">
-                    <mat-icon class="up-dl-icon">schedule</mat-icon>{{ t.deadline | date:'dd MMM' }}
+                    <mat-icon class="up-dl-icon">schedule</mat-icon>{{ t.deadline | date:'dd MMM':'':locale }}
                   </span>
                 </div>
               </div>
@@ -548,12 +548,6 @@
               <mat-option *ngFor="let b of boards" [value]="b.id.toString()">{{ b.title }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field appearance="outline" class="filter-select">
-            <mat-label>Sort</mat-label>
-            <mat-select [(ngModel)]="tableSortBy">
-              <mat-option *ngFor="let s of sortOptions" [value]="s.value">{{ s.label }}</mat-option>
-            </mat-select>
-          </mat-form-field>
         </div>
         <div class="table-wrap">
           <table class="tasks-table" *ngIf="filteredTasks.length > 0">
@@ -575,14 +569,14 @@
                   <span *ngIf="t.deadline" class="deadline-cell"
                         [class.overdue-text]="t.status!=='Done'&&isOverdue(t.deadline)"
                         [class.today-text]="isDueToday(t.deadline)">
-                    {{ t.deadline | date:'dd MMM yyyy' }}
+                    {{ t.deadline | date:'dd MMM yyyy':'':locale }}
                     <span class="overdue-tag" *ngIf="t.status!=='Done'&&isOverdue(t.deadline)">{{ 'analytics.overdue' | translate }}</span>
                     <span class="today-tag" *ngIf="isDueToday(t.deadline)&&t.status!=='Done'">{{ 'calendar.today' | translate }}</span>
                   </span>
                   <span *ngIf="!t.deadline" class="no-deadline">—</span>
                 </td>
                 <td>
-                  <span *ngIf="t.completedAt" class="completed-date">{{ t.completedAt | date:'dd MMM yyyy' }}</span>
+                  <span *ngIf="t.completedAt" class="completed-date">{{ t.completedAt | date:'dd MMM yyyy':'':locale }}</span>
                   <span *ngIf="!t.completedAt" class="no-deadline">—</span>
                 </td>
               </tr>
@@ -601,7 +595,7 @@
         <div class="section-header">
           <h2 class="section-title"><mat-icon>done_all</mat-icon> Completed by period</h2>
           <div class="period-chips">
-            <button *ngFor="let p of periods" [class.active]="activePeriod===p.value" (click)="activePeriod=p.value" class="pchip">{{ p.label }}</button>
+            <button *ngFor="let p of periods" [class.active]="activePeriod===p.value" (click)="activePeriod=p.value" class="pchip">{{ p.labelKey | translate }}</button>
           </div>
         </div>
         <div class="custom-range" *ngIf="activePeriod==='custom'">
@@ -626,11 +620,11 @@
                 <span class="cr-dot">·</span>
                 <span class="priority-badge" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span>
                 <span class="cr-dot">·</span>
-                <span class="cr-date">{{ t.completedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+                <span class="cr-date">{{ t.completedAt | date:'dd MMM yyyy, HH:mm':'':locale }}</span>
                 <ng-container *ngIf="t.deadline">
                   <span class="cr-dot">·</span>
                   <span class="cr-deadline" [class.late]="isOverdue(t.deadline)">
-                    Due {{ t.deadline | date:'dd MMM' }}<span *ngIf="isOverdue(t.deadline)"> (late)</span>
+                    Due {{ t.deadline | date:'dd MMM':'':locale }}<span *ngIf="isOverdue(t.deadline)"> (late)</span>
                   </span>
                 </ng-container>
               </div>

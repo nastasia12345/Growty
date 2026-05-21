@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,6 +24,7 @@ import { BoardService } from '../../services/board';
 import { TaskService } from '../../services/task';
 import { AIService, AISuggestion } from '../../services/ai';
 import { AiSuggestionDialog } from '../ai-suggestion-dialog/ai-suggestion-dialog';
+import { LanguageService } from '../../services/language.service';
 
 const PRIORITY_ORDER: Record<string, number> = {
   High: 3, Medium: 2, Low: 1
@@ -43,7 +44,7 @@ const PRIORITY_ORDER: Record<string, number> = {
   templateUrl: './board-detail.html',
   styleUrls: ['./board-detail.css']
 })
-export class BoardDetailComponent implements OnInit, AfterViewChecked {
+export class BoardDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
   boardId: number = 0;
   board: any = null;
   tasks: any[] = [];
@@ -70,12 +71,26 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked {
   viewMode: 'kanban' | 'pipeline' = 'kanban';
   private pipelineScrolled = false;
 
+  // ── Gantt / Pipeline ─────────────────────────────────────
+  @ViewChild('ganttScroll') ganttScrollRef!: ElementRef;
+  readonly DAY_W   = 52;
+  readonly LABEL_W = 180;
+  pipelineDays: Date[] = [];
+  dayIndexMap = new Map<string, number>();
+
+  // Resize state
+  resizingTask: any          = null;
+  resizeStartX               = 0;
+  resizeOrigDeadline         = new Date();
+  private readonly _onMove   = (e: MouseEvent) => this.onResizeMove(e);
+  private readonly _onUp     = ()               => this.onResizeUp();
+
   // Filter state
   priorityFilters = [
-    { label: 'All',    value: 'all' },
-    { label: 'High',   value: 'High' },
-    { label: 'Medium', value: 'Medium' },
-    { label: 'Low',    value: 'Low' }
+    { labelKey: 'analytics.allPriorities', value: 'all'    },
+    { labelKey: 'board.high',              value: 'High'   },
+    { labelKey: 'board.medium',            value: 'Medium' },
+    { labelKey: 'board.low',               value: 'Low'    }
   ];
 
   activePriority: string = 'all';
@@ -114,8 +129,11 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked {
     private taskService: TaskService,
     private aiService: AIService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public  langService: LanguageService
   ) {}
+
+  get locale(): string { return this.langService.current; }
 
   ngOnInit() {
     this.boardId = Number(this.route.snapshot.paramMap.get('id'));
@@ -123,6 +141,12 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked {
     this.loadColumnNames();
     this.loadBoard();
     this.loadTasks();
+    this.initPipelineDays();
+  }
+
+  ngOnDestroy() {
+    document.removeEventListener('mousemove', this._onMove);
+    document.removeEventListener('mouseup',   this._onUp);
   }
 
   // localStorage helpers
@@ -273,25 +297,89 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    if (this.viewMode === 'pipeline' && !this.pipelineScrolled) {
-      const todayEl = document.querySelector('.pipeline-col.is-today') as HTMLElement;
-      if (todayEl) {
-        todayEl.scrollIntoView({ inline: 'start', block: 'nearest' });
+    if (this.viewMode === 'pipeline' && !this.pipelineScrolled && this.ganttScrollRef) {
+      const el = this.ganttScrollRef.nativeElement as HTMLElement;
+      const scrollLeft = this.todayLineOffset - this.LABEL_W - 80;
+      if (el.scrollWidth > el.clientWidth) {
+        el.scrollLeft = Math.max(0, scrollLeft);
         this.pipelineScrolled = true;
       }
     }
   }
 
-  // ── Pipeline helpers ─────────────────────────────────────
-  get pipelineDays(): Date[] {
-    const days: Date[] = [];
+  // ── Pipeline / Gantt helpers ──────────────────────────────
+
+  initPipelineDays() {
     const start = new Date(); start.setHours(0, 0, 0, 0);
     start.setDate(start.getDate() - 14);
-    for (let i = 0; i < 105; i++) {
-      const d = new Date(start); d.setDate(start.getDate() + i);
-      days.push(d);
+    this.pipelineDays = Array.from({ length: 105 }, (_, i) => {
+      const d = new Date(start); d.setDate(start.getDate() + i); return d;
+    });
+    this.dayIndexMap.clear();
+    this.pipelineDays.forEach((d, i) => this.dayIndexMap.set(d.toDateString(), i));
+  }
+
+  get ganttWidth(): number { return this.pipelineDays.length * this.DAY_W; }
+
+  get todayLineOffset(): number {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return (this.dayIndexMap.get(today.toDateString()) ?? 14) * this.DAY_W;
+  }
+
+  get tasksWithDeadline(): any[] {
+    return this.filteredTasks.filter(t => {
+      if (!t.deadline) return false;
+      const d = new Date(t.deadline); d.setHours(0, 0, 0, 0);
+      return this.dayIndexMap.has(d.toDateString());
+    });
+  }
+
+  getBarStyle(task: any): { left: string; width: string } {
+    const dlDate = new Date(task.deadline); dlDate.setHours(0, 0, 0, 0);
+    const dlIdx  = this.dayIndexMap.get(dlDate.toDateString()) ?? -1;
+    if (dlIdx < 0) return { left: '0px', width: '0px' };
+    const startIdx = Math.max(0, dlIdx - 6);
+    const width    = (dlIdx - startIdx + 1) * this.DAY_W;
+    return { left: `${startIdx * this.DAY_W}px`, width: `${width}px` };
+  }
+
+  // Drag-resize
+  startResize(event: MouseEvent, task: any) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.resizingTask      = task;
+    this.resizeStartX      = event.clientX;
+    this.resizeOrigDeadline = new Date(task.deadline);
+    document.addEventListener('mousemove', this._onMove);
+    document.addEventListener('mouseup',   this._onUp);
+  }
+
+  private onResizeMove(e: MouseEvent) {
+    if (!this.resizingTask) return;
+    const delta     = e.clientX - this.resizeStartX;
+    const daysDelta = Math.round(delta / this.DAY_W);
+    const newDl     = new Date(this.resizeOrigDeadline);
+    newDl.setDate(newDl.getDate() + daysDelta);
+    this.resizingTask.deadline = newDl.toISOString();
+    this.cdr.detectChanges();
+  }
+
+  private onResizeUp() {
+    document.removeEventListener('mousemove', this._onMove);
+    document.removeEventListener('mouseup',   this._onUp);
+    if (this.resizingTask) {
+      const t = this.resizingTask;
+      this.taskService.updateTask(t.id, {
+        title:       t.title,
+        description: t.description || '',
+        priority:    t.priority,
+        status:      t.status,
+        deadline:    t.deadline,
+        boardId:     this.boardId,
+        checklist:   t.checklist ?? null
+      }).subscribe({ next: () => this.loadTasks() });
     }
-    return days;
+    this.resizingTask = null;
   }
 
   get filteredTasks(): any[] {
@@ -351,8 +439,10 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked {
   }
 
   jumpToToday() {
-    const el = document.querySelector('.pipeline-col.is-today') as HTMLElement;
-    if (el) el.scrollIntoView({ inline: 'start', block: 'nearest', behavior: 'smooth' });
+    if (this.ganttScrollRef) {
+      const el = this.ganttScrollRef.nativeElement as HTMLElement;
+      el.scrollTo({ left: Math.max(0, this.todayLineOffset - this.LABEL_W - 80), behavior: 'smooth' });
+    }
   }
 
   getConnectedDropLists(): string[] { return this.columns.map(col => col.status); }

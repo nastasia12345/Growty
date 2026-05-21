@@ -12,8 +12,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BoardService } from '../services/board';
+import { LanguageService } from '../services/language.service';
 import { TaskService } from '../services/task';
 import {
   EnrichedTask,
@@ -44,7 +45,7 @@ export class AnalyticsComponent implements OnInit {
   boards: any[] = [];
   allTasks: EnrichedTask[] = [];
 
-  // в”Ђв”Ђ Strategy instances (Context holds references to strategies) в”Ђв”Ђ
+  // в"Ђв"Ђ Strategy instances (Context holds references to strategies) в"Ђв"Ђ
   private readonly dayOfWeekStrategy      = new DayOfWeekInsightStrategy();
   private readonly timeOfDayStrategy      = new TimeOfDayInsightStrategy();
   private readonly streakStrategy         = new StreakInsightStrategy();
@@ -52,7 +53,7 @@ export class AnalyticsComponent implements OnInit {
   private readonly weekdayWeekendStrategy = new WeekdayWeekendInsightStrategy();
   private readonly powerDaysStrategy      = new PowerDaysInsightStrategy();
 
-  // в”Ђв”Ђ Tab navigation в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Tab navigation в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   activeTab = 'overview';
 
   tabs = [
@@ -61,47 +62,47 @@ export class AnalyticsComponent implements OnInit {
     { id: 'tasks',     labelKey: 'analytics.tasks',     icon: 'task_alt' }
   ];
 
-  // в”Ђв”Ђ Completion trend chart в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Completion trend chart в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   lineChartWindow = 30;
   lineChartWindowOptions = [
     { label: '7d',  days: 7  },
     { label: '30d', days: 30 },
     { label: '90d', days: 90 }
-  ];
+  ]; // numbers — intentionally not translated
 
-  // в”Ђв”Ђ Insights period filter в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Insights period filter в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   insightsPeriodDays = 0;  // 0 = all time
   insightsPeriodOptions = [
-    { label: 'All time',   days: 0 },
-    { label: '6 months',   days: 180 },
-    { label: '3 months',   days: 90 },
-    { label: 'Last month', days: 30 }
+    { labelKey: 'analytics.periodAllTime',   days: 0   },
+    { labelKey: 'analytics.period6months',   days: 180 },
+    { labelKey: 'analytics.period3months',   days: 90  },
+    { labelKey: 'analytics.periodLastMonth', days: 30  }
   ];
 
-  // в”Ђв”Ђ Forecast window в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Forecast window в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   forecastWindowDays = 14;
   forecastWindowOptions = [
-    { label: '7 days',  days: 7 },
-    { label: '14 days', days: 14 },
-    { label: '30 days', days: 30 }
-  ];
+    { label: '7d',  days: 7  },
+    { label: '14d', days: 14 },
+    { label: '30d', days: 30 }
+  ]; // numbers — intentionally not translated
 
-  // в”Ђв”Ђ Methodology panel в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Methodology panel в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   showMethodology = false;
 
-  // в”Ђв”Ђ Period selector (Tasks tab) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Period selector (Tasks tab) в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   periods = [
-    { label: 'Today',      value: 'today' },
-    { label: 'This week',  value: 'week' },
-    { label: 'This month', value: 'month' },
-    { label: 'All time',   value: 'all' },
-    { label: 'Custom',     value: 'custom' }
+    { labelKey: 'calendar.today',             value: 'today'  },
+    { labelKey: 'analytics.periodThisWeek',   value: 'week'   },
+    { labelKey: 'analytics.periodThisMonth',  value: 'month'  },
+    { labelKey: 'analytics.periodAllTime',    value: 'all'    },
+    { labelKey: 'analytics.periodCustom',     value: 'custom' }
   ];
   activePeriod = 'week';
   customFrom = '';
   customTo   = '';
 
-  // в”Ђв”Ђ Table filters в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Table filters в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   tableSearch   = '';
   tableStatus   = 'all';
   tablePriority = 'all';
@@ -109,19 +110,23 @@ export class AnalyticsComponent implements OnInit {
   tableSortBy   = 'deadline_asc';
 
   sortOptions = [
-    { label: 'Deadline в†‘', value: 'deadline_asc' },
-    { label: 'Deadline в†“', value: 'deadline_desc' },
-    { label: 'Priority в†“', value: 'priority_desc' },
-    { label: 'Priority в†‘', value: 'priority_asc' },
-    { label: 'Title Aв†’Z',  value: 'title_asc' },
-    { label: 'Board',      value: 'board' }
+    { label: 'Deadline ASC',  value: 'deadline_asc'  },
+    { label: 'Deadline DESC', value: 'deadline_desc' },
+    { label: 'Priority DESC', value: 'priority_desc' },
+    { label: 'Priority ASC',  value: 'priority_asc'  },
+    { label: 'Title A-Z',     value: 'title_asc'     },
+    { label: 'Board',         value: 'board'         }
   ];
 
   constructor(
     private boardService: BoardService,
     private taskService: TaskService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
+    public  langService: LanguageService
   ) {}
+
+  get locale(): string { return this.langService.current; }
 
   ngOnInit() { this.loadAll(); }
 
@@ -154,7 +159,7 @@ export class AnalyticsComponent implements OnInit {
     });
   }
 
-  // в”Ђв”Ђ Aggregate stats в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Aggregate stats в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   get total()      { return this.allTasks.length; }
   get totalDone()  { return this.allTasks.filter(t => t.status === 'Done').length; }
   get totalTodo()  { return this.allTasks.filter(t => t.status === 'ToDo').length; }
@@ -176,8 +181,8 @@ export class AnalyticsComponent implements OnInit {
     };
   }
 
-  // в”Ђв”Ђ Insights period filter в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-  /** Tasks used for all insight calculations вЂ” respects the Insights period selector */
+  // в"Ђв"Ђ Insights period filter в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
+  /** Tasks used for all insight calculations вЂ" respects the Insights period selector */
   get insightTasks(): EnrichedTask[] {
     if (this.insightsPeriodDays === 0) return this.allTasks;
     const cutoff = new Date();
@@ -188,14 +193,14 @@ export class AnalyticsComponent implements OnInit {
     });
   }
 
-  // в”Ђв”Ђ Stat trends (compare last 30d vs prev 30d) в”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Stat trends (compare last 30d vs prev 30d) в"Ђв"Ђв"Ђ
   get trendCompleted(): { value: string; dir: 'up' | 'down' | 'flat' } {
     const now  = new Date();
     const cut1 = new Date(now.getTime() - 30 * 86400000);
     const cut2 = new Date(now.getTime() - 60 * 86400000);
     const recent = this.allTasks.filter(t => t.status === 'Done' && t.completedAt && new Date(t.completedAt) >= cut1).length;
     const prev   = this.allTasks.filter(t => t.status === 'Done' && t.completedAt && new Date(t.completedAt) >= cut2 && new Date(t.completedAt) < cut1).length;
-    if (prev === 0) return { value: recent > 0 ? `+${recent}` : 'вЂ”', dir: recent > 0 ? 'up' : 'flat' };
+    if (prev === 0) return { value: recent > 0 ? `+${recent}` : 'вЂ"', dir: recent > 0 ? 'up' : 'flat' };
     const pct = Math.round((recent - prev) / prev * 100);
     return { value: pct >= 0 ? `+${pct}%` : `${pct}%`, dir: pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat' };
   }
@@ -203,11 +208,11 @@ export class AnalyticsComponent implements OnInit {
   get trendOverdue(): { value: string; dir: 'up' | 'down' | 'flat' } {
     const cur = this.totalOverdue;
     return cur === 0
-      ? { value: 'вњ“', dir: 'flat' }
+      ? { value: 'вњ"', dir: 'flat' }
       : { value: `${cur}`, dir: 'down' };
   }
 
-  // в”Ђв”Ђ Date range validation в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Date range validation в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   get dateRangeError(): string {
     if (this.activePeriod !== 'custom') return '';
     if (this.customFrom && this.customTo && new Date(this.customFrom) > new Date(this.customTo))
@@ -215,7 +220,7 @@ export class AnalyticsComponent implements OnInit {
     return '';
   }
 
-  // в”Ђв”Ђ Weekly bar chart data в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Weekly bar chart data в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   get weeklyBarData(): { label: string; count: number; pct: number; isCurrentWeek: boolean }[] {
     const today = new Date(); today.setHours(0,0,0,0);
     const weeks: { label: string; count: number; isCurrentWeek: boolean }[] = [];
@@ -238,7 +243,7 @@ export class AnalyticsComponent implements OnInit {
     return weeks.map(w => ({ ...w, pct: Math.round(w.count / max * 100) }));
   }
 
-  // в”Ђв”Ђ Monthly bar chart data в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Monthly bar chart data в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   get monthlyBarData(): { label: string; count: number; pct: number; isCurrentMonth: boolean }[] {
     const today = new Date();
     const months: { label: string; count: number; isCurrentMonth: boolean }[] = [];
@@ -260,7 +265,7 @@ export class AnalyticsComponent implements OnInit {
     return months.map(m => ({ ...m, pct: Math.round(m.count / max * 100) }));
   }
 
-  // в”Ђв”Ђ Completed tasks by period в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Completed tasks by period в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   get completedInPeriod(): EnrichedTask[] {
     const done = this.allTasks.filter(t => t.status === 'Done' && t.completedAt);
     if (this.activePeriod === 'all') return done;
@@ -288,7 +293,7 @@ export class AnalyticsComponent implements OnInit {
     }).sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
   }
 
-  // в”Ђв”Ђ All tasks table в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ All tasks table в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   get filteredTasks(): EnrichedTask[] {
     let result = [...this.allTasks];
 
@@ -365,11 +370,11 @@ export class AnalyticsComponent implements OnInit {
 
     if (current >= 5)
       return { icon: 'local_fire_department',
-        text: `рџ”Ґ ${current}-day streak! Outstanding consistency. Your peak window is ${topDay.day} ${topSlot.label.toLowerCase()}s вЂ” protect that time.` };
+        text: `рџ"Ґ ${current}-day streak! Outstanding consistency. Your peak window is ${topDay.day} ${topSlot.label.toLowerCase()}s вЂ" protect that time.` };
 
     if (overduePct >= 30)
       return { icon: 'alarm',
-        text: `${overduePct}% of your open tasks are overdue. Tackle them on ${topDay.day} ${topSlot.label.toLowerCase()}s вЂ” that's when you get the most done.` };
+        text: `${overduePct}% of your open tasks are overdue. Tackle them on ${topDay.day} ${topSlot.label.toLowerCase()}s вЂ" that's when you get the most done.` };
 
     if (ww.weekend > ww.weekday && ww.weekend > 0)
       return { icon: 'weekend',
@@ -377,11 +382,11 @@ export class AnalyticsComponent implements OnInit {
 
     if (this.onTimeRate >= 80)
       return { icon: 'verified',
-        text: `You deliver ${this.onTimeRate}% of tasks on time вЂ” excellent discipline! Keep scheduling your heaviest work on ${topDay.day}s.` };
+        text: `You deliver ${this.onTimeRate}% of tasks on time вЂ" excellent discipline! Keep scheduling your heaviest work on ${topDay.day}s.` };
 
     if (best >= 3 && current === 0)
       return { icon: 'restart_alt',
-        text: `You hit a ${best}-day streak before. ${topDay.day} ${topSlot.label.toLowerCase()}s are your sweet spot вЂ” try restarting your streak then!` };
+        text: `You hit a ${best}-day streak before. ${topDay.day} ${topSlot.label.toLowerCase()}s are your sweet spot вЂ" try restarting your streak then!` };
 
     return { icon: 'psychology',
       text: `Your most productive time is ${topDay.day} ${topSlot.label.toLowerCase()}s. Schedule your Critical and High-priority tasks in that window!` };
@@ -404,20 +409,20 @@ export class AnalyticsComponent implements OnInit {
     const historyStart  = new Date(now.getTime() - this.HISTORY_DAYS * 86400000);
     const forecastEnd   = new Date(now.getTime() + FORECAST_DAYS * 86400000);
 
-    // в”Ђв”Ђ Step 2: Load history в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+    // в"Ђв"Ђ Step 2: Load history в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
     const completedInHistory = this.allTasks.filter(t =>
       t.status === 'Done' && t.completedAt &&
       new Date(t.completedAt) >= historyStart
     );
 
-    // в”Ђв”Ђ Step 3: Average productivity (weighted tasks/day, scaled to forecast window)
+    // в"Ђв"Ђ Step 3: Average productivity (weighted tasks/day, scaled to forecast window)
     const totalWeight = completedInHistory.reduce(
       (sum, t) => sum + (this.PRIORITY_WEIGHT[t.priority] ?? 1.0), 0
     );
     // Weighted tasks per day, extrapolated to forecast window
     const avgProductivity = (totalWeight / this.HISTORY_DAYS) * FORECAST_DAYS;
 
-    // в”Ђв”Ђ Step 4: Upcoming tasks with deadlines in forecast window в”Ђв”Ђ
+    // в"Ђв"Ђ Step 4: Upcoming tasks with deadlines in forecast window в"Ђв"Ђ
     const upcomingTasks = this.allTasks
       .filter(t => {
         if (t.status === 'Done' || !t.deadline) return false;
@@ -431,17 +436,17 @@ export class AnalyticsComponent implements OnInit {
       (sum, t) => sum + (this.PRIORITY_WEIGHT[t.priority] ?? 1.0), 0
     );
 
-    // в”Ђв”Ђ Step 5: Risk coefficient в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+    // в"Ђв"Ђ Step 5: Risk coefficient в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
     const riskCoefficient = avgProductivity > 0
       ? plannedLoad / avgProductivity
       : (plannedLoad > 0 ? 2.0 : 0);
 
-    // в”Ђв”Ђ Step 6: Risk level classification в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+    // в"Ђв"Ђ Step 6: Risk level classification в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
     const isHigh   = riskCoefficient > 1.3;
     const isMedium = !isHigh && riskCoefficient > 1.1;
     const riskLevel = isHigh ? 'high' : isMedium ? 'medium' : 'low';
 
-    // в”Ђв”Ђ Step 7: Build prediction в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+    // в"Ђв"Ђ Step 7: Build prediction в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
     const rawAvgPerDay   = completedInHistory.length / this.HISTORY_DAYS;
     const capacityRawPct = Math.round(riskCoefficient * 100);
 
@@ -455,17 +460,17 @@ export class AnalyticsComponent implements OnInit {
     let suggestion   = '';
 
     if (isHigh) {
-      warning    = `вљ пёЏ Overload detected вЂ” your planned workload is ${Math.round((riskCoefficient - 1) * 100)}% above your capacity.`;
+      warning    = `вљ пёЏ Overload detected вЂ" your planned workload is ${Math.round((riskCoefficient - 1) * 100)}% above your capacity.`;
       prediction = `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${FORECAST_DAYS} days. Based on your history you typically complete ~${avgCountPeriod} tasks in this period.`;
       suggestion = `Consider rescheduling low-priority tasks or splitting large ones. Focus Critical and High items first.`;
     } else if (isMedium) {
-      warning    = `рџ“‹ Slightly above capacity вЂ” manageable with good prioritisation.`;
+      warning    = `рџ"‹ Slightly above capacity вЂ" manageable with good prioritisation.`;
       prediction = `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${FORECAST_DAYS} days, slightly above your average of ~${avgCountPeriod}.`;
       suggestion = `Try to complete Medium and High tasks early in the week to avoid a last-minute crunch.`;
     } else {
       warning    = upcomingCount > 0
-        ? `вњ… Workload is within your capacity вЂ” you're on track.`
-        : `вњ… No tasks due in the next ${FORECAST_DAYS} days вЂ” great time to plan ahead.`;
+        ? `вњ… Workload is within your capacity вЂ" you're on track.`
+        : `вњ… No tasks due in the next ${FORECAST_DAYS} days вЂ" great time to plan ahead.`;
       prediction = upcomingCount > 0
         ? `You have ${upcomingCount} task${upcomingCount !== 1 ? 's' : ''} due in the next ${FORECAST_DAYS} days, well within your average capacity of ~${avgCountPeriod}.`
         : `Your upcoming schedule is clear. Your average capacity is ~${avgCountPeriod} tasks per ${FORECAST_DAYS} days.`;
@@ -615,9 +620,9 @@ export class AnalyticsComponent implements OnInit {
     return dateSet.size;
   }
 
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ LINE CHART вЂ” daily completion trend в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ LINE CHART вЂ" daily completion trend в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
 
-  // SVG plot area shared by both charts: x 40вЂ“590 (W=550), y 20вЂ“130 (H=110)
+  // SVG plot area shared by both charts: x 40вЂ"590 (W=550), y 20вЂ"130 (H=110)
   private readonly CHART_PAD_L = 40;
   private readonly CHART_W     = 550;
   private readonly CHART_PAD_T = 20;
@@ -674,7 +679,7 @@ export class AnalyticsComponent implements OnInit {
     });
   }
 
-  // в”Ђв”Ђ Distribution chart (forecast window, task load per day) в”Ђв”Ђ
+  // в"Ђв"Ђ Distribution chart (forecast window, task load per day) в"Ђв"Ђ
   get distributionChartData(): { x: number; y: number; count: number; label: string; dayShort: string; dateNum: number }[] {
     const fc  = this.capacityForecast;
     const bd  = fc.dailyBreakdown;
@@ -716,7 +721,7 @@ export class AnalyticsComponent implements OnInit {
   // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ POWER DAYS в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   get powerDays() { return this.powerDaysStrategy.compute(this.insightTasks); }
 
-  // в”Ђв”Ђ Helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Helpers в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   isOverdue(deadline: string): boolean {
     if (!deadline) return false;
     const d = new Date(deadline); d.setHours(0, 0, 0, 0);
@@ -729,34 +734,41 @@ export class AnalyticsComponent implements OnInit {
     return new Date(deadline).toDateString() === new Date().toDateString();
   }
 
-  statusLabel(s: string) {
-    return s === 'ToDo' ? 'To Do' : s === 'InProgress' ? 'In Progress' : s;
+  statusLabel(s: string): string {
+    if (s === 'ToDo')       return this.translate.instant('board.todo');
+    if (s === 'InProgress') return this.translate.instant('board.inProgress');
+    if (s === 'Done')       return this.translate.instant('board.done');
+    return s;
   }
 
-  // в”Ђв”Ђ Excel export period в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Excel export period в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   isExporting = false;
   xlsExportPeriod = 'all';
   xlsExportFrom   = '';
   xlsExportTo     = '';
 
   xlsPeriodOptions = [
-    { label: 'All time',   value: 'all'     },
-    { label: 'This week',  value: 'week'    },
-    { label: 'This month', value: 'month'   },
-    { label: '3 months',   value: '3months' },
-    { label: '6 months',   value: '6months' },
-    { label: 'Custom',     value: 'custom'  },
+    { labelKey: 'analytics.periodAllTime',   value: 'all'     },
+    { labelKey: 'analytics.periodThisWeek',  value: 'week'    },
+    { labelKey: 'analytics.periodThisMonth', value: 'month'   },
+    { labelKey: 'analytics.period3months',   value: '3months' },
+    { labelKey: 'analytics.period6months',   value: '6months' },
+    { labelKey: 'analytics.periodCustom',    value: 'custom'  },
   ];
 
   get xlsPeriodLabel(): string {
+    const t = (k: string) => this.translate.instant(k);
     const map: Record<string, string> = {
-      all: 'All time', week: 'This week', month: 'This month',
-      '3months': 'Last 3 months', '6months': 'Last 6 months',
+      all:      t('analytics.periodAllTime'),
+      week:     t('analytics.periodThisWeek'),
+      month:    t('analytics.periodThisMonth'),
+      '3months': t('analytics.period3monthsLong'),
+      '6months': t('analytics.period6monthsLong'),
       custom: (this.xlsExportFrom || this.xlsExportTo)
-        ? `${this.xlsExportFrom || 'вЂ¦'} в†’ ${this.xlsExportTo || 'вЂ¦'}`
-        : 'Custom range'
+        ? `${this.xlsExportFrom || '…'} → ${this.xlsExportTo || '…'}`
+        : t('analytics.periodCustomRange')
     };
-    return map[this.xlsExportPeriod] ?? 'All time';
+    return map[this.xlsExportPeriod] ?? t('analytics.periodAllTime');
   }
 
   /** Done tasks filtered by completedAt in the chosen period + all active tasks */
@@ -791,7 +803,7 @@ export class AnalyticsComponent implements OnInit {
     return [...active, ...filteredDone];
   }
 
-  // в”Ђв”Ђ Excel report в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // в"Ђв"Ђ Excel report в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
   async generateExcelReport() {
     this.isExporting = true;
     try {
@@ -814,7 +826,7 @@ export class AnalyticsComponent implements OnInit {
         grayBg:  'FFF1F5F9',
       };
 
-      // в”Ђв”Ђ helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+      // в"Ђв"Ђ helpers в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
       const hdr = (row: any, bg = C.green) => {
         row.height = 28;
         row.eachCell((cell: any) => {
@@ -847,7 +859,7 @@ export class AnalyticsComponent implements OnInit {
       };
 
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-      //  SHEET 1 вЂ” SUMMARY
+      //  SHEET 1 вЂ" SUMMARY
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
       const ws1 = wb.addWorksheet('Summary', { properties: { tabColor: { argb: C.green } } });
       ws1.columns = [
@@ -857,7 +869,7 @@ export class AnalyticsComponent implements OnInit {
       // Title
       ws1.mergeCells('A1:F1');
       Object.assign(ws1.getCell('A1'), {
-        value: 'Growty вЂ” Analytics Report',
+        value: 'Growty вЂ" Analytics Report',
         font:      { bold: true, color: { argb: C.white }, size: 15 },
         fill:      { type: 'pattern', pattern: 'solid', fgColor: { argb: C.green } },
         alignment: { vertical: 'middle', indent: 1 },
@@ -914,12 +926,12 @@ export class AnalyticsComponent implements OnInit {
       const td  = this.dayOfWeekActivity.reduce((a, b) => b.count > a.count ? b : a);
       const ts  = this.timeOfDayActivity.reduce((a, b)  => b.count > a.count ? b : a);
       const acts: [string, string, string][] = [
-        ['Current streak',    `${st.current} days`,   st.current > 0 ? 'рџ”Ґ Keep it going' : 'Start today!'],
+        ['Current streak',    `${st.current} days`,   st.current > 0 ? 'рџ"Ґ Keep it going' : 'Start today!'],
         ['Best streak',       `${st.best} days`,      ''],
         ['On-time rate',      `${this.onTimeRate}%`,  this.onTimeRate >= 80 ? 'Excellent' : this.onTimeRate >= 60 ? 'Good' : 'Improve'],
         ['Active days',       `${this.heatmapActiveDays}`, 'last 12 weeks'],
-        ['Most active day',   td.count > 0 ? td.day  : 'вЂ”', td.count > 0 ? `${td.count} tasks` : ''],
-        ['Best time slot',    ts.count > 0 ? `${ts.label} (${ts.range})` : 'вЂ”', ''],
+        ['Most active day',   td.count > 0 ? td.day  : 'вЂ"', td.count > 0 ? `${td.count} tasks` : ''],
+        ['Best time slot',    ts.count > 0 ? `${ts.label} (${ts.range})` : 'вЂ"', ''],
         ['Weekday / Weekend', `${ww.weekday} / ${ww.weekend}`, 'completions'],
       ];
       acts.forEach(([m, v, n], i) => {
@@ -965,7 +977,7 @@ export class AnalyticsComponent implements OnInit {
       ws1.views = [{ state: 'frozen', ySplit: 1 }];
 
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-      //  SHEET 2 вЂ” TASKS
+      //  SHEET 2 вЂ" TASKS
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
       const ws2 = wb.addWorksheet('Tasks', { properties: { tabColor: { argb: 'FF6366F1' } } });
       ws2.columns = [
@@ -980,7 +992,7 @@ export class AnalyticsComponent implements OnInit {
 
       ws2.mergeCells('A1:G1');
       Object.assign(ws2.getCell('A1'), {
-        value: `Tasks вЂ” ${period}  (${tasks.length})`,
+        value: `Tasks вЂ" ${period}  (${tasks.length})`,
         font:      { bold: true, color: { argb: C.white }, size: 12 },
         fill:      { type: 'pattern', pattern: 'solid', fgColor: { argb: C.green } },
         alignment: { vertical: 'middle', indent: 1 },
@@ -1002,9 +1014,9 @@ export class AnalyticsComponent implements OnInit {
           t.title,
           t.boardTitle,
           this.statusLabel(t.status),
-          t.priority ?? 'вЂ”',
-          t.deadline    ? new Date(t.deadline).toLocaleDateString('en-GB')    : 'вЂ”',
-          t.completedAt ? new Date(t.completedAt).toLocaleDateString('en-GB') : 'вЂ”',
+          t.priority ?? 'вЂ"',
+          t.deadline    ? new Date(t.deadline).toLocaleDateString('en-GB')    : 'вЂ"',
+          t.completedAt ? new Date(t.completedAt).toLocaleDateString('en-GB') : 'вЂ"',
           t.description ?? '',
         ]);
         r.height = 20;
@@ -1037,7 +1049,7 @@ export class AnalyticsComponent implements OnInit {
       });
 
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-      //  SHEET 3 вЂ” BOARDS
+      //  SHEET 3 вЂ" BOARDS
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
       const ws3 = wb.addWorksheet('Boards', { properties: { tabColor: { argb: 'FF8B5CF6' } } });
       ws3.columns = [
@@ -1079,7 +1091,7 @@ export class AnalyticsComponent implements OnInit {
       });
 
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-      //  SHEET 4 вЂ” POWER DAYS  (only if data exists)
+      //  SHEET 4 вЂ" POWER DAYS  (only if data exists)
       // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
       const pds = this.powerDays;
       if (pds.length > 0) {
@@ -1088,7 +1100,7 @@ export class AnalyticsComponent implements OnInit {
 
         ws4.mergeCells('A1:D1');
         Object.assign(ws4.getCell('A1'), {
-          value: 'Power Days вЂ” Top Productivity Windows',
+          value: 'Power Days вЂ" Top Productivity Windows',
           font:      { bold: true, color: { argb: C.white }, size: 12 },
           fill:      { type: 'pattern', pattern: 'solid', fgColor: { argb: C.amber } },
           alignment: { vertical: 'middle', indent: 1 },
@@ -1116,7 +1128,7 @@ export class AnalyticsComponent implements OnInit {
         });
       }
 
-      // в”Ђв”Ђ Write & download в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+      // в"Ђв"Ђ Write & download в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
       const buf  = await wb.xlsx.writeBuffer() as ArrayBuffer;
       const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url  = URL.createObjectURL(blob);
@@ -1158,7 +1170,7 @@ export class AnalyticsComponent implements OnInit {
     const tasks = this.exportableTasks;
     const now = new Date().toISOString().slice(0, 10);
     const periodLabel = this.exportPeriod === 'custom'
-      ? `${this.exportFrom || 'start'}вЂ“${this.exportTo || 'now'}`
+      ? `${this.exportFrom || 'start'}вЂ"${this.exportTo || 'now'}`
       : this.exportPeriod;
 
     const done      = tasks.filter(t => t.status === 'Done').length;
@@ -1170,8 +1182,8 @@ export class AnalyticsComponent implements OnInit {
     const rate      = tasks.length > 0 ? Math.round(done / tasks.length * 100) : 0;
 
     const rows: string[][] = [
-      // в”Ђв”Ђ Header block в”Ђв”Ђ
-      [`Growty Export вЂ” ${periodLabel} вЂ” generated ${now}`],
+      // в"Ђв"Ђ Header block в"Ђв"Ђ
+      [`Growty Export вЂ" ${periodLabel} вЂ" generated ${now}`],
       [],
       ['SUMMARY'],
       ['Total tasks', String(tasks.length)],
@@ -1181,7 +1193,7 @@ export class AnalyticsComponent implements OnInit {
       ['Overdue',     String(overdue)],
       ['On-time rate',`${onTime} / ${done} (${rate}%)`],
       [],
-      // в”Ђв”Ђ Tasks table в”Ђв”Ђ
+      // в"Ђв"Ђ Tasks table в"Ђв"Ђ
       ['Title','Board','Status','Priority','Deadline','Completed At','Created At','On Time'],
       ...tasks.map(t => {
         const onTimeFlag = t.status === 'Done' && t.completedAt && t.deadline

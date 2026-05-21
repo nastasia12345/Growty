@@ -209,7 +209,7 @@
                 [ngModel]="activePriority"
                 (ngModelChange)="setPriority($event)"
                 [class.priority-active]="activePriority !== 'all'">
-          <option *ngFor="let pf of priorityFilters" [value]="pf.value">{{ pf.label }}</option>
+          <option *ngFor="let pf of priorityFilters" [value]="pf.value">{{ pf.labelKey | translate }}</option>
         </select>
       </div>
 
@@ -223,7 +223,7 @@
 
     </div>
 
-    <!-- ═══════════════════ PIPELINE VIEW ═══════════════════ -->
+    <!-- ═══════════════════ PIPELINE / GANTT VIEW ═══════════════════ -->
     <div class="pipeline-view" *ngIf="viewMode === 'pipeline'">
 
       <!-- No-deadline strip -->
@@ -237,48 +237,81 @@
         </div>
       </div>
 
-      <!-- Timeline grid -->
-      <div class="pipeline-scroll">
-
-        <!-- Jump to today -->
+      <!-- Jump-to-today (sticky top-left) -->
+      <div class="gantt-toolbar">
         <button class="pipeline-today-btn" (click)="jumpToToday()" matTooltip="Jump to today">
           <mat-icon>today</mat-icon>
           {{ 'calendar.today' | translate }}
         </button>
+        <span class="gantt-hint">
+          <mat-icon>drag_handle</mat-icon>
+          {{ 'boards.ganttHint' | translate }}
+        </span>
+      </div>
 
-        <div class="pipeline-grid">
+      <!-- Gantt scroll container -->
+      <div class="gantt-scroll" #ganttScroll>
+        <div class="gantt-table">
 
-          <div *ngFor="let day of pipelineDays"
-               class="pipeline-col"
-               [class.is-today]="isPipelineToday(day)"
-               [class.is-past]="isPipelinePast(day) && !isPipelineToday(day)"
-               [class.is-monday]="isMonday(day) && !isPipelineToday(day)">
-
-            <!-- Column header -->
-            <div class="pipeline-col-header">
-              <div class="pipeline-month-label">{{ pipelineMonthLabel(day) }}</div>
-              <div class="pipeline-week-label" *ngIf="isMonday(day)">Wk {{ weekNumber(day) }}</div>
-              <div class="pipeline-day-num">{{ day | date:'d' }}</div>
-              <div class="pipeline-day-name">{{ day | date:'EEE' }}</div>
-            </div>
-
-            <!-- Tasks in this day -->
-            <div class="pipeline-col-body">
-              <div *ngFor="let t of getTasksForDay(day)"
-                   class="pipeline-task"
-                   [class]="'pt-' + t.priority?.toLowerCase()"
-                   [class.pt-done]="t.status === 'Done'"
-                   (click)="editTask(t); drawer.open()"
-                   [matTooltip]="t.title">
-                <div class="pt-status-dot" [class]="'psd-' + t.status?.toLowerCase()"></div>
-                <span class="pt-title">{{ t.title }}</span>
+          <!-- ── Header row (sticky top) ── -->
+          <div class="gantt-header">
+            <div class="gantt-label-hdr">Task</div>
+            <div class="gantt-days-row" [style.width.px]="ganttWidth">
+              <div class="gantt-day-cell"
+                   *ngFor="let day of pipelineDays"
+                   [class.gdc-today]="isPipelineToday(day)"
+                   [class.gdc-past]="isPipelinePast(day) && !isPipelineToday(day)"
+                   [class.gdc-monday]="isMonday(day) && !isPipelineToday(day)">
+                <span class="gdc-month">{{ pipelineMonthLabel(day) }}</span>
+                <span class="gdc-num">{{ day | date:'d':'':locale }}</span>
+                <span class="gdc-name">{{ day | date:'EEE':'':locale }}</span>
               </div>
             </div>
-
           </div>
-        </div>
 
-      </div><!-- /pipeline-scroll -->
+          <!-- ── Body rows ── -->
+          <div class="gantt-body">
+
+            <div class="gantt-row" *ngFor="let task of tasksWithDeadline">
+
+              <!-- Sticky label -->
+              <div class="gantt-row-label"
+                   (click)="editTask(task); drawer.open()"
+                   [matTooltip]="task.title">
+                <span class="grl-dot" [class]="'grl-' + task.priority?.toLowerCase()"></span>
+                <span class="grl-title">{{ task.title }}</span>
+              </div>
+
+              <!-- Timeline cell -->
+              <div class="gantt-timeline" [style.width.px]="ganttWidth">
+                <!-- Today vertical line -->
+                <div class="gantt-today-line" [style.left.px]="todayLineOffset"></div>
+                <!-- Task bar -->
+                <div class="gantt-bar"
+                     [class]="'gbar-' + task.priority?.toLowerCase()"
+                     [class.gbar-done]="task.status === 'Done'"
+                     [ngStyle]="getBarStyle(task)"
+                     (click)="editTask(task); drawer.open()">
+                  <span class="gantt-bar-label">{{ task.title }}</span>
+                  <div class="gantt-bar-resize"
+                       (mousedown)="startResize($event, task)"
+                       matTooltip="Drag to extend deadline"></div>
+                </div>
+              </div>
+
+            </div><!-- /gantt-row -->
+
+            <!-- Empty -->
+            <div class="gantt-empty" *ngIf="tasksWithDeadline.length === 0">
+              <mat-icon>event_busy</mat-icon>
+              <p>No tasks with deadlines in the visible range</p>
+            </div>
+
+          </div><!-- /gantt-body -->
+
+        </div><!-- /gantt-table -->
+      </div><!-- /gantt-scroll -->
+
     </div><!-- /pipeline-view -->
 
     <!-- KANBAN COLUMNS -->
@@ -393,7 +426,7 @@
                     [class.due-today]="isDueToday(task.deadline) && task.status !== 'Done'"
                     [class.due-soon]="isDueSoon(task.deadline) && task.status !== 'Done'">
                 <mat-icon class="deadline-icon">schedule</mat-icon>
-                {{ task.deadline | date:'dd MMM HH:mm' }}
+                {{ task.deadline | date:'dd MMM HH:mm':'':locale }}
                 <span class="deadline-tag" *ngIf="isOverdue(task.deadline) && task.status !== 'Done'">{{ 'board.overdue' | translate }}</span>
                 <span class="deadline-tag today-tag" *ngIf="isDueToday(task.deadline) && task.status !== 'Done'">{{ 'calendar.today' | translate }}</span>
               </span>
