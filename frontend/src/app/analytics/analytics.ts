@@ -59,8 +59,7 @@ export class AnalyticsComponent implements OnInit {
   tabs = [
     { id: 'overview',  labelKey: 'analytics.overview',  icon: 'dashboard' },
     { id: 'insights',  labelKey: 'analytics.activity',  icon: 'psychology' },
-    { id: 'tasks',     labelKey: 'analytics.tasks',     icon: 'task_alt' },
-    { id: 'heatmap',   labelKey: 'analytics.heatmap',   icon: 'grid_view' }
+    { id: 'tasks',     labelKey: 'analytics.tasks',     icon: 'task_alt' }
   ];
 
   // в"Ђв"Ђ Completion trend chart в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
