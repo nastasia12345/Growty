@@ -168,23 +168,41 @@
           </div>
         </div>
 
-        <!-- ④ Completion trend (full width) ──────────────────────── -->
+        <!-- ④ Trend / Heatmap switcher (full width) ───────────────── -->
         <div class="bento-card bento-full">
           <div class="bento-row-header">
             <div class="bc-label">
-              {{ 'analytics.completionTrend' | translate }}
-              <span class="bc-sub">{{ 'analytics.tasksPerDay' | translate }}</span>
+              <ng-container *ngIf="overviewChart === 'trend'">
+                {{ 'analytics.completionTrend' | translate }}
+                <span class="bc-sub">{{ 'analytics.tasksPerDay' | translate }}</span>
+              </ng-container>
+              <ng-container *ngIf="overviewChart === 'heatmap'">
+                {{ 'analytics.heatmap' | translate }}
+                <span class="bc-sub">{{ heatmapTotalDays }} {{ 'analytics.tasksTotal' | translate }} · {{ heatmapActiveDays }} {{ 'analytics.activeDays' | translate }}</span>
+              </ng-container>
             </div>
-            <div class="heatmap-view-toggle">
-              <button *ngFor="let opt of lineChartWindowOptions" class="view-btn"
-                      [class.active]="lineChartWindow===opt.days"
-                      (click)="lineChartWindow=opt.days">
-                {{ opt.label }}
+            <div class="overview-chart-toggle">
+              <button class="view-btn" [class.active]="overviewChart==='trend'"
+                      (click)="overviewChart='trend'" [matTooltip]="'analytics.completionTrend' | translate">
+                <mat-icon>show_chart</mat-icon>
               </button>
+              <button class="view-btn" [class.active]="overviewChart==='heatmap'"
+                      (click)="overviewChart='heatmap'" [matTooltip]="'analytics.heatmap' | translate">
+                <mat-icon>grid_view</mat-icon>
+              </button>
+              <div class="toggle-sep" *ngIf="overviewChart==='trend'"></div>
+              <ng-container *ngIf="overviewChart==='trend'">
+                <button *ngFor="let opt of lineChartWindowOptions" class="view-btn"
+                        [class.active]="lineChartWindow===opt.days"
+                        (click)="lineChartWindow=opt.days">
+                  {{ opt.label }}
+                </button>
+              </ng-container>
             </div>
           </div>
 
-          <div class="line-chart-wrap">
+          <!-- Line chart -->
+          <div class="line-chart-wrap" *ngIf="overviewChart==='trend'">
             <svg class="line-chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
@@ -192,30 +210,69 @@
                   <stop offset="100%" stop-color="#10b981" stop-opacity="0.02"/>
                 </linearGradient>
               </defs>
-              <!-- grid lines -->
               <line x1="40" y1="20" x2="590" y2="20" stroke="#f1f5f9" stroke-width="1"/>
               <line x1="40" y1="75" x2="590" y2="75" stroke="#f1f5f9" stroke-width="1"/>
               <line x1="40" y1="130" x2="590" y2="130" stroke="#e2e8f0" stroke-width="1"/>
-              <!-- y-axis labels -->
               <text x="36" y="24" text-anchor="end" font-size="9" fill="#94a3b8">{{ lineChartMax }}</text>
               <text x="36" y="79" text-anchor="end" font-size="9" fill="#94a3b8">{{ lineChartYMid }}</text>
               <text x="36" y="134" text-anchor="end" font-size="9" fill="#94a3b8">0</text>
-              <!-- area fill -->
               <polygon [attr.points]="lineChartArea" fill="url(#lineGrad)"/>
-              <!-- polyline -->
               <polyline [attr.points]="lineChartPolyline" fill="none" stroke="#10b981" stroke-width="2"
                         stroke-linejoin="round" stroke-linecap="round"/>
-              <!-- dots for non-zero days -->
               <ng-container *ngFor="let d of lineChartData">
                 <circle *ngIf="d.count > 0"
                         [attr.cx]="d.x" [attr.cy]="d.y" r="3"
                         fill="white" stroke="#10b981" stroke-width="2"
                         [matTooltip]="d.label + ': ' + d.count + ' task' + (d.count !== 1 ? 's' : '')"/>
               </ng-container>
-              <!-- x-axis labels -->
               <text *ngFor="let lbl of lineChartXLabels"
                     [attr.x]="lbl.x" y="150" text-anchor="middle" font-size="9" fill="#94a3b8">{{ lbl.label }}</text>
             </svg>
+          </div>
+
+          <!-- Heatmap -->
+          <div class="bento-heatmap" *ngIf="overviewChart==='heatmap'">
+            <div class="heatmap-wrap">
+              <div class="heatmap-day-labels">
+                <span>{{ 'calendar.weekMon' | translate }}</span>
+                <span>{{ 'calendar.weekTue' | translate }}</span>
+                <span>{{ 'calendar.weekWed' | translate }}</span>
+                <span>{{ 'calendar.weekThu' | translate }}</span>
+                <span>{{ 'calendar.weekFri' | translate }}</span>
+                <span>{{ 'calendar.weekSat' | translate }}</span>
+                <span>{{ 'calendar.weekSun' | translate }}</span>
+              </div>
+              <div class="heatmap-grid-wrap">
+                <div class="heatmap-months">
+                  <span *ngFor="let m of activityHeatmap.months"
+                        [style.grid-column]="'span ' + m.colSpan"
+                        class="heatmap-month-label">{{ m.label }}</span>
+                </div>
+                <div class="heatmap-grid">
+                  <div *ngFor="let week of activityHeatmap.weeks" class="heatmap-col">
+                    <div *ngFor="let day of week.days"
+                         class="heatmap-cell"
+                         [class.level-0]="day.level === 0"
+                         [class.level-1]="day.level === 1"
+                         [class.level-2]="day.level === 2"
+                         [class.level-3]="day.level === 3"
+                         [class.level-4]="day.level === 4"
+                         [class.level-future]="day.level === -1"
+                         [matTooltip]="day.label || ''">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="heatmap-legend">
+              <span class="legend-label">{{ 'calendar.legendNone' | translate }}</span>
+              <div class="legend-cell level-0"></div>
+              <div class="legend-cell level-1"></div>
+              <div class="legend-cell level-2"></div>
+              <div class="legend-cell level-3"></div>
+              <div class="legend-cell level-4"></div>
+              <span class="legend-label">{{ 'calendar.legendHigh' | translate }}</span>
+            </div>
           </div>
         </div>
 

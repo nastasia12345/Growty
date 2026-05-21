@@ -545,6 +545,31 @@
   gap: 4px;
 }
 
+.overview-chart-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toggle-sep {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}
+
+.bento-heatmap {
+  padding-top: 8px;
+}
+
+.bento-heatmap .heatmap-wrap {
+  margin-top: 8px;
+}
+
+.bento-heatmap .heatmap-legend {
+  margin-top: 10px;
+}
+
 .view-btn {
   display: flex;
   align-items: center;

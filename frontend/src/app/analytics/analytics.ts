@@ -64,6 +64,7 @@ export class AnalyticsComponent implements OnInit {
   ];
 
   // в"Ђв"Ђ Completion trend chart в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
+  overviewChart: 'trend' | 'heatmap' = 'trend';
   lineChartWindow = 30;
   lineChartWindowOptions = [
     { label: '7d',  days: 7  },
