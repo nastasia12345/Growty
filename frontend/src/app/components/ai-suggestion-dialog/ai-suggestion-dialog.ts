@@ -5,8 +5,9 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 import { TaskService } from '../../services/task';
-import { MatDividerModule } from '@angular/material/divider';  // ← Додайте це
+import { MatDividerModule } from '@angular/material/divider';
 
 
 @Component({
@@ -19,7 +20,8 @@ import { MatDividerModule } from '@angular/material/divider';  // ← Додай
     MatCheckboxModule,
     MatIconModule,
     MatButtonModule,
-    MatDividerModule 
+    MatDividerModule,
+    TranslateModule
   ],
   templateUrl: './ai-suggestion-dialog.html',
   styleUrls: ['./ai-suggestion-dialog.css']

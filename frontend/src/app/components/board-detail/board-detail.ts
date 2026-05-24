@@ -114,10 +114,14 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked, OnDestroy
   ];
 
   // ── Column name editing ──────────────────────────
-  private readonly DEFAULT_COL_NAMES: Record<string, string> = {
-    ToDo: 'To Do', InProgress: 'In Progress', Done: 'Done'
-  };
-  columnNames: Record<string, string> = { ...this.DEFAULT_COL_NAMES };
+  private get DEFAULT_COL_NAMES(): Record<string, string> {
+    return {
+      ToDo:       this.translate.instant('board.todo'),
+      InProgress: this.translate.instant('board.inProgress'),
+      Done:       this.translate.instant('board.done')
+    };
+  }
+  columnNames: Record<string, string> = { ToDo: 'To Do', InProgress: 'In Progress', Done: 'Done' };
   editingColumnStatus: string | null = null;
   columnNameInput = '';
 
@@ -431,9 +435,9 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked, OnDestroy
   }
 
   pipelineMonthLabel(day: Date): string {
-    return this.isFirstOfMonth(day)
-      ? day.toLocaleDateString('en', { month: 'short', year: 'numeric' })
-      : '';
+    if (!this.isFirstOfMonth(day)) return '';
+    const loc = this.langService.current === 'uk' ? 'uk-UA' : 'en-US';
+    return day.toLocaleDateString(loc, { month: 'short', year: 'numeric' });
   }
 
   isMonday(day: Date): boolean {
@@ -516,15 +520,15 @@ export class BoardDetailComponent implements OnInit, AfterViewChecked, OnDestroy
 
     // Validation
     if (!this.taskForm.title.trim()) {
-      this.formErrors.title = 'Task title is required';
+      this.formErrors.title = this.translate.instant('board.titleRequired');
       return;
     }
     if (this.taskForm.title.trim().length > 120) {
-      this.formErrors.title = 'Title must be under 120 characters';
+      this.formErrors.title = this.translate.instant('board.titleTooLong');
       return;
     }
     if (!this.deadlineDate) {
-      this.formErrors.deadline = 'Deadline is required';
+      this.formErrors.deadline = this.translate.instant('board.deadlineRequired');
       return;
     }
 

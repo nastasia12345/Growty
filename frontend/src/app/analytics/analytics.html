@@ -341,7 +341,7 @@
 
           <div class="insight-card power-days-card" *ngIf="powerDays.length > 0">
             <div class="insight-header"><mat-icon>bolt</mat-icon><span>{{ 'analytics.powerDays' | translate }}</span>
-              <span class="insight-badge">🔥 Top {{ powerDays.length }}</span>
+              <span class="insight-badge">🔥 {{ 'analytics.topCount' | translate }} {{ powerDays.length }}</span>
             </div>
             <p class="power-days-desc">{{ 'analytics.powerDaysDesc' | translate }}</p>
             <div class="power-days-list">
@@ -463,7 +463,7 @@
                   <div class="gauge-labels"><span>0</span><span>1.1</span><span>1.3+</span></div>
                 </div>
                 <div class="fmetric-label">{{ 'analytics.riskCoefficientLabel' | translate }}</div>
-                <div class="fmetric-sub">PlannedLoad / AvgCapacity</div>
+                <div class="fmetric-sub">{{ 'analytics.plannedLoadFormula' | translate }}</div>
               </div>
             </div>
 
@@ -473,7 +473,7 @@
             </div>
 
             <div class="forecast-timeline">
-              <h3 class="timeline-title"><mat-icon>event</mat-icon> Distribution — next {{ capacityForecast.forecastDays }} days</h3>
+              <h3 class="timeline-title"><mat-icon>event</mat-icon> {{ 'analytics.distributionTitle' | translate:{ forecastDays: capacityForecast.forecastDays } }}</h3>
               <div class="line-chart-wrap">
                 <svg class="line-chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
                   <defs>
@@ -510,10 +510,10 @@
             </div>
 
             <div class="upcoming-tasks" *ngIf="capacityForecast.upcomingCount > 0">
-              <h3 class="timeline-title"><mat-icon>assignment_late</mat-icon> Upcoming in window</h3>
+              <h3 class="timeline-title"><mat-icon>assignment_late</mat-icon> {{ 'analytics.upcomingInWindow' | translate }}</h3>
               <div class="upcoming-list">
                 <div *ngFor="let t of capacityForecast.upcomingTasks" class="upcoming-row">
-                  <span class="up-priority" [ngClass]="t.priority.toLowerCase()">{{ t.priority }}</span>
+                  <span class="up-priority" [ngClass]="t.priority.toLowerCase()">{{ priorityLabel(t.priority) }}</span>
                   <span class="up-title">{{ t.title }}</span>
                   <span class="up-board">{{ t.boardTitle }}</span>
                   <span class="up-deadline" [class.up-urgent]="isDueToday(t.deadline)||isOverdue(t.deadline)">
@@ -530,31 +530,31 @@
           <button class="methodology-toggle" (click)="showMethodology=!showMethodology">
             <mat-icon>{{ showMethodology?'expand_less':'expand_more' }}</mat-icon>
             <mat-icon>science</mat-icon>
-            How these algorithms work
+            {{ 'analytics.howAlgorithmsWork' | translate }}
           </button>
           <div class="methodology-content" *ngIf="showMethodology">
             <div class="methodology-grid">
               <div class="method-card">
-                <div class="method-title"><mat-icon>speed</mat-icon> Capacity Forecast</div>
-                <p>The <strong>Risk Coefficient</strong> = PlannedLoad / AvgCapacity. Tasks weighted: High × 1.5, Medium × 1.0, Low × 0.5. History window: last 30 days.</p>
-                <div class="method-formula">RiskCoefficient = PlannedLoad / AvgCapacity</div>
+                <div class="method-title"><mat-icon>speed</mat-icon> {{ 'analytics.methodCapacityTitle' | translate }}</div>
+                <p>{{ 'analytics.methodCapacityDesc' | translate }}</p>
+                <div class="method-formula">{{ 'analytics.methodFormula' | translate }}</div>
                 <div class="method-thresholds">
-                  <span class="mth high">Risk &gt; 1.3 → High</span>
-                  <span class="mth medium">Risk &gt; 1.1 → Medium</span>
-                  <span class="mth low">Risk ≤ 1.1 → On track</span>
+                  <span class="mth high">{{ 'analytics.riskThresholdHigh' | translate }}</span>
+                  <span class="mth medium">{{ 'analytics.riskThresholdMedium' | translate }}</span>
+                  <span class="mth low">{{ 'analytics.riskThresholdLow' | translate }}</span>
                 </div>
               </div>
               <div class="method-card">
-                <div class="method-title"><mat-icon>bolt</mat-icon> Power Days</div>
-                <p>Cross-references day of week × time slot (Morning 6–11, Afternoon 12–16, Evening 17–21, Night). Top 3 combos ranked by completion frequency.</p>
+                <div class="method-title"><mat-icon>bolt</mat-icon> {{ 'analytics.methodPowerDaysTitle' | translate }}</div>
+                <p>{{ 'analytics.methodPowerDaysDesc' | translate }}</p>
               </div>
               <div class="method-card">
-                <div class="method-title"><mat-icon>local_fire_department</mat-icon> Streaks</div>
-                <p>Consecutive days with ≥ 1 completion. Alive if last active day = today or yesterday. On-time rate: <code>completedAt ≤ deadline</code> among Done tasks with deadline.</p>
+                <div class="method-title"><mat-icon>local_fire_department</mat-icon> {{ 'analytics.methodStreaksTitle' | translate }}</div>
+                <p>{{ 'analytics.methodStreaksDesc' | translate }}</p>
               </div>
               <div class="method-card">
-                <div class="method-title"><mat-icon>show_chart</mat-icon> Completion Trend</div>
-                <p>Daily completed task count plotted as a polyline over the chosen window (7 / 30 / 90 days). Dots appear only on active days. Distribution chart shows upcoming weighted task load per day in the forecast window.</p>
+                <div class="method-title"><mat-icon>show_chart</mat-icon> {{ 'analytics.methodTrendTitle' | translate }}</div>
+                <p>{{ 'analytics.methodTrendDesc' | translate }}</p>
               </div>
             </div>
           </div>
@@ -572,7 +572,7 @@
       <section class="section">
         <div class="section-header">
           <h2 class="section-title"><mat-icon>table_rows</mat-icon> {{ 'analytics.tasks' | translate }}</h2>
-          <span class="tasks-count">{{ filteredTasks.length }} of {{ total }}</span>
+          <span class="tasks-count">{{ filteredTasks.length }} {{ 'analytics.ofCount' | translate }} {{ total }}</span>
         </div>
         <div class="table-filters">
           <mat-form-field appearance="outline" class="search-field">
@@ -642,7 +642,7 @@
           <div class="empty-state" *ngIf="filteredTasks.length === 0">
             <mat-icon>search_off</mat-icon>
             <p>{{ 'analytics.noTasks' | translate }}</p>
-            <button mat-stroked-button (click)="tableSearch='';tableStatus='all';tablePriority='all';tableBoard='all'">Clear filters</button>
+            <button mat-stroked-button (click)="tableSearch='';tableStatus='all';tablePriority='all';tableBoard='all'">{{ 'analytics.clearFilters' | translate }}</button>
           </div>
         </div>
       </section>
@@ -650,22 +650,22 @@
       <!-- Completed by period -->
       <section class="section">
         <div class="section-header">
-          <h2 class="section-title"><mat-icon>done_all</mat-icon> Completed by period</h2>
+          <h2 class="section-title"><mat-icon>done_all</mat-icon> {{ 'analytics.completedByPeriod' | translate }}</h2>
           <div class="period-chips">
             <button *ngFor="let p of periods" [class.active]="activePeriod===p.value" (click)="activePeriod=p.value" class="pchip">{{ p.labelKey | translate }}</button>
           </div>
         </div>
         <div class="custom-range" *ngIf="activePeriod==='custom'">
           <mat-form-field appearance="outline" class="date-field" [class.field-error-mat]="dateRangeError">
-            <mat-label>From</mat-label><input matInput type="date" [(ngModel)]="customFrom">
+            <mat-label>{{ 'analytics.dateFrom' | translate }}</mat-label><input matInput type="date" [(ngModel)]="customFrom">
           </mat-form-field>
           <mat-form-field appearance="outline" class="date-field" [class.field-error-mat]="dateRangeError">
-            <mat-label>To</mat-label><input matInput type="date" [(ngModel)]="customTo">
+            <mat-label>{{ 'analytics.dateTo' | translate }}</mat-label><input matInput type="date" [(ngModel)]="customTo">
           </mat-form-field>
           <div class="date-range-error" *ngIf="dateRangeError"><mat-icon>error_outline</mat-icon> {{ dateRangeError }}</div>
         </div>
         <div class="completed-summary">
-          <span class="completed-count">{{ completedInPeriod.length }} tasks completed</span>
+          <span class="completed-count">{{ completedInPeriod.length }} {{ 'analytics.tasksCompleted' | translate }}</span>
         </div>
         <div class="completed-list" *ngIf="completedInPeriod.length > 0">
           <div class="completed-row" *ngFor="let t of completedInPeriod">
@@ -681,7 +681,7 @@
                 <ng-container *ngIf="t.deadline">
                   <span class="cr-dot">·</span>
                   <span class="cr-deadline" [class.late]="isOverdue(t.deadline)">
-                    Due {{ t.deadline | date:'dd MMM':'':locale }}<span *ngIf="isOverdue(t.deadline)"> (late)</span>
+                    {{ 'analytics.due' | translate }} {{ t.deadline | date:'dd MMM':'':locale }}<span *ngIf="isOverdue(t.deadline)"> ({{ 'analytics.late' | translate }})</span>
                   </span>
                 </ng-container>
               </div>
@@ -689,7 +689,7 @@
           </div>
         </div>
         <div class="empty-state" *ngIf="completedInPeriod.length === 0">
-          <mat-icon>inbox</mat-icon><p>No completed tasks for this period</p>
+          <mat-icon>inbox</mat-icon><p>{{ 'analytics.noCompletedTasks' | translate }}</p>
         </div>
       </section>
 

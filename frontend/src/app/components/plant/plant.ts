@@ -13,20 +13,20 @@ import { GamificationService, GamificationState } from '../../services/gamificat
 import { PlantViewerComponent } from './plant-viewer/plant-viewer';
 
 interface Collectible {
-  emoji: string;
-  name: string;
+  emoji:     string;
+  nameKey:   string;
   threshold: number;
 }
 
 const ALL_COLLECTIBLES: Collectible[] = [
-  { emoji: '🌾', name: 'Пшениця',  threshold: 25  },
-  { emoji: '🦋', name: 'Метелик',  threshold: 50  },
-  { emoji: '🌻', name: 'Соняшник', threshold: 75  },
-  { emoji: '🍄', name: 'Гриб',     threshold: 100 },
-  { emoji: '🌈', name: 'Веселка',  threshold: 125 },
-  { emoji: '⭐', name: 'Зірка',    threshold: 150 },
-  { emoji: '🦄', name: 'Єдиноріг', threshold: 200 },
-  { emoji: '🏆', name: 'Трофей',   threshold: 250 },
+  { emoji: '🌾', nameKey: 'plant.collectibleWheat',     threshold: 25  },
+  { emoji: '🦋', nameKey: 'plant.collectibleButterfly', threshold: 50  },
+  { emoji: '🌻', nameKey: 'plant.collectibleSunflower', threshold: 75  },
+  { emoji: '🍄', nameKey: 'plant.collectibleMushroom',  threshold: 100 },
+  { emoji: '🌈', nameKey: 'plant.collectibleRainbow',   threshold: 125 },
+  { emoji: '⭐', nameKey: 'plant.collectibleStar',      threshold: 150 },
+  { emoji: '🦄', nameKey: 'plant.collectibleUnicorn',   threshold: 200 },
+  { emoji: '🏆', nameKey: 'plant.collectibleTrophy',    threshold: 250 },
 ];
 
 @Component({

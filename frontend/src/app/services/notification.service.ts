@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -27,31 +28,17 @@ const STORAGE_SHOWN = 'growty_notif_shown';
 const ICON_URL      = '/icons/growty-notify.svg';
 
 /** Reminder triggers: how many minutes BEFORE the deadline to fire */
-const REMINDER_OFFSETS: { minutesBefore: number; label: string }[] = [
-  { minutesBefore: 24 * 60, label: '1 day'      },
-  { minutesBefore: 2  * 60, label: '2 hours'    },
-  { minutesBefore: 30,      label: '30 minutes' },
-  { minutesBefore: 0,       label: 'right now'  },
+const REMINDER_OFFSETS: { minutesBefore: number }[] = [
+  { minutesBefore: 24 * 60 },
+  { minutesBefore: 2  * 60 },
+  { minutesBefore: 30      },
+  { minutesBefore: 0       },
 ];
 
-const MESSAGES: Record<'soon' | 'today' | 'now', string[]> = {
-  soon: [
-    'Stay on track — your plant is cheering you on! 🌿',
-    'Keep growing! Great things take time. 🌱',
-    'Your plant is rooting for you! 🌸',
-    "Plan ahead and you'll bloom! 🌻",
-  ],
-  today: [
-    "Time to bloom — your deadline is almost here! 🌻",
-    "Your plant is counting on you! Let's go! 🌿",
-    "You've got this — finish strong! 💪",
-    "Almost there! Your plant sees your progress. 🌸",
-  ],
-  now: [
-    "Deadline is NOW — your plant needs you! 🥀",
-    "Now's the moment — don't let your plant wilt! 🌺",
-    "Rise to the moment! Your plant believes in you. 🌸",
-  ],
+const MSG_KEYS: Record<'soon' | 'today' | 'now', string[]> = {
+  soon:  ['notif.soonMsg1',  'notif.soonMsg2',  'notif.soonMsg3',  'notif.soonMsg4'],
+  today: ['notif.todayMsg1', 'notif.todayMsg2', 'notif.todayMsg3', 'notif.todayMsg4'],
+  now:   ['notif.nowMsg1',   'notif.nowMsg2',   'notif.nowMsg3'],
 };
 
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -65,6 +52,8 @@ export class NotificationService {
 
   private timers  = new Map<string, ReturnType<typeof setTimeout>>();
   private shown   = new Set<string>(this.loadShown());
+
+  constructor(private translate: TranslateService) {}
 
   // ── Permission ──────────────────────────────────────────────────────────────
 
@@ -160,9 +149,9 @@ export class NotificationService {
     urgency:   'soon' | 'today' | 'now'
   ): void {
     const titles: Record<typeof urgency, string> = {
-      soon:  `Growty — Upcoming: ${item.title}`,
-      today: `Growty — Due soon: ${item.title}`,
-      now:   `Growty — Deadline now: ${item.title}`,
+      soon:  `${this.translate.instant('notif.nativeUpcoming')} ${item.title}`,
+      today: `${this.translate.instant('notif.nativeDueSoon')} ${item.title}`,
+      now:   `${this.translate.instant('notif.nativeDeadlineNow')} ${item.title}`,
     };
 
     try {
@@ -186,24 +175,26 @@ export class NotificationService {
   }
 
   private pickMessage(urgency: 'soon' | 'today' | 'now'): string {
-    const pool = MESSAGES[urgency];
-    return pool[Math.floor(Math.random() * pool.length)];
+    const pool = MSG_KEYS[urgency];
+    const key  = pool[Math.floor(Math.random() * pool.length)];
+    return this.translate.instant(key);
   }
 
   private formatDeadline(date: Date, minutesBefore: number): string {
-    if (minutesBefore === 0) return 'Due right now!';
+    if (minutesBefore === 0) return this.translate.instant('notif.dueRightNow');
 
+    const locale = this.translate.currentLang === 'uk' ? 'uk-UA' : 'en-US';
     const opts: Intl.DateTimeFormatOptions = {
       weekday: 'short', month: 'short', day: 'numeric',
       hour: '2-digit', minute: '2-digit',
     };
 
     if (minutesBefore >= 24 * 60) {
-      // Show just the date
-      return `Tomorrow · ${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`;
+      const tomorrow = this.translate.instant('notif.tomorrow');
+      return `${tomorrow} · ${date.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}`;
     }
 
-    return date.toLocaleString('en-US', opts);
+    return date.toLocaleString(locale, opts);
   }
 
   // ── Persistence (so refreshing the page doesn't re-show same notification) ──

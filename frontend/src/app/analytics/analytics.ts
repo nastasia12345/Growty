@@ -217,7 +217,7 @@ export class AnalyticsComponent implements OnInit {
   get dateRangeError(): string {
     if (this.activePeriod !== 'custom') return '';
     if (this.customFrom && this.customTo && new Date(this.customFrom) > new Date(this.customTo))
-      return '"From" date must be before "To" date';
+      return this.translate.instant('analytics.dateRangeError');
     return '';
   }
 

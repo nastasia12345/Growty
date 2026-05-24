@@ -153,9 +153,9 @@
         <div>
           <h1>{{ board?.title }}</h1>
           <p>
-            <span class="total-badge">{{ tasks.length }} total</span>
-            <span class="shown-badge" *ngIf="totalFiltered() !== tasks.length">· {{ totalFiltered() }} shown</span>
-            <span class="done-badge" *ngIf="boardCompletionPct > 0">· {{ boardCompletionPct }}% done</span>
+            <span class="total-badge">{{ tasks.length }} {{ 'board.total' | translate }}</span>
+            <span class="shown-badge" *ngIf="totalFiltered() !== tasks.length">· {{ totalFiltered() }} {{ 'board.shown' | translate }}</span>
+            <span class="done-badge" *ngIf="boardCompletionPct > 0">· {{ boardCompletionPct }}% {{ 'board.pctDone' | translate }}</span>
           </p>
         </div>
       </div>
@@ -171,7 +171,7 @@
       <!-- View toggle -->
       <div class="view-toggle">
         <button class="view-btn" [class.active]="viewMode === 'kanban'"
-                (click)="setViewMode('kanban')" matTooltip="Kanban view">
+                (click)="setViewMode('kanban')" [matTooltip]="'board.kanbanView' | translate">
           <mat-icon>view_kanban</mat-icon>
         </button>
       </div>
@@ -212,7 +212,7 @@
       <!-- Clear -->
       <div class="filter-actions">
         <button mat-icon-button *ngIf="hasActiveFilters"
-                (click)="clearFilters()" matTooltip="Clear all filters" class="reset-btn">
+                (click)="clearFilters()" [matTooltip]="'board.clearFilters' | translate" class="reset-btn">
           <mat-icon>filter_alt_off</mat-icon>
         </button>
       </div>
@@ -235,7 +235,7 @@
 
       <!-- Jump-to-today (sticky top-left) -->
       <div class="gantt-toolbar">
-        <button class="pipeline-today-btn" (click)="jumpToToday()" matTooltip="Jump to today">
+        <button class="pipeline-today-btn" (click)="jumpToToday()" [matTooltip]="'board.jumpToToday' | translate">
           <mat-icon>today</mat-icon>
           {{ 'calendar.today' | translate }}
         </button>
@@ -251,7 +251,7 @@
 
           <!-- ── Header row (sticky top) ── -->
           <div class="gantt-header">
-            <div class="gantt-label-hdr">Task</div>
+            <div class="gantt-label-hdr">{{ 'board.ganttTask' | translate }}</div>
             <div class="gantt-days-row" [style.width.px]="ganttWidth">
               <div class="gantt-day-cell"
                    *ngFor="let day of pipelineDays"
@@ -291,7 +291,7 @@
                   <span class="gantt-bar-label">{{ task.title }}</span>
                   <div class="gantt-bar-resize"
                        (mousedown)="startResize($event, task)"
-                       matTooltip="Drag to extend deadline"></div>
+                       [matTooltip]="'board.dragDeadline' | translate"></div>
                 </div>
               </div>
 
@@ -300,7 +300,7 @@
             <!-- Empty -->
             <div class="gantt-empty" *ngIf="tasksWithDeadline.length === 0">
               <mat-icon>event_busy</mat-icon>
-              <p>No tasks with deadlines in the visible range</p>
+              <p>{{ 'board.ganttNoDl' | translate }}</p>
             </div>
 
           </div><!-- /gantt-body -->
@@ -328,7 +328,7 @@
               <h3 class="col-name">{{ colName(column.status) }}</h3>
               <button mat-icon-button class="col-edit-btn"
                       (click)="startEditColumn(column.status)"
-                      matTooltip="Rename column">
+                      [matTooltip]="'board.renameColumn' | translate">
                 <mat-icon>edit</mat-icon>
               </button>
             </ng-container>
@@ -341,10 +341,10 @@
                      (keydown.escape)="cancelEditColumn()"
                      maxlength="40"
                      autofocus>
-              <button mat-icon-button class="col-save-btn" (click)="saveColumnName()" matTooltip="Save">
+              <button mat-icon-button class="col-save-btn" (click)="saveColumnName()" [matTooltip]="'board.saveTooltip' | translate">
                 <mat-icon>check</mat-icon>
               </button>
-              <button mat-icon-button class="col-cancel-btn" (click)="cancelEditColumn()" matTooltip="Cancel">
+              <button mat-icon-button class="col-cancel-btn" (click)="cancelEditColumn()" [matTooltip]="'board.cancelTooltip' | translate">
                 <mat-icon>close</mat-icon>
               </button>
             </ng-container>
@@ -352,7 +352,7 @@
 
           <div class="col-header-right">
             <span class="overdue-badge" *ngIf="columnOverdueCount(column.status) > 0"
-                  matTooltip="{{ columnOverdueCount(column.status) }} overdue">
+                  [matTooltip]="columnOverdueCount(column.status) + ' ' + ('board.overdue' | translate)">
               <mat-icon>warning</mat-icon>{{ columnOverdueCount(column.status) }}
             </span>
             <span class="column-count"
@@ -433,7 +433,7 @@
               <button mat-icon-button class="quick-done-btn"
                       *ngIf="task.status !== 'Done'"
                       (click)="quickComplete(task)"
-                      matTooltip="Mark as Done">
+                      [matTooltip]="'board.markDone' | translate">
                 <mat-icon>check_circle</mat-icon>
               </button>
               <button mat-icon-button class="edit-btn"
@@ -451,7 +451,7 @@
           <!-- Empty column state -->
           <div *ngIf="getTasksByStatus(column.status).length === 0" class="empty-column">
             <mat-icon>{{ taskSearch ? 'search_off' : 'inbox' }}</mat-icon>
-            <p>{{ taskSearch ? 'No match for "' + taskSearch + '"' : ('board.noTasks' | translate) }}</p>
+            <p>{{ taskSearch ? (('board.noMatch' | translate) + ' "' + taskSearch + '"') : ('board.noTasks' | translate) }}</p>
           </div>
 
         </div>

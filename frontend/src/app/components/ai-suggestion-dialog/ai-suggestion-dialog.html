@@ -1,40 +1,40 @@
 <h2 mat-dialog-title>
   <mat-icon>auto_awesome</mat-icon>
-  Допомога від AI: покращення опису завдання
+  {{ 'ai.title' | translate }}
 </h2>
 
 <mat-dialog-content>
   <div class="confidence-badge" [class.high]="data.suggestion.confidence > 70">
     <mat-icon>psychology</mat-icon>
-    AI confidence: {{ data.suggestion.confidence }}%
-    <span class="smart-tag">SMART format</span>
+    {{ 'ai.confidence' | translate }}: {{ data.suggestion.confidence }}%
+    <span class="smart-tag">{{ 'ai.smartFormat' | translate }}</span>
   </div>
 
   <mat-divider></mat-divider>
 
   <!-- Original description -->
   <div class="section">
-    <h3><span class="sec-icon">📝</span> Original description</h3>
+    <h3><span class="sec-icon">📝</span> {{ 'ai.originalDesc' | translate }}</h3>
     <div class="original-text">
-      {{ data.task.description || 'No description provided' }}
+      {{ data.task.description || ('ai.noDesc' | translate) }}
     </div>
   </div>
 
   <!-- SMART improved description -->
   <div class="section">
-    <h3><span class="sec-icon">✨</span> SMART-formatted description</h3>
+    <h3><span class="sec-icon">✨</span> {{ 'ai.smartDesc' | translate }}</h3>
     <div class="smart-pills">
-      <span class="smart-pill">Specific</span>
-      <span class="smart-pill">Measurable</span>
-      <span class="smart-pill">Achievable</span>
-      <span class="smart-pill">Relevant</span>
-      <span class="smart-pill">Time-bound</span>
+      <span class="smart-pill">{{ 'ai.specific' | translate }}</span>
+      <span class="smart-pill">{{ 'ai.measurable' | translate }}</span>
+      <span class="smart-pill">{{ 'ai.achievable' | translate }}</span>
+      <span class="smart-pill">{{ 'ai.relevant' | translate }}</span>
+      <span class="smart-pill">{{ 'ai.timeBound' | translate }}</span>
     </div>
     <div class="improved-text">
       {{ data.suggestion.improvedText }}
     </div>
     <mat-checkbox [(ngModel)]="applyDescription">
-      Apply improved description
+      {{ 'ai.applyDesc' | translate }}
     </mat-checkbox>
   </div>
 
@@ -42,7 +42,7 @@
 
   <!-- Subtasks -->
   <div class="section" *ngIf="data.suggestion.subtasks?.length">
-    <h3><span class="sec-icon">📋</span> Auto-generated subtasks</h3>
+    <h3><span class="sec-icon">📋</span> {{ 'ai.subtasks' | translate }}</h3>
     <ul class="subtasks-list">
       <li *ngFor="let subtask of data.suggestion.subtasks">
         <mat-icon>check_circle_outline</mat-icon>
@@ -50,7 +50,7 @@
       </li>
     </ul>
     <mat-checkbox [(ngModel)]="applySubtasks">
-      Add to checklist
+      {{ 'ai.addChecklist' | translate }}
     </mat-checkbox>
   </div>
 </mat-dialog-content>
@@ -58,10 +58,10 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="rejectSuggestion()">
     <mat-icon>close</mat-icon>
-    Reject
+    {{ 'ai.reject' | translate }}
   </button>
   <button mat-raised-button color="primary" (click)="acceptSuggestion()">
     <mat-icon>check</mat-icon>
-    Apply changes
+    {{ 'ai.apply' | translate }}
   </button>
 </mat-dialog-actions>

@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { KanbanTask } from '../models/board.model';
 import { TaskService } from '../services/task';
 import { FeedbackService } from '../services/feedback';
@@ -29,7 +30,8 @@ import { FeedbackService } from '../services/feedback';
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslateModule
   ],
   templateUrl: './task-details.html',
   styleUrls: ['./task-details.css']
@@ -49,7 +51,8 @@ export class TaskDetailComponent {
   constructor(
     private taskService: TaskService,
     private feedbackService: FeedbackService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) { }
 
   openForCreate(boardId: number, initialStatus: string = 'ToDo') {
@@ -106,7 +109,7 @@ export class TaskDetailComponent {
     this.taskService.moveTask(this.task.id, newStatus).subscribe({
       next: () => {
         this.task.status = newStatus;
-        this.snackBar.open('Статус оновлено', 'OK', { duration: 2000 });
+        this.snackBar.open(this.translate.instant('taskDetail.statusUpdated'), 'OK', { duration: 2000 });
         this.taskChanged.emit();
       }
     });
@@ -116,7 +119,7 @@ export class TaskDetailComponent {
     if (!this.task.id) return;
     this.feedbackService.addFeedback(this.task.id, this.feedbackComment, this.difficultyRating).subscribe({
       next: () => {
-        this.snackBar.open('Дякуємо за відгук!', 'OK', { duration: 2000 });
+        this.snackBar.open(this.translate.instant('taskDetail.feedbackThanks'), 'OK', { duration: 2000 });
         this.taskChanged.emit();
       }
     });
@@ -130,7 +133,7 @@ export class TaskDetailComponent {
     if (this.task.id) {
       this.taskService.updateTask(this.task.id, taskData).subscribe({
         next: () => {
-          this.snackBar.open('Завдання оновлено', 'OK', { duration: 2000 });
+          this.snackBar.open(this.translate.instant('taskDetail.taskUpdated'), 'OK', { duration: 2000 });
           this.taskChanged.emit();
           this.close();
         }
@@ -138,7 +141,7 @@ export class TaskDetailComponent {
     } else {
       this.taskService.createTask(taskData).subscribe({
         next: () => {
-          this.snackBar.open('Завдання створено', 'OK', { duration: 2000 });
+          this.snackBar.open(this.translate.instant('taskDetail.taskCreated'), 'OK', { duration: 2000 });
           this.taskChanged.emit();
           this.close();
         }
@@ -148,10 +151,10 @@ export class TaskDetailComponent {
 
   deleteTask() {
     if (!this.task.id) return;
-    if (confirm('Видалити завдання?')) {
+    if (confirm(this.translate.instant('board.deleteTitle'))) {
       this.taskService.deleteTask(this.task.id).subscribe({
         next: () => {
-          this.snackBar.open('Завдання видалено', 'OK', { duration: 2000 });
+          this.snackBar.open(this.translate.instant('taskDetail.taskDeleted'), 'OK', { duration: 2000 });
           this.taskChanged.emit();
           this.close();
         }

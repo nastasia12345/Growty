@@ -78,7 +78,7 @@
         <div class="gcal-sub" *ngIf="!googleConnected">{{ 'calendar.gcalSub' | translate }}</div>
         <div class="gcal-sub connected-sub" *ngIf="googleConnected">
           <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">check_circle</mat-icon>
-          {{ 'calendar.connected' | translate }} · {{ allGoogleEvents.length }} event{{ allGoogleEvents.length !== 1 ? 's' : '' }} loaded
+          {{ 'calendar.connected' | translate }} · {{ allGoogleEvents.length }} {{ allGoogleEvents.length === 1 ? ('calendar.eventLoaded_one' | translate) : ('calendar.eventLoaded_other' | translate) }}
         </div>
       </div>
     </div>

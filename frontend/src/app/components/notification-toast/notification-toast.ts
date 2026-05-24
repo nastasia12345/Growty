@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService, ToastNotification } from '../../services/notification.service';
 
 @Component({
@@ -256,7 +257,8 @@ export class NotificationToastComponent implements OnInit, OnDestroy {
 
   constructor(
     private notifService: NotificationService,
-    private cdr:          ChangeDetectorRef
+    private cdr:          ChangeDetectorRef,
+    private translate:    TranslateService
   ) {}
 
   ngOnInit() {
@@ -291,7 +293,9 @@ export class NotificationToastComponent implements OnInit, OnDestroy {
   }
 
   urgencyLabel(urgency: 'soon' | 'today' | 'now'): string {
-    return urgency === 'now' ? '🔥 Now!' : urgency === 'today' ? '⏰ Soon' : '📅 Upcoming';
+    if (urgency === 'now')   return this.translate.instant('notif.urgencyNow');
+    if (urgency === 'today') return this.translate.instant('notif.urgencySoon');
+    return this.translate.instant('notif.urgencyUpcoming');
   }
 
   trackId(_: number, t: ToastNotification) { return t.id; }

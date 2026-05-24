@@ -106,7 +106,7 @@
              class="panel-input"
              [class.input-error]="formError && !form.title.trim()"
              [(ngModel)]="form.title"
-             placeholder="e.g. Product Roadmap"
+             [placeholder]="'boards.namePlaceholder' | translate"
              maxlength="100"
              (keydown.enter)="save()" />
     </div>
@@ -116,7 +116,7 @@
       <textarea id="board-desc"
                 class="panel-textarea"
                 [(ngModel)]="form.description"
-                placeholder="What is this board for?"
+                [placeholder]="'boards.descPlaceholder' | translate"
                 rows="3"
                 maxlength="300"></textarea>
     </div>

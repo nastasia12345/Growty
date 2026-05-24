@@ -170,10 +170,10 @@
             *ngFor="let item of collectibles"
             [class.unlocked]="item.unlocked"
             [class.locked]="!item.unlocked"
-            [matTooltip]="item.unlocked ? item.name : 'Complete ' + item.threshold + ' tasks to unlock'"
+            [matTooltip]="item.unlocked ? (item.nameKey | translate) : ('plant.lockTooltip' | translate:{ threshold: item.threshold })"
           >
             <span class="item-emoji">{{ item.unlocked ? item.emoji : '🔒' }}</span>
-            <span class="item-name">{{ item.unlocked ? item.name : '???' }}</span>
+            <span class="item-name">{{ item.unlocked ? (item.nameKey | translate) : '???' }}</span>
             <span class="item-req">{{ item.threshold }} ✓</span>
           </div>
         </div>
