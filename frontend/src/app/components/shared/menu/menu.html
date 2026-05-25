@@ -66,21 +66,86 @@
         (click)="toggleDropdown()"
         [matTooltip]="auth.currentUser()?.displayName || ''"
       >
-        <span class="avatar-initials">{{ auth.initials }}</span>
+          <img *ngIf="avatarDataUrl" [src]="avatarDataUrl" alt="avatar" class="avatar-photo"/>
+          <span *ngIf="!avatarDataUrl" class="avatar-initials">{{ auth.initials }}</span>
       </button>
 
       <div class="user-dropdown" *ngIf="showUserDropdown" (click)="$event.stopPropagation()">
+
+        <!-- ── User header ── -->
         <div class="dropdown-header">
-          <div class="dropdown-avatar">{{ auth.initials }}</div>
+          <div class="dropdown-avatar">
+            <img *ngIf="avatarDataUrl" [src]="avatarDataUrl" alt="avatar" class="dropdown-avatar-photo"/>
+            <span *ngIf="!avatarDataUrl">{{ auth.initials }}</span>
+          </div>
           <div>
             <div class="dropdown-name">{{ auth.currentUser()?.displayName }}</div>
             <div class="dropdown-email">{{ auth.currentUser()?.email }}</div>
           </div>
         </div>
         <div class="dropdown-divider"></div>
-        <button class="dropdown-item logout" (click)="logout()">
-          <mat-icon>logout</mat-icon> {{ 'nav.signOut' | translate }}
+
+        <!-- ── Profile Settings ── -->
+        <button class="dropdown-item" (click)="openProfileModal()">
+          <mat-icon>manage_accounts</mat-icon>
+          <span class="item-label">{{ 'nav.profileSettings' | translate }}</span>
+          <mat-icon class="item-chevron">chevron_right</mat-icon>
         </button>
+        <div class="dropdown-divider"></div>
+
+        <!-- ── Your Rewards ── -->
+        <div class="dropdown-section">
+          <div class="section-header">
+            <span class="section-title">{{ 'nav.yourRewards' | translate }}</span>
+            <span class="section-badge">{{ menuUnlockedCount }}/{{ menuCollectibles.length }}</span>
+          </div>
+          <div class="rewards-grid" *ngIf="!menuDataLoading; else rewardsLoading">
+            <span
+              *ngFor="let c of menuCollectibles"
+              class="reward-chip"
+              [class.reward-unlocked]="c.unlocked"
+              [class.reward-locked]="!c.unlocked"
+              [matTooltip]="c.unlocked ? (c.nameKey | translate) : ('plant.lockTooltip' | translate:{ threshold: c.threshold })"
+            >{{ c.unlocked ? c.emoji : '🔒' }}</span>
+          </div>
+          <ng-template #rewardsLoading>
+            <div class="section-skeleton">
+              <span class="skel-chip" *ngFor="let _ of [1,2,3,4,5,6,7,8]"></span>
+            </div>
+          </ng-template>
+        </div>
+        <div class="dropdown-divider"></div>
+
+        <!-- ── Plant Health ── -->
+        <div class="dropdown-section">
+          <div class="section-header">
+            <span class="section-title">
+              <span class="plant-emoji-label">{{ menuHealthLabel }}</span>
+              {{ 'nav.plantHealth' | translate }}
+            </span>
+            <span class="health-pct" [style.color]="menuHealthColor">{{ menuHealthPercent }}%</span>
+          </div>
+          <div class="health-track-wrap" *ngIf="!menuDataLoading; else healthLoading">
+            <div class="health-track">
+              <div
+                class="health-fill"
+                [style.width.%]="menuHealthPercent"
+                [style.background]="menuHealthColor"
+              ></div>
+            </div>
+          </div>
+          <ng-template #healthLoading>
+            <div class="skel-bar"></div>
+          </ng-template>
+        </div>
+        <div class="dropdown-divider"></div>
+
+        <!-- ── Sign out ── -->
+        <button class="dropdown-item logout" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span class="item-label">{{ 'nav.signOut' | translate }}</span>
+        </button>
+
       </div>
     </div>
 
@@ -88,6 +153,7 @@
 </mat-toolbar>
 
 <app-auth-modal *ngIf="showAuthModal" (closed)="closeAuth()"></app-auth-modal>
+<app-profile-settings-modal *ngIf="showProfileModal" (closed)="closeProfileModal()"></app-profile-settings-modal>
 <div *ngIf="showUserDropdown" class="dropdown-overlay" (click)="closeDropdown()"></div>
 
 <mat-sidenav-container class="sidenav-container">
@@ -98,7 +164,10 @@
 
     <!-- Sidenav user section -->
     <div class="sidenav-user" *ngIf="auth.isLoggedIn">
-      <div class="sidenav-avatar">{{ auth.initials }}</div>
+      <div class="sidenav-avatar">
+        <img *ngIf="avatarDataUrl" [src]="avatarDataUrl" alt="avatar" class="avatar-photo"/>
+        <span *ngIf="!avatarDataUrl">{{ auth.initials }}</span>
+      </div>
       <div>
         <div class="sidenav-name">{{ auth.currentUser()?.displayName }}</div>
         <div class="sidenav-email">{{ auth.currentUser()?.email }}</div>

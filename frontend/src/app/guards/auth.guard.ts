@@ -12,6 +12,6 @@ export const authGuard: CanActivateFn = () => {
 
   if (auth.isLoggedIn) return true;
 
-  // Preserve the intended URL so we can redirect back after login (future feature)
-  return router.createUrlTree(['/sign-in']);
+  // Not authenticated — send to home page where the login modal lives
+  return router.createUrlTree(['/']);
 };

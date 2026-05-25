@@ -6,7 +6,10 @@
     "plant": "Plant",
     "calendar": "Calendar",
     "signIn": "Sign in",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "profileSettings": "Profile Settings",
+    "yourRewards": "Your Rewards",
+    "plantHealth": "Plant Health"
   },
   "auth": {
     "signIn": "Sign in",
@@ -347,6 +350,37 @@
     "en": "EN",
     "uk": "UK"
   },
+  "settings": {
+    "title": "Profile Settings",
+    "subtitle": "Manage your account information",
+    "accountInfo": "Account Information",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "savedMessage": "Profile updated successfully"
+  },
+  "profile": {
+    "close": "Close",
+    "avatarHint": "Click the photo to upload a new one",
+    "removePhoto": "Remove photo",
+    "imgError": "Please select a valid image file",
+    "phone": "Phone number",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "gender": "Gender",
+    "gender_female": "Female",
+    "gender_male": "Male",
+    "gender_nonbinary": "Non-binary",
+    "gender_preferNotToSay": "Prefer not to say",
+    "hobbies": "Hobbies",
+    "hobbyPlaceholder": "e.g. reading, hiking…",
+    "hobbyHint": "Press Enter or click Add to add each hobby",
+    "add": "Add",
+    "happyThings": "What makes you happy?",
+    "happyPlaceholder": "e.g. morning coffee, long walks, good music…",
+    "optional": "(optional)",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "savedMessage": "Profile saved!"
+  },
   "plant": {
     "title": "My Plant",
     "subtitle": "Complete tasks to keep your plant healthy and growing",
@@ -381,7 +415,10 @@
     "collectibleStar": "Star",
     "collectibleUnicorn": "Unicorn",
     "collectibleTrophy": "Trophy",
-    "lockTooltip": "Complete {{threshold}} tasks to unlock"
+    "lockTooltip": "Complete {{threshold}} tasks to unlock",
+    "placeHint": "Click to place • Drag onto plant to position • Drag placed sprite to move • Double-click sprite to remove",
+    "placeNearPlant": "Place near plant",
+    "removeFromPlant": "Remove from plant"
   },
   "ai": {
     "title": "AI Assistance: Task Description Improvement",

@@ -127,7 +127,11 @@
               [healthPercent]="healthPercent"
               [wiltingLevel]="wiltingLevel"
               [done]="done"
-              [total]="total">
+              [total]="total"
+              [placements]="placements"
+              (placed)="onPlaced($event)"
+              (moved)="onMoved($event)"
+              (removed)="onRemoved($event)">
             </app-plant-viewer>
           </div>
 
@@ -163,6 +167,12 @@
         </p>
       </div>
 
+      <!-- Place hint -->
+      <p class="place-hint" *ngIf="unlockedCount > 0">
+        <mat-icon>touch_app</mat-icon>
+        {{ 'plant.placeHint' | translate }}
+      </p>
+
       <div class="shelf">
         <div class="shelf-items">
           <div
@@ -170,11 +180,23 @@
             *ngFor="let item of collectibles"
             [class.unlocked]="item.unlocked"
             [class.locked]="!item.unlocked"
-            [matTooltip]="item.unlocked ? (item.nameKey | translate) : ('plant.lockTooltip' | translate:{ threshold: item.threshold })"
+            [class.placed]="item.unlocked && isPlaced(item.emoji)"
+            [attr.draggable]="item.unlocked ? true : null"
+            [matTooltip]="item.unlocked
+              ? (isPlaced(item.emoji)
+                  ? ('plant.removeFromPlant' | translate)
+                  : ('plant.placeNearPlant'  | translate))
+              : ('plant.lockTooltip' | translate:{ threshold: item.threshold })"
+            (click)="item.unlocked && togglePlaced(item.emoji)"
+            (dragstart)="item.unlocked && onDragStart($event, item.emoji)"
           >
             <span class="item-emoji">{{ item.unlocked ? item.emoji : '🔒' }}</span>
             <span class="item-name">{{ item.unlocked ? (item.nameKey | translate) : '???' }}</span>
             <span class="item-req">{{ item.threshold }} ✓</span>
+            <!-- Placed badge -->
+            <span class="placed-badge" *ngIf="item.unlocked && isPlaced(item.emoji)">
+              <mat-icon>local_florist</mat-icon>
+            </span>
           </div>
         </div>
         <div class="shelf-plank"></div>

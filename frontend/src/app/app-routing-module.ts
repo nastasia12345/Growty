@@ -5,13 +5,16 @@ import { BoardsComponent } from './components/boards/boards';
 import { BoardDetailComponent } from './components/board-detail/board-detail';
 import { AnalyticsComponent } from './analytics/analytics';
 import { PlantComponent } from './components/plant/plant';
+import { SettingsComponent } from './components/settings/settings';
+import { authGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   { path: '',           component: HomeComponent },
-  { path: 'boards',    component: BoardsComponent },
-  { path: 'board/:id', component: BoardDetailComponent },
-  { path: 'analytics', component: AnalyticsComponent },
-  { path: 'plant',     component: PlantComponent },
+  { path: 'boards',    component: BoardsComponent,      canActivate: [authGuard] },
+  { path: 'board/:id', component: BoardDetailComponent, canActivate: [authGuard] },
+  { path: 'analytics', component: AnalyticsComponent,  canActivate: [authGuard] },
+  { path: 'plant',     component: PlantComponent,       canActivate: [authGuard] },
+  { path: 'settings',  component: SettingsComponent,    canActivate: [authGuard] },
   { path: '**',        redirectTo: '' }
 ];
 

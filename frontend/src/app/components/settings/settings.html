@@ -1,0 +1,43 @@
+<div class="settings-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button mat-icon-button class="back-btn" routerLink="/boards" [matTooltip]="'calendar.backToBoards' | translate">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>{{ 'settings.title' | translate }}</h1>
+        <p>{{ 'settings.subtitle' | translate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="settings-card">
+
+    <div class="settings-section-label">
+      <mat-icon>person</mat-icon>
+      {{ 'settings.accountInfo' | translate }}
+    </div>
+
+    <mat-form-field appearance="outline" class="settings-field">
+      <mat-label>{{ 'auth.displayNameLabel' | translate }}</mat-label>
+      <input matInput [(ngModel)]="displayName" [placeholder]="'auth.displayNamePlaceholder' | translate" />
+      <mat-icon matSuffix>badge</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="settings-field">
+      <mat-label>{{ 'auth.emailLabel' | translate }}</mat-label>
+      <input matInput [(ngModel)]="email" [placeholder]="'auth.emailPlaceholder' | translate" type="email" />
+      <mat-icon matSuffix>email</mat-icon>
+    </mat-form-field>
+
+    <button mat-flat-button class="save-btn" (click)="save()" [disabled]="saving">
+      <mat-icon>save</mat-icon>
+      {{ saving ? ('settings.saving' | translate) : ('settings.save' | translate) }}
+    </button>
+
+  </div>
+
+</div>

@@ -10,7 +10,7 @@ import { timeout, catchError } from 'rxjs/operators';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AnalyticsService } from '../../services/analytics';
 import { GamificationService, GamificationState } from '../../services/gamification';
-import { PlantViewerComponent } from './plant-viewer/plant-viewer';
+import { PlantViewerComponent, PlacedItem } from './plant-viewer/plant-viewer';
 
 interface Collectible {
   emoji:     string;
@@ -29,6 +29,25 @@ const ALL_COLLECTIBLES: Collectible[] = [
   { emoji: '🏆', nameKey: 'plant.collectibleTrophy',    threshold: 250 },
 ];
 
+/** Storage key for placed collectibles (v2 = PlacedItem[] format). */
+const PLACED_KEY = 'growty_placements_v2';
+
+/**
+ * Default world positions for click-to-place.
+ * Index matches ALL_COLLECTIBLES order.
+ * Matches the scene coordinate system (plant ~4 units tall, pot at y=0).
+ */
+const DEFAULT_POSITIONS: [number, number, number][] = [
+  [-1.05,  0.90,  1.00],  // 0 — front-left,  low
+  [ 1.05,  0.90,  1.00],  // 1 — front-right, low
+  [-1.45,  2.05,  0.55],  // 2 — mid-left
+  [ 1.45,  2.05,  0.55],  // 3 — mid-right
+  [-0.75,  3.10,  0.70],  // 4 — upper-left
+  [ 0.75,  3.10,  0.70],  // 5 — upper-right
+  [ 0.00,  3.85,  0.80],  // 6 — top-center
+  [ 0.00,  0.30,  1.30],  // 7 — base-front
+];
+
 @Component({
   selector: 'app-plant',
   standalone: true,
@@ -36,6 +55,7 @@ const ALL_COLLECTIBLES: Collectible[] = [
   templateUrl: './plant.html',
   styleUrls: ['./plant.css']
 })
+
 export class PlantComponent implements OnInit {
   todo       = 0;
   inProgress = 0;
@@ -46,12 +66,82 @@ export class PlantComponent implements OnInit {
   // Gamification state from backend
   gamState: GamificationState | null = null;
 
+  // ── Placed decorations ──────────────────────────────────────────────────
+  placements: PlacedItem[] = this.loadPlaced();
+
   constructor(
     private analyticsService: AnalyticsService,
     private gamificationService: GamificationService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService
   ) {}
+
+  isPlaced(emoji: string): boolean {
+    return this.placements.some(p => p.emoji === emoji);
+  }
+
+  /**
+   * Click-to-toggle: if already placed, remove it; otherwise add at its
+   * pre-defined default world position so it appears near the plant immediately.
+   */
+  togglePlaced(emoji: string): void {
+    if (this.isPlaced(emoji)) {
+      this.placements = this.placements.filter(p => p.emoji !== emoji);
+    } else {
+      const idx = ALL_COLLECTIBLES.findIndex(c => c.emoji === emoji);
+      const [x, y, z] = DEFAULT_POSITIONS[idx % DEFAULT_POSITIONS.length];
+      this.placements = [...this.placements, { emoji, x, y, z }];
+    }
+    this.savePlaced();
+    this.cdr.markForCheck();
+  }
+
+  /** Called when the user drags an emoji onto the 3-D plant canvas. */
+  onDragStart(e: DragEvent, emoji: string): void {
+    if (!e.dataTransfer) return;
+    e.dataTransfer.setData('text/plain', emoji);
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  /** Called by (placed) output from plant-viewer after a successful drop. */
+  onPlaced(item: PlacedItem): void {
+    // Replace any existing placement for this emoji with the new drop position
+    this.placements = [
+      ...this.placements.filter(p => p.emoji !== item.emoji),
+      item,
+    ];
+    this.savePlaced();
+    this.cdr.markForCheck();
+  }
+
+  /** Called when the user drags a placed sprite to a new position inside the canvas. */
+  onMoved(item: PlacedItem): void {
+    this.placements = [
+      ...this.placements.filter(p => p.emoji !== item.emoji),
+      item,
+    ];
+    this.savePlaced();
+    // No markForCheck needed — plant-viewer handles the visual itself
+    // and sets skipNextDecorRebuild before emitting.
+  }
+
+  /** Called when the user double-clicks a placed sprite to remove it. */
+  onRemoved(emoji: string): void {
+    this.placements = this.placements.filter(p => p.emoji !== emoji);
+    this.savePlaced();
+    this.cdr.markForCheck();
+  }
+
+  private loadPlaced(): PlacedItem[] {
+    try {
+      const raw = localStorage.getItem(PLACED_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+
+  private savePlaced(): void {
+    try { localStorage.setItem(PLACED_KEY, JSON.stringify(this.placements)); } catch {}
+  }
 
   ngOnInit() {
     forkJoin({

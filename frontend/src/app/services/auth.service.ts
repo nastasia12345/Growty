@@ -49,6 +49,7 @@ export class AuthService {
   }
 
   logout() {
+    this.wb.resetLoginPrompt();          // survey must re-appear on next login
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this.currentUser.set(null);

@@ -1,0 +1,145 @@
+<!-- ══════════ BACKDROP ══════════ -->
+<div class="psm-backdrop" (click)="close()"></div>
+
+<!-- ══════════ PANEL ══════════ -->
+<div class="psm-panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+
+  <!-- Close -->
+  <button class="psm-close" (click)="close()" [attr.aria-label]="'profile.close' | translate">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <!-- ── Avatar section ── -->
+  <div class="psm-avatar-section">
+    <div class="psm-avatar-wrap">
+      <div class="psm-avatar" (click)="triggerFileInput()">
+        <img *ngIf="avatarDataUrl" [src]="avatarDataUrl" alt="avatar" class="psm-avatar-img"/>
+        <span *ngIf="!avatarDataUrl" class="psm-avatar-initials">{{ initials }}</span>
+        <div class="psm-avatar-overlay">
+          <mat-icon>photo_camera</mat-icon>
+        </div>
+      </div>
+      <button *ngIf="avatarDataUrl" class="psm-remove-photo" (click)="removeAvatar()"
+              [matTooltip]="'profile.removePhoto' | translate">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </div>
+    <p class="psm-avatar-hint">{{ 'profile.avatarHint' | translate }}</p>
+    <p class="psm-img-error" *ngIf="imgError">{{ 'profile.imgError' | translate }}</p>
+    <input #fileInput type="file" accept="image/*" class="psm-file-hidden"
+           (change)="onFileSelected($event)"/>
+  </div>
+
+  <!-- ── Read-only identity ── -->
+  <div class="psm-identity">
+    <div class="psm-identity-name">{{ displayName }}</div>
+    <div class="psm-identity-email">{{ email }}</div>
+  </div>
+
+  <div class="psm-divider"></div>
+
+  <!-- ── Form ── -->
+  <div class="psm-form">
+
+    <!-- Phone -->
+    <div class="psm-field">
+      <label class="psm-label">
+        <mat-icon>phone</mat-icon>
+        {{ 'profile.phone' | translate }}
+        <span class="psm-optional">{{ 'profile.optional' | translate }}</span>
+      </label>
+      <div class="psm-input-wrap">
+        <input
+          type="tel"
+          class="psm-input"
+          [(ngModel)]="phone"
+          [placeholder]="'profile.phonePlaceholder' | translate"
+        />
+      </div>
+    </div>
+
+    <!-- Gender -->
+    <div class="psm-field">
+      <label class="psm-label">
+        <mat-icon>wc</mat-icon>
+        {{ 'profile.gender' | translate }}
+        <span class="psm-optional">{{ 'profile.optional' | translate }}</span>
+      </label>
+      <div class="psm-gender-group">
+        <button
+          *ngFor="let g of genderOptions"
+          type="button"
+          class="psm-gender-btn"
+          [class.selected]="gender === g"
+          (click)="gender = (gender === g ? '' : g)"
+        >{{ genderLabel(g) }}</button>
+      </div>
+    </div>
+
+    <!-- Hobbies -->
+    <div class="psm-field">
+      <label class="psm-label">
+        <mat-icon>sports_esports</mat-icon>
+        {{ 'profile.hobbies' | translate }}
+        <span class="psm-optional">{{ 'profile.optional' | translate }}</span>
+      </label>
+
+      <!-- Chip display -->
+      <div class="psm-chips" *ngIf="hobbies.length > 0">
+        <span class="psm-chip" *ngFor="let h of hobbies; let i = index">
+          {{ h }}
+          <button class="psm-chip-remove" (click)="removeHobby(i)" type="button">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      </div>
+
+      <!-- Tag input -->
+      <div class="psm-input-wrap psm-tag-input">
+        <mat-icon>add</mat-icon>
+        <input
+          type="text"
+          class="psm-input"
+          [(ngModel)]="hobbyInput"
+          (keydown)="onHobbyKeydown($event)"
+          [placeholder]="'profile.hobbyPlaceholder' | translate"
+        />
+        <button type="button" class="psm-add-btn" (click)="addHobby()"
+                [disabled]="!hobbyInput.trim()">
+          {{ 'profile.add' | translate }}
+        </button>
+      </div>
+      <p class="psm-field-hint">{{ 'profile.hobbyHint' | translate }}</p>
+    </div>
+
+    <!-- What makes you happy -->
+    <div class="psm-field">
+      <label class="psm-label">
+        <mat-icon>auto_awesome</mat-icon>
+        {{ 'profile.happyThings' | translate }}
+        <span class="psm-optional">{{ 'profile.optional' | translate }}</span>
+      </label>
+      <textarea
+        class="psm-textarea"
+        [(ngModel)]="happyThings"
+        [placeholder]="'profile.happyPlaceholder' | translate"
+        rows="3"
+      ></textarea>
+    </div>
+
+  </div>
+
+  <!-- ── Actions ── -->
+  <div class="psm-actions">
+    <div class="psm-saved-msg" [class.visible]="saved">
+      <mat-icon>check_circle</mat-icon>
+      {{ 'profile.savedMessage' | translate }}
+    </div>
+    <button class="psm-save-btn" (click)="save()" [disabled]="saving">
+      <mat-icon *ngIf="saving" class="spin">autorenew</mat-icon>
+      <mat-icon *ngIf="!saving">save</mat-icon>
+      {{ saving ? ('profile.saving' | translate) : ('profile.save' | translate) }}
+    </button>
+  </div>
+
+</div>

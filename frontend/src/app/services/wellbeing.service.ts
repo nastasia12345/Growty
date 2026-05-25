@@ -81,6 +81,13 @@ export class WellbeingService {
     this.showPrompt.set(false);
   }
 
+  /** Call on logout so the survey appears again on the next login. */
+  resetLoginPrompt(): void {
+    const today = this.todayKey();
+    localStorage.removeItem(`${PROMPT_KEY}_login_${today}`);
+    this.showPrompt.set(false);
+  }
+
   markCompleted(period: string): void {
     const store = this.load();
     const today = this.todayKey();

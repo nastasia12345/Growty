@@ -304,7 +304,21 @@
 }
 
 /* Shelf items */
+/* ── Place hint ────────────────────────────────────────────────────────── */
+.place-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.place-hint mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+/* ── Shelf items ─────────────────────────────────────────────────────────── */
 .shelf-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -313,7 +327,7 @@
   padding: 10px 6px 8px;
   border-radius: 14px;
   border: 1px solid transparent;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s, background 0.22s;
   cursor: default;
 }
 
@@ -321,10 +335,40 @@
   background: white;
   border-color: #d1fae5;
   box-shadow: 0 2px 8px rgba(16,185,129,0.10);
+  cursor: pointer;
 }
 .shelf-item.unlocked:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 24px rgba(16,185,129,0.18);
+}
+.shelf-item.unlocked:active {
+  transform: translateY(-2px) scale(0.96);
+}
+/* Drag-lift: browser shows a ghost image, give the original a faded look */
+.shelf-item[draggable="true"]:active,
+.shelf-item.dragging {
+  opacity: 0.55;
+  transform: translateY(-3px) scale(0.94);
+  box-shadow: 0 16px 32px rgba(16,185,129,0.22);
+}
+
+/* Placed state — glowing green ring */
+.shelf-item.placed {
+  background: #f0fdf4;
+  border-color: #10b981 !important;
+  box-shadow:
+    0 0 0 3px rgba(16,185,129,0.18),
+    0 6px 18px rgba(16,185,129,0.22) !important;
+  animation: placed-pulse 2.8s ease-in-out infinite;
+}
+@keyframes placed-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.18), 0 6px 18px rgba(16,185,129,0.22); }
+  50%       { box-shadow: 0 0 0 5px rgba(16,185,129,0.30), 0 8px 24px rgba(16,185,129,0.28); }
+}
+.shelf-item.placed:hover {
+  transform: translateY(-5px);
+  animation: none;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.25), 0 12px 28px rgba(16,185,129,0.28) !important;
 }
 
 .shelf-item.locked {
@@ -337,6 +381,32 @@
 .item-name   { font-size: 11px; font-weight: 600; color: #374151; text-align: center; line-height: 1.2; }
 .item-req    { font-size: 10px; color: #94a3b8; font-weight: 500; }
 .shelf-item.locked .item-name { color: #94a3b8; }
+
+/* Placed badge — small leaf icon in corner */
+.placed-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  background: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(16,185,129,0.4);
+  animation: badge-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.placed-badge mat-icon {
+  font-size: 11px;
+  width: 11px;
+  height: 11px;
+  color: white;
+}
+@keyframes badge-pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
 
 /* ══════════ RESPONSIVE ══════════ */
 @media (max-width: 900px) {
