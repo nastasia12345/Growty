@@ -226,6 +226,59 @@
   text-underline-offset: 2px;
 }
 
+/* Forgot password link */
+.forgot-link {
+  text-align: center;
+  margin: 2px 0 0;
+}
+
+/* Reset password heading */
+.reset-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.reset-heading h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.reset-heading p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+.back-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  margin-top: 2px;
+}
+.back-btn:hover { background: #e2e8f0; color: #0f172a; }
+.back-btn mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+/* Reset submit button — amber accent */
+.reset-submit {
+  background: #f59e0b;
+  box-shadow: 0 4px 14px rgba(245,158,11,0.3);
+}
+.reset-submit:hover:not(:disabled) {
+  background: #d97706;
+  box-shadow: 0 6px 20px rgba(245,158,11,0.4);
+}
+
 /* Spinner */
 .spin { animation: spin 0.8s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

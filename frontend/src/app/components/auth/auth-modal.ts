@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 
-type Tab = 'login' | 'register';
+type Tab = 'login' | 'register' | 'reset';
 
 @Component({
   selector: 'app-auth-modal',
@@ -45,16 +45,58 @@ export class AuthModalComponent implements OnInit {
   showRegPwd      = false;
   showRegConfirm  = false;
 
+  // Reset-password form
+  resetEmail    = '';
+  resetPassword = '';
+  resetConfirm  = '';
+  showResetPwd  = false;
+  showResetConf = false;
+
   constructor(
     private auth: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   switchTab(t: Tab) {
-    this.tab     = t;
-    this.error   = '';
-    this.success = '';
+    this.tab          = t;
+    this.error        = '';
+    this.success      = '';
+    this.resetEmail   = '';
+    this.resetPassword = '';
+    this.resetConfirm = '';
     this.cdr.markForCheck();
+  }
+
+  submitReset() {
+    this.error = '';
+    if (!this.resetEmail) {
+      this.error = 'Please enter your email.'; return;
+    }
+    if (!this.resetPassword) {
+      this.error = 'Please enter a new password.'; return;
+    }
+    if (this.resetPassword.length < 6) {
+      this.error = 'Password must be at least 6 characters.'; return;
+    }
+    if (this.resetPassword !== this.resetConfirm) {
+      this.error = 'Passwords do not match.'; return;
+    }
+    this.loading = true;
+    this.cdr.markForCheck();
+
+    this.auth.resetPassword(this.resetEmail, this.resetPassword).subscribe({
+      next: () => {
+        this.loading = false;
+        this.success = 'Password changed! You can now sign in.';
+        this.cdr.markForCheck();
+        setTimeout(() => this.switchTab('login'), 2000);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error   = err?.error?.error ?? 'Something went wrong. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   submitLogin() {

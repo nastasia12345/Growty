@@ -48,6 +48,10 @@ export class AuthService {
       .pipe(tap(res => this.saveSession(res)));
   }
 
+  resetPassword(email: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/reset-password`, { email, newPassword });
+  }
+
   logout() {
     this.wb.resetLoginPrompt();          // survey must re-appear on next login
     localStorage.removeItem(this.TOKEN_KEY);

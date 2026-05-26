@@ -12,10 +12,21 @@
   <!-- Logo -->
   <div class="auth-brand">🌱 <span>Growty</span></div>
 
-  <!-- Tabs -->
-  <div class="auth-tabs">
+  <!-- Tabs (hidden on reset view) -->
+  <div class="auth-tabs" *ngIf="tab !== 'reset'">
     <button [class.active]="tab === 'login'"    (click)="switchTab('login')">{{ 'auth.signIn' | translate }}</button>
     <button [class.active]="tab === 'register'" (click)="switchTab('register')">{{ 'auth.createAccount' | translate }}</button>
+  </div>
+
+  <!-- Reset password heading -->
+  <div class="reset-heading" *ngIf="tab === 'reset'">
+    <button class="back-btn" type="button" (click)="switchTab('login')">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h2>{{ 'auth.resetTitle' | translate }}</h2>
+      <p>{{ 'auth.resetSubtitle' | translate }}</p>
+    </div>
   </div>
 
   <!-- Success -->
@@ -62,6 +73,58 @@
       {{ 'auth.noAccount' | translate }}
       <button type="button" class="link-btn" (click)="switchTab('register')">{{ 'auth.createOne' | translate }}</button>
     </p>
+
+    <p class="forgot-link">
+      <button type="button" class="link-btn" (click)="switchTab('reset')">
+        {{ 'auth.forgotPassword' | translate }}
+      </button>
+    </p>
+  </form>
+
+  <!-- ── RESET PASSWORD FORM ── -->
+  <form *ngIf="tab === 'reset'" (ngSubmit)="submitReset()" class="auth-form" autocomplete="off">
+
+    <div class="field">
+      <label>{{ 'auth.emailLabel' | translate }}</label>
+      <div class="input-wrap">
+        <mat-icon>email</mat-icon>
+        <input type="email" [(ngModel)]="resetEmail" name="resetEmail"
+               [placeholder]="'auth.emailPlaceholder' | translate" autocomplete="email" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>{{ 'auth.newPasswordLabel' | translate }}</label>
+      <div class="input-wrap">
+        <mat-icon>lock_reset</mat-icon>
+        <input [type]="showResetPwd ? 'text' : 'password'"
+               [(ngModel)]="resetPassword" name="newPassword"
+               placeholder="••••••••" autocomplete="new-password" required/>
+        <button type="button" class="eye-btn" (click)="showResetPwd = !showResetPwd" tabindex="-1">
+          <mat-icon>{{ showResetPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>{{ 'auth.confirmNewPasswordLabel' | translate }}</label>
+      <div class="input-wrap">
+        <mat-icon>lock_outline</mat-icon>
+        <input [type]="showResetConf ? 'text' : 'password'"
+               [(ngModel)]="resetConfirm" name="confirmPassword"
+               placeholder="••••••••" autocomplete="new-password" required/>
+        <button type="button" class="eye-btn" (click)="showResetConf = !showResetConf" tabindex="-1">
+          <mat-icon>{{ showResetConf ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn reset-submit" [disabled]="loading">
+      <mat-icon *ngIf="loading" class="spin">autorenew</mat-icon>
+      <mat-icon *ngIf="!loading">lock_reset</mat-icon>
+      {{ loading ? ('auth.resetting' | translate) : ('auth.resetSubmit' | translate) }}
+    </button>
+
   </form>
 
   <!-- ── REGISTER FORM ── -->

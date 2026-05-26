@@ -26,7 +26,14 @@
     "creatingAccount": "Creating account…",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
-    "createOne": "Create one"
+    "createOne": "Create one",
+    "forgotPassword": "Forgot your password?",
+    "resetTitle": "Reset Password",
+    "resetSubtitle": "Enter your email and choose a new password.",
+    "newPasswordLabel": "New password",
+    "confirmNewPasswordLabel": "Confirm new password",
+    "resetSubmit": "Change Password",
+    "resetting": "Updating…"
   },
   "home": {
     "badge": "Growty — your task manager",

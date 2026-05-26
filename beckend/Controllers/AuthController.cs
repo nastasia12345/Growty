@@ -70,6 +70,28 @@ public class AuthController : ControllerBase
         return Ok(UserResponse(user, token));
     }
 
+    // ── POST /api/auth/reset-password ────────────────────────────────────
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.NewPassword))
+            return BadRequest(new { error = "Email and new password are required." });
+
+        if (req.NewPassword.Length < 6)
+            return BadRequest(new { error = "Password must be at least 6 characters." });
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == req.Email.ToLower().Trim());
+
+        if (user == null)
+            return NotFound(new { error = "No account found with this email address." });
+
+        user.PasswordHash = HashPassword(req.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Password updated successfully." });
+    }
+
     // ── GET /api/auth/me ──────────────────────────────────────────────────
     [HttpGet("me")]
     public async Task<IActionResult> Me()
@@ -178,3 +200,4 @@ public class AuthController : ControllerBase
 
 public record RegisterRequest(string Email, string DisplayName, string Password);
 public record LoginRequest(string Email, string Password);
+public record ResetPasswordRequest(string Email, string NewPassword);
